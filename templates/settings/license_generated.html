@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}License Generated{% endblock %}
+{% block page_title %}License Key Generated{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Product Key Generated</span>
+        <a href="{% url 'license_info' %}" class="btn btn-sm">Back to License</a>
+    </div>
+    <div class="card-body">
+        <div class="alert alert-success" style="margin-bottom:16px;">
+            Product key generated successfully for <strong>{{ school_name }}</strong>.
+        </div>
+
+        <div style="padding:16px; background:#f0f7ff; border:2px solid var(--primary); border-radius:var(--radius); margin-bottom:20px;">
+            <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Product Key</div>
+            <div style="font-family:monospace; font-size:15px; font-weight:700; word-break:break-all; margin-top:8px; padding:12px; background:#fff; border-radius:4px; border:1px solid var(--border);">
+                {{ product_key }}
+            </div>
+            <button type="button" onclick="navigator.clipboard.writeText('{{ product_key }}'); this.textContent='Copied!';"
+                    class="btn btn-sm btn-outline-primary" style="margin-top:8px;">
+                Copy to Clipboard
+            </button>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:16px;">
+            <div>
+                <div class="text-muted" style="font-size:12px;">SCHOOL</div>
+                <div style="font-weight:600;">{{ school_name }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px;">EXPIRES</div>
+                <div style="font-weight:600;">{{ expires|date:"M d, Y" }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px;">MAX STUDENTS</div>
+                <div style="font-weight:600;">{{ max_students }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px;">MAX DEVICES</div>
+                <div style="font-weight:600;">{{ max_devices }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top:20px; padding:12px; background:#fdf3e3; border-radius:var(--radius); border:1px solid #f0d7a9;">
+            <strong>Next step:</strong> Go to <a href="{% url 'activate' %}">Activation</a> and enter this key.
+            Or use it offline via the <a href="{% url 'offline_license_check' %}">Offline License Check</a> page.
+        </div>
+    </div>
+</div>
+
+{% endblock %}

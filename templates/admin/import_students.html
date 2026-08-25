@@ -1,0 +1,133 @@
+{% extends "admin/base_site.html" %}
+{% block content %}
+<div style="max-width:900px; margin:20px auto; background:#fff; padding:30px; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.1);">
+<h2 style="margin-top:0;">Import Students from .xlsx</h2>
+
+{% if messages %}
+    {% for msg in messages %}
+        <div style="padding:10px 15px; border-radius:4px; margin:10px 0;
+            {% if msg.tags == 'success' %}background:#d4edda; color:#155724; border:1px solid #c3e6cb;
+            {% else %}background:#f8d7da; color:#721c24; border:1px solid #f5c6cb;{% endif %}">
+            {{ msg }}
+        </div>
+    {% endfor %}
+{% endif %}
+
+{% if preview %}
+<div style="background:#e8f4fd; padding:12px 15px; border-radius:4px; margin-bottom:20px; font-size:13px;">
+    <strong>Preview — {{ file_name }}</strong> ({{ school }} / {{ term }})<br>
+    <span style="color:#155724;"><strong>{{ preview.new_count }}</strong> new students</span> &middot;
+    <span style="color:#0b5ed7;"><strong>{{ preview.existing_count }}</strong> existing students</span> &middot;
+    {% if preview.skipped_count %}
+        <span style="color:#721c24;"><strong>{{ preview.skipped_count }}</strong> rows will be skipped</span>
+    {% else %}
+        <span>no rows skipped</span>
+    {% endif %}
+    <br><em>Nothing has been saved yet. Review the rows below, then confirm or cancel.</em>
+</div>
+
+<div style="max-height:400px; overflow:auto; border:1px solid #dee2e6; border-radius:4px; margin-bottom:20px;">
+    <table style="width:100%; border-collapse:collapse; font-size:12px;">
+        <thead style="position:sticky; top:0; background:#f8f9fa;">
+            <tr>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">Row</th>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">Name</th>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">Register</th>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">Sex</th>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">DOB</th>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">Class</th>
+                <th style="padding:8px; border-bottom:2px solid #dee2e6; text-align:left;">Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for rec in preview.records %}
+                <tr style="{% if rec.status == 'skipped' %}background:#f8d7da;{% endif %}">
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">{{ rec.row }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">{{ rec.first_name }} {{ rec.other_names }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">{{ rec.register }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">{{ rec.sex }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">{{ rec.dob }}</td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">
+                        {{ rec.class_display }}{% if rec.note %}<br><small style="color:#856404;">{{ rec.note }}</small>{% endif %}
+                    </td>
+                    <td style="padding:6px 8px; border-bottom:1px solid #eee;">
+                        {% if rec.status == 'new' %}<span style="color:#155724; font-weight:600;">New</span>
+                        {% elif rec.status == 'existing' %}<span style="color:#0b5ed7; font-weight:600;">Existing</span>
+                        {% else %}<span style="color:#721c24; font-weight:600;">Skipped</span>{% endif %}
+                        {% if rec.error %}<br><small style="color:#721c24;">{{ rec.error }}</small>{% endif %}
+                    </td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<form method="post" style="display:inline-block; margin-right:10px;">
+    {% csrf_token %}
+    <input type="hidden" name="confirm" value="1">
+    <button type="submit"
+            style="background:#28a745; color:#fff; padding:10px 25px; border:none; border-radius:4px; font-size:15px; cursor:pointer;">
+        Confirm Import
+    </button>
+</form>
+<a href="{% url 'import_students' %}?cancel=1"
+   style="display:inline-block; background:#6c757d; color:#fff; padding:10px 25px; border-radius:4px; font-size:15px; text-decoration:none;">
+    Cancel
+</a>
+
+<hr style="margin:25px 0;">
+
+<h3 style="font-size:16px;">Upload a different file</h3>
+{% endif %}
+
+<div style="background:#f8f9fa; padding:12px 15px; border-radius:4px; margin-bottom:20px; font-size:13px;">
+    <strong>Current data:</strong>
+    {{ stats.students }} students &middot; {{ stats.enrollments }} enrollments
+</div>
+
+<form method="post" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <div style="margin-bottom:15px;">
+        <label style="font-weight:600; display:block; margin-bottom:5px;">School</label>
+        <select name="school" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:4px; font-size:15px; min-height:44px;">
+            {% for val, label in form.fields.school.choices %}
+                <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div style="margin-bottom:15px;">
+        <label style="font-weight:600; display:block; margin-bottom:5px;">Academic Term</label>
+        <select name="term" style="width:100%; padding:12px; border:1px solid #ccc; border-radius:4px; font-size:15px; min-height:44px;">
+            {% for val, label in form.fields.term.choices %}
+                <option value="{{ val }}">{{ label }}</option>
+            {% endfor %}
+        </select>
+        <small style="color:#666;">Leave as Auto-detect if unsure.</small>
+    </div>
+
+    <div style="margin-bottom:20px;">
+        <label style="font-weight:600; display:block; margin-bottom:5px;">Government .xlsx File</label>
+        <input type="file" name="file" accept=".xlsx" required
+               style="width:100%; padding:12px; border:1px solid #ccc; border-radius:4px; font-size:15px; background:#fff; min-height:44px;">
+    </div>
+
+    <button type="submit"
+            style="background:#417690; color:#fff; padding:10px 25px; border:none; border-radius:4px; font-size:15px; cursor:pointer;">
+        Preview Import
+    </button>
+</form>
+
+<div style="margin-top:20px; padding:12px; background:#fff3cd; border:1px solid #ffeeba; border-radius:4px; font-size:12px; color:#856404;">
+    <strong>Expected format:</strong> The .xlsx should have columns for
+    <strong>Name</strong>, <strong>Register</strong> (unique ID), <strong>Sex</strong> (M/F),
+    <strong>Date of birth</strong>, and optionally <strong>Place of birth</strong>, <strong>Class</strong>.
+    Column matching is automatic. The file is previewed for validation before anything is saved.
+</div>
+
+<div style="margin-top:15px; text-align:center;">
+    <a href="{% url 'admin:index' %}" style="color:#417690;">&larr; Back to Admin</a>
+</div>
+</div>
+{% endblock %}

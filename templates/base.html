@@ -1,0 +1,898 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>{% block title %}School Management System{% endblock %}</title>
+    <style>
+        :root {
+            --primary: #1f4e78;
+            --primary-dark: #163a5c;
+            --primary-light: #2f6a9e;
+            --accent: #e8f0f7;
+            --sidebar-bg: #1a2332;
+            --sidebar-text: #aeb9c7;
+            --sidebar-hover: #232f42;
+            --body-bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --border: #e2e8f0;
+            --text: #2d3a47;
+            --text-muted: #6b7785;
+            --success: #2f9e44;
+            --danger: #d64545;
+            --warning: #e8900c;
+            --info: #1b7fb5;
+            --sidebar-width: 240px;
+            --sidebar-collapsed: 64px;
+            --topbar-height: 60px;
+            --radius: 8px;
+            --shadow-sm: 0 1px 3px rgba(26, 35, 50, .08);
+            --shadow-md: 0 4px 12px rgba(26, 35, 50, .12);
+        }
+
+        * { box-sizing: border-box; }
+
+        html, body { margin: 0; padding: 0; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
+            color: var(--text);
+            background: var(--body-bg);
+            min-height: 100vh;
+        }
+
+        a { color: var(--primary); }
+        a:hover { color: var(--primary-dark); }
+
+        /* ------------------------------------------------------------------
+           State toggles (hidden checkboxes driving pure-CSS sidebar behaviour)
+           ------------------------------------------------------------------ */
+        .state-toggle {
+            position: absolute;
+            left: -9999px;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        /* ==================================================================
+           Top navbar
+           ================================================================== */
+        .topbar {
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: var(--topbar-height);
+            background: var(--card-bg);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 0 16px;
+            z-index: 900;
+            transition: left .2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .icon-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 38px;
+            height: 38px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            color: var(--primary);
+            font-size: 16px;
+            line-height: 1;
+            cursor: pointer;
+            flex-shrink: 0;
+            user-select: none;
+            transition: background .15s ease, color .15s ease;
+        }
+        .icon-btn:hover {
+            background: var(--accent);
+            color: var(--primary-dark);
+        }
+        .hamburger { display: none; }
+
+        .topbar-title {
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            margin-right: auto;
+        }
+        .topbar-title h1 {
+            margin: 0;
+            font-size: 17px;
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .topbar-school {
+            font-size: 12px;
+            color: var(--text-muted);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .term-badge {
+            background: var(--accent);
+            color: var(--primary);
+            border: 1px solid #c9daea;
+            border-radius: 999px;
+            padding: 4px 12px;
+            font-size: 12px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        .topbar-user {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-shrink: 0;
+        }
+        .user-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--primary);
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        .user-meta {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.2;
+        }
+        .user-name {
+            font-weight: 600;
+            color: var(--text);
+            white-space: nowrap;
+        }
+        .role-badge {
+            display: inline-block;
+            margin-top: 2px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .04em;
+            text-transform: uppercase;
+            border-radius: 999px;
+            padding: 2px 8px;
+            white-space: nowrap;
+            align-self: flex-start;
+        }
+        .role-superuser, .role-admin   { background: var(--primary); color: #fff; }
+        .role-bursar                   { background: #e6f4ea; color: var(--success); }
+        .role-class_master             { background: #eef0f9; color: #5b6bd6; }
+        .role-teacher                  { background: #e8f1f7; color: var(--info); }
+        .role-default                  { background: #eef1f4; color: var(--text-muted); }
+
+        .logout-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            color: var(--text-muted);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
+        }
+        .logout-btn:hover {
+            background: #fdecec;
+            border-color: #f0c4c4;
+            color: var(--danger);
+        }
+
+        /* ==================================================================
+           Sidebar
+           ================================================================== */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            background: var(--sidebar-bg);
+            color: var(--sidebar-text);
+            display: flex;
+            flex-direction: column;
+            z-index: 1000;
+            transition: width .2s ease, transform .2s ease;
+            overflow: hidden;
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            height: var(--topbar-height);
+            padding: 0 16px;
+            background: #141b27;
+            border-bottom: 1px solid rgba(255, 255, 255, .06);
+            flex-shrink: 0;
+            overflow: hidden;
+        }
+        .brand-mark {
+            width: 30px;
+            height: 30px;
+            flex-shrink: 0;
+            border-radius: 6px;
+            background: linear-gradient(135deg, var(--primary-light), var(--primary));
+            color: #fff;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 800;
+        }
+        .brand-text {
+            font-size: 15px;
+            font-weight: 700;
+            color: #fff;
+            white-space: nowrap;
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 12px 0;
+        }
+        .sidebar-nav ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+        }
+        .nav-section {
+            padding: 10px 20px 6px;
+            font-size: 10px;
+            font-weight: 700;
+            letter-spacing: .12em;
+            text-transform: uppercase;
+            color: #5c6a7e;
+            white-space: nowrap;
+        }
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 20px;
+            color: var(--sidebar-text);
+            text-decoration: none;
+            font-size: 14px;
+            border-left: 3px solid transparent;
+            white-space: nowrap;
+            transition: background .15s ease, color .15s ease, border-color .15s ease;
+        }
+        .nav-link:hover {
+            background: var(--sidebar-hover);
+            color: #fff;
+        }
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(31, 78, 120, .55), rgba(31, 78, 120, .18));
+            color: #fff;
+            border-left-color: #6db3f2;
+            font-weight: 600;
+        }
+        .nav-icon {
+            width: 20px;
+            text-align: center;
+            font-size: 15px;
+            flex-shrink: 0;
+        }
+        .nav-label { overflow: hidden; text-overflow: ellipsis; }
+
+        .sidebar-footer {
+            padding: 12px 20px;
+            border-top: 1px solid rgba(255, 255, 255, .06);
+            font-size: 11px;
+            color: #5c6a7e;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .sidebar-footer .dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #e8900c;
+            flex-shrink: 0;
+        }
+
+        /* Overlay behind the sidebar when open on mobile */
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(10, 16, 26, .5);
+            z-index: 990;
+            display: none;
+            cursor: pointer;
+        }
+
+        /* ==================================================================
+           Content wrapper + footer
+           ================================================================== */
+        .content-wrapper {
+            margin-left: var(--sidebar-width);
+            margin-top: var(--topbar-height);
+            padding: 24px;
+            min-height: calc(100vh - var(--topbar-height));
+            overflow-x: hidden;
+            transition: margin-left .2s ease;
+        }
+
+        .main-footer {
+            margin-left: var(--sidebar-width);
+            padding: 14px 24px;
+            background: var(--card-bg);
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 12.5px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            transition: margin-left .2s ease;
+        }
+        .license-ok   { color: var(--success); font-weight: 600; }
+        .license-warn { color: var(--warning); font-weight: 600; }
+        .license-bad  { color: var(--danger);  font-weight: 600; }
+
+        /* ==================================================================
+           Desktop collapse to icon-only
+           ================================================================== */
+        @media (min-width: 769px) {
+            #sidebar-collapse:checked ~ .sidebar { width: var(--sidebar-collapsed); }
+            #sidebar-collapse:checked ~ .topbar { left: var(--sidebar-collapsed); }
+            #sidebar-collapse:checked ~ .content-wrapper,
+            #sidebar-collapse:checked ~ .main-footer { margin-left: var(--sidebar-collapsed); }
+
+            #sidebar-collapse:checked ~ .sidebar .brand-text,
+            #sidebar-collapse:checked ~ .sidebar .nav-label,
+            #sidebar-collapse:checked ~ .sidebar .nav-section,
+            #sidebar-collapse:checked ~ .sidebar .sidebar-footer > *:not(.dot) { display: none; }
+
+            #sidebar-collapse:checked ~ .sidebar .sidebar-brand { padding: 0; justify-content: center; }
+            #sidebar-collapse:checked ~ .sidebar .nav-link { padding: 10px 0; justify-content: center; gap: 0; }
+            #sidebar-collapse:checked ~ .sidebar .nav-section { height: 0; padding: 0; }
+            #sidebar-collapse:checked ~ .sidebar .sidebar-footer { padding: 12px 0; justify-content: center; }
+        }
+
+        /* ==================================================================
+           Mobile: off-canvas sidebar
+           ================================================================== */
+        @media (max-width: 768px) {
+            .hamburger { display: inline-flex; }
+            .collapse-btn { display: none; }
+
+            .topbar {
+                left: 0 !important;
+                padding: 0 10px;
+            }
+            .topbar-school { display: none; }
+
+            .sidebar {
+                width: var(--sidebar-width) !important;
+                transform: translateX(-100%);
+                box-shadow: var(--shadow-md);
+            }
+            #nav-toggle:checked ~ .sidebar { transform: translateX(0); }
+            #nav-toggle:checked ~ .sidebar-overlay { display: block; }
+
+            .content-wrapper,
+            .main-footer { margin-left: 0 !important; }
+            .content-wrapper { padding: 16px; margin-top: var(--topbar-height); }
+
+            .user-name { display: none; }
+        }
+
+        /* ==================================================================
+           Shared components (buttons, cards, tables, alerts, forms, badges)
+           ================================================================== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            background: var(--card-bg);
+            color: var(--text);
+            font-size: 13.5px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: background .15s ease, border-color .15s ease, color .15s ease, box-shadow .15s ease;
+        }
+        .btn:hover { background: #f7fafc; }
+        .btn-primary {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+        .btn-primary:hover { background: var(--primary-dark); border-color: var(--primary-dark); color: #fff; }
+        .btn-outline-primary {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: transparent;
+        }
+        .btn-outline-primary:hover { background: var(--accent); color: var(--primary-dark); }
+        .btn-danger {
+            background: var(--danger);
+            border-color: var(--danger);
+            color: #fff;
+        }
+        .btn-danger:hover { background: #b83a3a; border-color: #b83a3a; color: #fff; }
+        .btn-sm { padding: 5px 10px; font-size: 12.5px; }
+        .btn-block { width: 100%; }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 20px;
+        }
+        .card-header {
+            padding: 14px 20px;
+            border-bottom: 1px solid var(--border);
+            font-weight: 600;
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .card-body { padding: 20px; }
+        .card-footer {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            background: #fbfcfe;
+            border-radius: 0 0 var(--radius) var(--radius);
+        }
+
+        .table-wrap { overflow-x: auto; }
+        table.table {
+            width: 100%;
+            border-collapse: collapse;
+            background: var(--card-bg);
+            font-size: 13.5px;
+        }
+        table.table th,
+        table.table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid var(--border);
+            text-align: left;
+            vertical-align: middle;
+        }
+        table.table thead th {
+            background: var(--accent);
+            color: var(--primary);
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            white-space: nowrap;
+        }
+        table.table tbody tr:hover { background: #f8fafc; }
+
+        .alert {
+            padding: 12px 16px;
+            border-radius: var(--radius);
+            border: 1px solid var(--border);
+            margin-bottom: 16px;
+            font-size: 13.5px;
+        }
+        .alert-success { background: #e6f4ea; border-color: #b7dfc4; color: #1f6e34; }
+        .alert-error, .alert-danger { background: #fdecec; border-color: #f0c4c4; color: #a03232; }
+        .alert-warning { background: #fdf3e3; border-color: #f0d7a9; color: #8a5a0a; }
+        .alert-info    { background: var(--accent); border-color: #c9daea; color: var(--primary); }
+
+        .badge {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 999px;
+            font-size: 11.5px;
+            font-weight: 600;
+        }
+        .badge-success { background: #e6f4ea; color: var(--success); }
+        .badge-warning { background: #fdf3e3; color: var(--warning); }
+        .badge-danger  { background: #fdecec; color: var(--danger); }
+        .badge-info    { background: var(--accent); color: var(--info); }
+
+        .form-group { margin-bottom: 16px; }
+        .form-group label {
+            display: block;
+            margin-bottom: 6px;
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--text);
+        }
+        input[type="text"], input[type="number"], input[type="date"], input[type="password"],
+        input[type="email"], select, textarea {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            font-size: 13.5px;
+            font-family: inherit;
+            color: var(--text);
+            background: var(--card-bg);
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(31, 78, 120, .15);
+        }
+        .form-hint { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+        .text-muted { color: var(--text-muted); }
+        .text-right { text-align: right; }
+        .mt-0 { margin-top: 0; }
+        .mb-0 { margin-bottom: 0; }
+        .mb-1 { margin-bottom: 6px; }
+        .mb-2 { margin-bottom: 12px; }
+        .mb-3 { margin-bottom: 18px; }
+        .mt-3 { margin-top: 18px; }
+        .float-end { float: right; }
+        .d-flex { display: flex; }
+        .align-center { align-items: center; }
+        .justify-between { justify-content: space-between; }
+        .gap-2 { gap: 8px; }
+
+        @media (max-width: 768px) {
+            .user-meta { display: none; }
+            .main-footer { justify-content: center; text-align: center; }
+        }
+
+        :focus-visible {
+            outline: 2px solid var(--primary-light);
+            outline-offset: 2px;
+        }
+    </style>
+</head>
+<body>
+
+    <input type="checkbox" id="nav-toggle" class="state-toggle" aria-hidden="true" tabindex="-1">
+    <input type="checkbox" id="sidebar-collapse" class="state-toggle" aria-hidden="true" tabindex="-1">
+
+    <!-- ============================= Top navbar ============================= -->
+    <header class="topbar">
+        <label for="nav-toggle" class="icon-btn hamburger" title="Menu">&#9776;</label>
+        <label for="sidebar-collapse" class="icon-btn collapse-btn" title="Collapse sidebar">&#9776;</label>
+
+        <div class="topbar-title">
+            <h1>{% block page_title %}{% endblock %}</h1>
+            <span class="topbar-school">{{ school.name_en|default:"" }}</span>
+        </div>
+
+        {% if current_term %}
+            <span class="term-badge">Term: {{ current_term }}</span>
+        {% endif %}
+
+        <div class="topbar-user">
+            <span class="user-avatar">{{ user.get_full_name|default:user.username|slice:":1"|upper }}</span>
+            <div class="user-meta">
+                <span class="user-name">{{ user.get_full_name|default:user.username }}</span>
+                <span class="role-badge role-{{ user_role|default:"default" }}">
+                    {% if user_role == "superuser" %}Superuser
+                    {% elif user_role == "admin" %}Administrator
+                    {% elif user_role == "bursar" %}Bursar
+                    {% elif user_role == "class_master" %}Class Master
+                    {% elif user_role == "teacher" %}Teacher
+                    {% else %}{{ user_role|default:"User" }}
+                    {% endif %}
+                </span>
+            </div>
+            <a href="{% url 'logout' %}" class="logout-btn" title="Sign out">&#8617; Logout</a>
+        </div>
+    </header>
+
+    <!-- =============================== Sidebar ============================== -->
+    <aside class="sidebar" aria-label="Main navigation">
+        <div class="sidebar-brand">
+            <span class="brand-mark">&#9670;</span>
+            <span class="brand-text">School Manager</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+
+                {% if is_admin %}
+                    <li class="nav-section">Administration</li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
+                           href="{% url 'dashboard' %}" title="Dashboard">
+                            <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'student_list' %} active{% endif %}"
+                           href="{% url 'student_list' %}" title="Students">
+                            <span class="nav-icon">&#9636;</span><span class="nav-label">Students</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'teacher_list' %} active{% endif %}"
+                           href="{% url 'teacher_list' %}" title="Teachers">
+                            <span class="nav-icon">&#9670;</span><span class="nav-label">Teachers</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'mark_entry_select' %} active{% endif %}"
+                           href="{% url 'mark_entry_select' %}" title="Mark Entry">
+                            <span class="nav-icon">&#9998;</span><span class="nav-label">Mark Entry</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'compute_results' %} active{% endif %}"
+                           href="{% url 'compute_results' %}" title="Compute Results">
+                            <span class="nav-icon">&#10010;</span><span class="nav-label">Compute Results</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'reports_hub' %} active{% endif %}"
+                           href="{% url 'reports_hub' %}" title="Reports">
+                            <span class="nav-icon">&#10047;</span><span class="nav-label">Reports</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'attendance_entry' %} active{% endif %}"
+                           href="{% url 'attendance_entry' %}" title="Attendance">
+                            <span class="nav-icon">&#9745;</span><span class="nav-label">Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'discipline_summary' %} active{% endif %}"
+                           href="{% url 'discipline_summary' %}" title="Discipline">
+                            <span class="nav-icon">&#9888;</span><span class="nav-label">Discipline</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'finance_dashboard' %} active{% endif %}"
+                           href="{% url 'finance_dashboard' %}" title="Finance">
+                            <span class="nav-icon">&#8355;</span><span class="nav-label">Finance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'import_students' %} active{% endif %}"
+                           href="{% url 'import_students' %}" title="Import Students">
+                            <span class="nav-icon">&#8678;</span><span class="nav-label">Import Students</span>
+                        </a>
+                    </li>
+
+                    <li class="nav-section">Configuration</li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'settings' %} active{% endif %}"
+                           href="{% url 'settings' %}" title="Settings">
+                            <span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'school_profile' %} active{% endif %}"
+                           href="{% url 'school_profile' %}" title="School Profile">
+                            <span class="nav-icon">&#127970;</span><span class="nav-label">School Profile</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'terms_manage' %} active{% endif %}"
+                           href="{% url 'terms_manage' %}" title="Academic Terms">
+                            <span class="nav-icon">&#128197;</span><span class="nav-label">Academic Terms</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'classes_manage' %} active{% endif %}"
+                           href="{% url 'classes_manage' %}" title="Classes &amp; Streams">
+                            <span class="nav-icon">&#127891;</span><span class="nav-label">Classes &amp; Streams</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'subjects_manage' %} active{% endif %}"
+                           href="{% url 'subjects_manage' %}" title="Subjects">
+                            <span class="nav-icon">&#128221;</span><span class="nav-label">Subjects</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'class_subjects_all' %} active{% endif %}"
+                           href="{% url 'class_subjects_all' %}" title="Class Subjects &amp; Coefficients">
+                            <span class="nav-icon">&#10133;</span><span class="nav-label">Class Subjects &amp; Coefficients</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'competencies_manage' %} active{% endif %}"
+                           href="{% url 'competencies_manage' %}" title="Competencies">
+                            <span class="nav-icon">&#10004;</span><span class="nav-label">Competencies</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'users_manage' %} active{% endif %}"
+                           href="{% url 'users_manage' %}" title="Users &amp; Teacher Links">
+                            <span class="nav-icon">&#128101;</span><span class="nav-label">Users &amp; Teacher Links</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'pta_config' %} active{% endif %}"
+                           href="{% url 'pta_config' %}" title="PTA Configuration">
+                            <span class="nav-icon">&#8355;</span><span class="nav-label">PTA Configuration</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'conduct_config' %} active{% endif %}"
+                           href="{% url 'conduct_config' %}" title="Conduct Thresholds">
+                            <span class="nav-icon">&#9888;</span><span class="nav-label">Conduct Thresholds</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'backup_management' %} active{% endif %}"
+                           href="{% url 'backup_management' %}" title="Backup &amp; Restore">
+                            <span class="nav-icon">&#128190;</span><span class="nav-label">Backup &amp; Restore</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'license_info' %} active{% endif %}"
+                           href="{% url 'license_info' %}" title="License">
+                            <span class="nav-icon">&#128196;</span><span class="nav-label">License</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'sms_configuration' %} active{% endif %}"
+                           href="{% url 'sms_configuration' %}" title="SMS">
+                            <span class="nav-icon">&#9993;</span><span class="nav-label">SMS</span>
+                        </a>
+                    </li>
+
+                {% elif is_bursar %}
+                    <li class="nav-section">Finance</li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
+                           href="{% url 'dashboard' %}" title="Dashboard">
+                            <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'finance_dashboard' %} active{% endif %}"
+                           href="{% url 'finance_dashboard' %}" title="Finance">
+                            <span class="nav-icon">&#8355;</span><span class="nav-label">Finance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'student_list' %} active{% endif %}"
+                           href="{% url 'student_list' %}" title="Students">
+                            <span class="nav-icon">&#9636;</span><span class="nav-label">Students</span>
+                        </a>
+                    </li>
+
+                {% elif is_class_master %}
+                    <li class="nav-section">Class Management</li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
+                           href="{% url 'dashboard' %}" title="Dashboard">
+                            <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
+                           href="{% url 'dashboard' %}#my-class" title="My Class">
+                            <span class="nav-icon">&#9635;</span><span class="nav-label">My Class</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'mark_entry_select' %} active{% endif %}"
+                           href="{% url 'mark_entry_select' %}" title="Mark Entry">
+                            <span class="nav-icon">&#9998;</span><span class="nav-label">Mark Entry</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'attendance_entry' %} active{% endif %}"
+                           href="{% url 'attendance_entry' %}" title="Attendance">
+                            <span class="nav-icon">&#9745;</span><span class="nav-label">Attendance</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'discipline_summary' %} active{% endif %}"
+                           href="{% url 'discipline_summary' %}" title="Discipline">
+                            <span class="nav-icon">&#9888;</span><span class="nav-label">Discipline</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'reports_hub' %} active{% endif %}"
+                           href="{% url 'reports_hub' %}" title="Reports">
+                            <span class="nav-icon">&#10047;</span><span class="nav-label">Reports</span>
+                        </a>
+                    </li>
+
+                {% elif is_teacher %}
+                    <li class="nav-section">Teaching</li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
+                           href="{% url 'dashboard' %}" title="Dashboard">
+                            <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'mark_entry_select' %} active{% endif %}"
+                           href="{% url 'mark_entry_select' %}" title="Mark Entry">
+                            <span class="nav-icon">&#9998;</span><span class="nav-label">Mark Entry</span>
+                        </a>
+                    </li>
+
+                {% else %}
+                    <li class="nav-section">Menu</li>
+                    <li>
+                        <a class="nav-link" href="{% url 'dashboard' %}" title="Dashboard">
+                            <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
+                        </a>
+                    </li>
+                {% endif %}
+
+            </ul>
+        </nav>
+
+        <div class="sidebar-footer">
+            <span class="dot"></span>
+            <span class="brand-text">v{{ APP_VERSION }}</span>
+        </div>
+    </aside>
+
+    <label for="nav-toggle" class="sidebar-overlay" aria-hidden="true"></label>
+
+    <!-- ============================== Content =============================== -->
+    <main class="content-wrapper">
+        {% if messages %}
+            {% for msg in messages %}
+                <div class="alert alert-{% if msg.tags == 'error' %}danger{% else %}{{ msg.tags }}{% endif %}">{{ msg }}</div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- =============================== Footer =============================== -->
+    <footer class="main-footer">
+        <span>&#169; {{ school.name_en|default:"School Management System" }} &mdash; {{ current_term|default:"" }}</span>
+        <span>
+            {% if license_info %}
+                {% if license_info.is_valid %}
+                    <span class="license-ok">Licensed</span>
+                {% else %}
+                    <span class="license-bad">License Expired</span>
+                {% endif %}
+                {% if license_info.school_name %} &mdash; {{ license_info.school_name }}{% endif %}
+                {% if license_info.expires_at %} &mdash; Expires {{ license_info.expires_at|date:"M j, Y" }}{% endif %}
+                {% if license_info.days_remaining is not None %}
+                    &mdash; {{ license_info.days_remaining }} day{{ license_info.days_remaining|pluralize }} left
+                {% endif %}
+            {% else %}
+                <span class="license-warn">Unlicensed</span>
+            {% endif %}
+            &middot; v{{ APP_VERSION }}
+        </span>
+    </footer>
+
+    <script src="{% static 'vendor/alpinejs/alpine.min.js' %}" defer></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>

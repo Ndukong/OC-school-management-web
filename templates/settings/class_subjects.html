@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}Class Subjects — {{ school_class }}{% endblock %}
+{% block page_title %}Class Subjects — {{ school_class }}{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Subjects &amp; Coefficients for {{ school_class }}</span>
+        <div>
+            <a href="{% url 'class_subjects_all' %}" class="btn btn-sm">All Classes</a>
+            <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if items %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Code</th>
+                        <th>Coefficient</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in items %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td style="font-weight:600;">{{ item.subject.name }}</td>
+                        <td><span class="badge badge-info">{{ item.subject.code }}</span></td>
+                        <td>
+                            <form method="post" style="display:flex; gap:6px; align-items:center;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="update">
+                                <input type="hidden" name="cs_id" value="{{ item.pk }}">
+                                <input type="number" name="coefficient" min="1" max="9" value="{{ item.coefficient }}" style="width:70px;">
+                                <button type="submit" class="btn btn-sm btn-outline-primary">Save</button>
+                            </form>
+                        </td>
+                        <td>
+                            <form method="post" style="display:inline;"
+                                  onsubmit="return confirm('Remove {{ item.subject.name }} from {{ school_class }}?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="cs_id" value="{{ item.pk }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No subjects assigned yet. Add subjects below.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Add Subject to {{ school_class }}</span></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Subject</label>
+                    <select name="subject" required>
+                        {% for s in form.fields.subject.queryset %}
+                            <option value="{{ s.pk }}">{{ s.name }} ({{ s.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Coefficient</label>
+                    <input type="number" name="coefficient" min="1" max="9" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Sort order</label>
+                    <input type="number" name="sort_order" value="0">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Subject</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

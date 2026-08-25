@@ -1,0 +1,175 @@
+{% extends "base.html" %}
+{% block title %}Users &amp; Teacher Links{% endblock %}
+{% block page_title %}Users &amp; Teacher Links{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>School Accounts</span>
+        <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+    </div>
+    <div class="card-body">
+        {% if profiles %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Full Name</th>
+                        <th>Role</th>
+                        <th>Teacher Link</th>
+                        <th>Active</th>
+                        <th>Edit</th>
+                        <th>Reset Password</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for profile in profiles %}
+                    <tr>
+                        <td style="font-weight:600;">{{ profile.user.username }}</td>
+                        <td>{{ profile.user.get_full_name|default:"—" }}</td>
+                        <td><span class="badge role-{{ profile.role }}">{{ profile.get_role_display }}</span></td>
+                        <td>
+                            {% if profile.teacher %}
+                                <a href="{% url 'teacher_detail' profile.teacher.pk %}">{{ profile.teacher }}</a>
+                            {% else %}
+                                <span class="text-muted">—</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if profile.user.is_active %}
+                                <span class="badge badge-success">Active</span>
+                            {% else %}
+                                <span class="badge badge-danger">Disabled</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <details>
+                                <summary style="cursor:pointer; color:var(--primary);">Edit</summary>
+                                <form method="post" style="margin-top:10px; min-width:260px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="update">
+                                    <input type="hidden" name="profile_id" value="{{ profile.pk }}">
+                                    <div class="form-group">
+                                        <label>Role</label>
+                                        <select name="role">
+                                            {% for value, label in profile.ROLE_CHOICES %}
+                                                <option value="{{ value }}" {% if profile.role == value %}selected{% endif %}>{{ label }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Teacher link</label>
+                                        <select name="teacher">
+                                            <option value="">— No teacher link —</option>
+                                            {% for t in teachers %}
+                                                <option value="{{ t.pk }}" {% if profile.teacher_id == t.pk %}selected{% endif %}>{{ t }} ({{ t.teacher_code|default:"no code" }})</option>
+                                            {% endfor %}
+                                        </select>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Phone</label>
+                                        <input type="text" name="phone" value="{{ profile.phone }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>First name</label>
+                                        <input type="text" name="first_name" value="{{ profile.user.first_name }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Last name</label>
+                                        <input type="text" name="last_name" value="{{ profile.user.last_name }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Email</label>
+                                        <input type="email" name="email" value="{{ profile.user.email }}">
+                                    </div>
+                                    <div class="form-group">
+                                        <label><input type="checkbox" name="is_active" {% if profile.user.is_active %}checked{% endif %}> Active account</label>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-primary">Save</button>
+                                </form>
+                            </details>
+                        </td>
+                        <td>
+                            <details>
+                                <summary style="cursor:pointer; color:var(--primary);">Reset</summary>
+                                <form method="post" style="margin-top:10px; min-width:220px;">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="action" value="reset_password">
+                                    <input type="hidden" name="profile_id" value="{{ profile.pk }}">
+                                    <div class="form-group">
+                                        <label>New password (min 6 chars)</label>
+                                        <input type="password" name="password" minlength="6" required>
+                                    </div>
+                                    <button type="submit" class="btn btn-sm btn-outline-primary">Reset</button>
+                                </form>
+                            </details>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No accounts yet. Create the first user below.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Create User</span></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Username *</label>
+                    {{ create_form.username }}
+                    {% if create_form.username.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ create_form.username.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>First name</label>
+                    {{ create_form.first_name }}
+                </div>
+                <div class="form-group">
+                    <label>Last name</label>
+                    {{ create_form.last_name }}
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    {{ create_form.email }}
+                </div>
+                <div class="form-group">
+                    <label>Password *</label>
+                    {{ create_form.password }}
+                </div>
+                <div class="form-group">
+                    <label>Confirm password *</label>
+                    {{ create_form.password_confirm }}
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select name="role">
+                        {% for value, label in create_form.fields.role.choices %}
+                            <option value="{{ value }}">{{ label }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Teacher link</label>
+                    <select name="teacher">
+                        <option value="">— No teacher link —</option>
+                        {% for t in create_form.fields.teacher.queryset %}
+                            <option value="{{ t.pk }}">{{ t }} ({{ t.teacher_code|default:"no code" }})</option>
+                        {% endfor %}
+                    </select>
+                    <div class="form-hint"><a href="{% url 'teacher_list' %}">Add teachers</a> first so they can be linked.</div>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Create User</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Teacher Assignments{% endblock %}
+{% block page_title %}Teacher Assignments{% endblock %}
+{% block content %}
+<style>
+.stu-count { color:var(--text-muted); font-size:13px; }
+.stu-range { font-weight:600; color:var(--primary); }
+.pagination-x { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:16px; }
+.page-nums { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.page-nums a, .page-nums span {
+    display:inline-block; min-width:32px; padding:4px 10px; text-align:center;
+    border:1px solid var(--border); border-radius:var(--radius); font-size:13px; text-decoration:none;
+}
+.page-nums a:hover { background:var(--accent); }
+.page-nums .cur { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:700; }
+.page-nums .ellip { border:none; }
+.per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-muted); }
+.per-page select { padding:4px 6px; border:1px solid var(--border); border-radius:var(--radius); }
+</style>
+<div class="card">
+    <div class="card-header">Add New Assignment</div>
+    <div class="card-body">
+        <form method="post" style="display:flex; flex-wrap:wrap; gap:10px; align-items:end;">
+            {% csrf_token %}
+            <div class="form-group" style="flex:2; min-width:180px; margin-bottom:0;">
+                <label>Teacher</label>
+                {{ form.teacher }}
+            </div>
+            <div class="form-group" style="flex:1; min-width:140px; margin-bottom:0;">
+                <label>Class</label>
+                {{ form.school_class }}
+            </div>
+            <div class="form-group" style="flex:1; min-width:140px; margin-bottom:0;">
+                <label>Subject</label>
+                {{ form.subject }}
+            </div>
+            <div class="form-group" style="margin-bottom:0;">
+                <label style="display:inline;">{{ form.is_class_master }} Class Master</label>
+            </div>
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+        {% if form.errors %}
+        <div class="alert alert-danger" style="margin-top:10px; padding:8px 12px; font-size:13px;">
+            {% for field, errs in form.errors.items %}{% for e in errs %}{{ e }}<br>{% endfor %}{% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span>Current Assignments (<span class="stu-count">{{ total_count }}</span>)</span>
+        <div class="per-page">
+            <form method="get">
+                <label for="per-page">Rows:</label>
+                <select id="per-page" name="per_page" onchange="this.form.submit()">
+                    <option value="10" {% if per_page == 10 %}selected{% endif %}>10</option>
+                    <option value="25" {% if per_page == 25 %}selected{% endif %}>25</option>
+                    <option value="50" {% if per_page == 50 %}selected{% endif %}>50</option>
+                    <option value="100" {% if per_page == 100 %}selected{% endif %}>100</option>
+                </select>
+            </form>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if assignments %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Teacher</th><th>Class</th><th>Subject</th><th>Master</th><th></th></tr></thead>
+                <tbody>
+                {% for a in assignments %}
+                <tr>
+                    <td><a href="{% url 'teacher_detail' a.teacher.pk %}">{{ a.teacher.first_name }} {{ a.teacher.last_name }}</a></td>
+                    <td>{{ a.school_class }}</td>
+                    <td>{{ a.subject.name }} ({{ a.subject.code }})</td>
+                    <td>{% if a.is_class_master %}<span class="badge badge-info">Yes</span>{% else %}-{% endif %}</td>
+                    <td>
+                        <form method="post" style="display:inline;">
+                            {% csrf_token %}
+                            <input type="hidden" name="action" value="delete">
+                            <input type="hidden" name="assignment_id" value="{{ a.pk }}">
+                            <input type="hidden" name="page" value="{{ page_obj.number }}">
+                            <input type="hidden" name="per_page" value="{{ per_page }}">
+                            <button type="submit" class="btn btn-sm" style="color:var(--danger);" onclick="return confirm('Remove this assignment?')">Remove</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if page_obj.paginator.num_pages > 1 %}
+        <div class="pagination-x">
+            <span class="stu-count">
+                Showing <span class="stu-range">{{ page_obj.start_index }}&ndash;{{ page_obj.end_index }}</span>
+                of <span class="stu-range">{{ page_obj.paginator.count }}</span> assignments
+            </span>
+            <div class="page-nums">
+                {% if page_obj.has_previous %}
+                <a href="?page=1&per_page={{ per_page }}">&laquo;</a>
+                <a href="?page={{ page_obj.previous_page_number }}&per_page={{ per_page }}">&lsaquo;</a>
+                {% endif %}
+
+                {% for num in page_obj.paginator.get_elided_page_range %}
+                    {% if num == page_obj.paginator.ELLIPSIS %}
+                    <span class="ellip">&hellip;</span>
+                    {% elif num == page_obj.number %}
+                    <span class="cur">{{ num }}</span>
+                    {% else %}
+                    <a href="?page={{ num }}&per_page={{ per_page }}">{{ num }}</a>
+                    {% endif %}
+                {% endfor %}
+
+                {% if page_obj.has_next %}
+                <a href="?page={{ page_obj.next_page_number }}&per_page={{ per_page }}">&rsaquo;</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&per_page={{ per_page }}">&raquo;</a>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+        {% else %}
+        <div class="text-muted">No assignments configured.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

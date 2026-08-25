@@ -1,0 +1,33 @@
+{% extends "parent/base.html" %}
+{% block title %}Parent Login{% endblock %}
+{% block content %}
+<div class="login-card card">
+    <div class="logo">
+        <div class="school-name">{{ school.name_en|default:"School Management System" }}</div>
+        <div class="sub">Parent &amp; Guardian Portal</div>
+    </div>
+
+    <form method="post" autocomplete="off">
+        {% csrf_token %}
+        <div class="field">
+            <label for="unique_id">Student 9-digit ID</label>
+            <input type="text" id="unique_id" name="unique_id" required
+                   pattern="[0-9]{9}" maxlength="9" inputmode="numeric"
+                   placeholder="e.g., 123456789">
+            <div class="hint">This is the student's national identification number.</div>
+        </div>
+        <div class="field">
+            <label for="guardian_contact">Registered Guardian Phone</label>
+            <input type="tel" id="guardian_contact" name="guardian_contact" required
+                   maxlength="20" inputmode="tel"
+                   placeholder="e.g., 670000000">
+            <div class="hint">The phone number registered at enrolment.</div>
+        </div>
+        <button type="submit" class="btn">Log in</button>
+    </form>
+</div>
+
+<div style="text-align:center; font-size:12px; color:var(--muted); margin-top:16px;">
+    Having trouble? Contact the school bursary.
+</div>
+{% endblock %}

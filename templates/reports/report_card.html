@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@page {
+    size: A4 portrait;
+    margin: 0;
+}
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 10pt;
+    line-height: 1.25;
+    color: #000;
+}
+/* ── Title ── */
+.report-title { text-align:center; font-weight:bold; font-size:14pt; margin:6px 0 2px; }
+.school-year  { text-align:center; font-size:10pt; margin-bottom:6px; }
+
+/* ── Letterhead (inline for browser preview; report.css covers PDF) ── */
+.lh-line { margin:0; line-height:1.15; }
+.lh-star { margin:0; font-size:9pt; letter-spacing:1px; line-height:1.1; }
+.lh-matricule { text-align:center; font-size:9pt; margin:2px 0 0; }
+
+/* ── Student info section ── */
+.si-wrap { width:18cm; margin:0 auto 6px; }
+.si-outer { width:18cm; border-collapse:collapse; }
+.si-outer td { padding:0; vertical-align:top; }
+.si-photo { width:2.84cm; height:2.84cm; border:1px solid #000; text-align:center; vertical-align:middle; padding:0; }
+.si-photo img { width:2.84cm; height:2.84cm; object-fit:contain; }
+.si-photo-placeholder { width:2.84cm; height:2.84cm; display:inline-flex; align-items:center; justify-content:center; font-size:7pt; color:#999; }
+.si-table { width:15cm; border-collapse:collapse; font-size:9pt; }
+.si-table td { border:1px solid #000; padding:1px 4px; vertical-align:middle; height:0.45cm; }
+.si-table .val { font-weight:bold; text-transform:uppercase; }
+.si-table .no-border-cell { border:none; }
+.si-table .no-border-bottom { border-bottom:none; }
+.si-table .no-border-top { border-top:none; }
+
+/* ── Subject table ── */
+.subj-table { width:100%; border-collapse:collapse; font-size:8pt; margin-top:1mm; margin-bottom:6px; table-layout:fixed; }
+.subj-table th, .subj-table td { border:1px solid #000; padding:2px 3px; vertical-align:middle; }
+.subj-table th { font-weight:bold; text-align:center; background:#f0f0f0; }
+.subj-table .subj-name { font-weight:bold; text-align:left; }
+.subj-table .teacher   { font-size:7.5pt; font-style:italic; font-weight:normal; }
+.subj-table .coef-col  { background:#f0f0f0; }
+.subj-table .score-val { font-weight:bold; font-size:9pt; }
+.subj-table .center    { text-align:center; }
+.subj-table .right     { text-align:right; }
+.fail { color:red; }
+.black { color:#000; }
+
+/* ── Summary grid ── */
+.sum-table { width:100%; border-collapse:collapse; font-size:8pt; margin-bottom:6px; table-layout:fixed; }
+.sum-table th, .sum-table td { border:1px solid #000; padding:2px 4px; vertical-align:middle; }
+.sum-table th { font-weight:bold; text-align:center; background:#e0e0e0; }
+.sum-table .val { font-weight:bold; }
+.sum-table .val-right { font-weight:bold; text-align:right; }
+.sum-table .val-center { font-weight:bold; text-align:center; }
+
+/* ── Bottom ── */
+.bot-table { width:100%; border-collapse:collapse; font-size:9pt; table-layout:fixed; }
+.bot-table td { border:1px solid #000; padding:4px 6px; vertical-align:middle; text-align:center; }
+.bot-table .sig-img { max-height:4.6cm; }
+
+/* ── Page container (A4 dimensions for consistent preview) ── */
+.page {
+    width: 21cm;
+    min-height: 29.7cm;
+    padding: 13mm;
+    margin: 0 auto;
+    background: #fff;
+    box-sizing: border-box;
+    overflow: hidden;
+}
+
+/* In the PDF the page has zero margins; every report item (letterhead,
+   student info, subject/marks table, summary, signatures) is 18cm wide and
+   is centred on the A4 page, leaving ~1.5cm on each side so nothing clips. */
+@media print {
+    html, body {
+        width: 100% !important;
+        margin: 0;
+        padding: 0;
+    }
+    .page {
+        width: 18cm;
+        min-height: 0;
+        padding: 0;
+        margin: 0 auto;
+        overflow: hidden;
+    }
+    table {
+        table-layout: fixed;
+    }
+    img {
+        max-width: 100% !important;
+    }
+}
+</style>
+</head>
+<body>
+
+<!-- Fixed A4 page container (21cm x 29.7cm) for consistent preview -->
+<div class="page">
+{% include "reports/_letterhead.html" with max_width="18cm" %}
+
+<!-- Title -->
+{% if is_annual %}
+<div class="report-title">ANNUAL REPORT SHEET</div>
+{% else %}
+<div class="report-title">{{ term.label|upper }} REPORT SHEET</div>
+{% endif %}
+<div class="school-year">School Year: {{ term.year_start }}/{{ term.year_end }}</div>
+
+<!-- Student Info: photo (2.7cm) + 2mm gap + info table (15cm) = 18cm -->
+<table class="si-outer">
+<tr>
+    <!-- Photo cell: 2.84cm x 2.84cm -->
+    <td style="width:2.84cm; height:2.84cm; border:1px solid #000; text-align:center; vertical-align:middle; padding:0;">
+        {% if student.photo %}
+            <img src="{{ student.photo.url }}" alt="Photo" style="width:2.84cm; height:2.84cm; object-fit:contain; display:block; margin:0 auto;">
+        {% else %}
+            <div style="width:2.84cm; height:2.84cm; display:inline-flex; align-items:center; justify-content:center; font-size:7pt; color:#999;">[photo]</div>
+        {% endif %}
+    </td>
+    <!-- 2mm gap -->
+    <td style="width:2mm; border:none; padding:0;">&nbsp;</td>
+    <!-- Info table: 8.5cm + 2.5cm + 4cm = 15cm -->
+    <td style="border:none; padding:0;">
+        <table class="si-table">
+        <!-- Row 1: A+B merged | C -->
+        <tr>
+            <td colspan="2" style="width:11cm;">Name of Student: <span class="val">{{ student.full_name }}</span></td>
+            <td style="width:4cm;">Class: <span class="val">{{ school_class.name }}</span></td>
+        </tr>
+        <!-- Row 2: A | B | C -->
+        <tr>
+            <td style="width:8.5cm;">Date &amp; Place of Birth: <span class="val">{{ student.date_of_birth|date:"d/m/Y" }} at {{ student.place_of_birth }}</span></td>
+            <td style="width:2.5cm;">Sex: <span class="val">{{ student.get_sex_display }}</span></td>
+            <td style="width:4cm;">Class Enrolment: <span class="val">{{ enrolment.total }}</span></td>
+        </tr>
+        <!-- Row 3: A | B | C -->
+        <tr>
+            <td style="width:8.5cm;">Unique Identification Number: <span class="val fail">{{ student.unique_id }}</span></td>
+            <td style="width:2.5cm;">Repeater? <span class="val">{% if student.repeater %}Yes{% else %}No{% endif %}</span></td>
+            <td style="width:4cm;">Number of Subjects: <span class="val">{{ total_subjects }}</span></td>
+        </tr>
+        <!-- Row 4: A+B merged (faint border) | C -->
+        <tr>
+            <td colspan="2" style="width:11cm; border-color:#ccc; border-left:1px solid #000;">Parent's/Guardian's Name and Contact:</td>
+            <td style="width:4cm;">Number Passed: <span class="val">{{ passed_subjects }}</span></td>
+        </tr>
+        <!-- Row 5: A+B merged (rowspan=2) | C -->
+        <tr>
+            <td rowspan="2" colspan="2" style="width:11cm; border-left:1px solid #000; border-bottom:1px solid #000; border-top:none; border-right:none; text-align:left; vertical-align:middle; padding:1px 4px;">
+                {{ student.guardian_name }}, {{ student.guardian_contact }}, {{ student.guardian_address }}
+            </td>
+            <td style="width:4cm; border-bottom:none;">Class Master:</td>
+        </tr>
+        <!-- Row 6: C only (A+B covered by rowspan) -->
+        <tr>
+            <td style="width:4cm; border-top:none; text-align:center;">{{ class_master }}</td>
+        </tr>
+        </table>
+    </td>
+</tr>
+</table>
+
+<!-- Subject & Scores Table -->
+{% if is_annual %}
+<table class="subj-table">
+<colgroup>
+    <col style="width:17%"><col style="width:10%">
+    <col style="width:10%"><col style="width:10%">
+    <col style="width:11%"><col style="width:8%">
+    <col style="width:8%"><col style="width:7%">
+    <col style="width:7%"><col style="width:12%">
+</colgroup>
+<thead>
+    <tr>
+        <th>Subject &amp; Teacher's Name</th>
+        {% for t in terms %}<th>AV T{{ t.term_number }}</th>{% endfor %}
+        <th>Annual AV</th>
+        <th>Coef</th>
+        <th>AVxCoef</th>
+        <th>Grade</th>
+        <th>Rank</th>
+        <th>Remark &amp; Signature</th>
+    </tr>
+</thead>
+<tbody>
+    {% for sd in subjects_data %}
+    <tr>
+        <td class="subj-name" style="padding:0; vertical-align:middle;">
+            <div style="display:table; width:100%; height:100%;">
+                <div style="display:table-row;">
+                    <div style="display:table-cell; vertical-align:middle; text-align:left; padding:1px 4px;">{{ sd.subject.name }}</div>
+                </div>
+                {% if sd.teacher_name %}
+                <div style="display:table-row;">
+                    <div style="display:table-cell; vertical-align:bottom; text-align:right; padding:0 4px; font-size:7.5pt;">{{ sd.teacher_name }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </td>
+        {% for avg in sd.term_averages %}
+        <td class="center{% if avg is not None and avg < 10 %} fail{% endif %}">
+            {% if avg is not None %}{{ avg|floatformat:2 }}{% endif %}
+        </td>
+        {% endfor %}
+        <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %} score-val">
+            {% if sd.average is not None %}{{ sd.average|floatformat:2 }}{% endif %}
+        </td>
+        <td class="center black coef-col">{{ sd.coefficient }}</td>
+        <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %} score-val">
+            {% if sd.av_coef is not None %}{{ sd.av_coef|floatformat:2 }}{% endif %}
+        </td>
+        <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}">{{ sd.grade }}</td>
+        <td class="center{% if rank and average < 10 %} fail{% endif %}">
+            {% if forloop.first and rank %}{{ rank }}{% endif %}
+        </td>
+        <td>
+            <span class="{% if sd.average is not None and sd.average < 10 %}fail{% endif %}">{{ sd.remark }}</span>
+            {% if sd.teacher_signature %}
+            <span style="float:right;"><img src="{{ sd.teacher_signature }}" alt="Sig" style="width:2cm; max-width:none;"></span>
+            {% endif %}
+        </td>
+    </tr>
+    {% endfor %}
+    <tr>
+        <td colspan="2" style="text-align:right; font-weight:bold; padding-right:8px;">TOTAL</td>
+        <td colspan="{{ terms|length }}" class="center" style="font-weight:bold;">Coef: {{ total_coef }}</td>
+        <td class="center coef-col" style="font-weight:bold;">{{ total_coef }}</td>
+        <td class="center score-val">{{ total_score|floatformat:2 }}</td>
+        <td colspan="3" style="font-weight:bold; text-align:center;">
+            Student's Average: <span class="score-val {% if average < 10 %}fail{% endif %}">{{ average|floatformat:2 }}</span>
+        </td>
+    </tr>
+</tbody>
+</table>
+{% else %}
+<table class="subj-table">
+<thead>
+    <tr>
+        <th style="width:17%">Subject &amp; Teacher's Name</th>
+        <th style="width:27%">Competencies Evaluated</th>
+        <th style="width:7%">MK/20</th>
+        <th style="width:6%">AV/20</th>
+        <th style="width:8%">Coef</th>
+        <th style="width:8%">AVxCoef</th>
+        <th style="width:7%">Grade</th>
+        <th style="width:7%">Rank</th>
+        <th style="width:13%">Remark &amp; Signature</th>
+    </tr>
+</thead>
+<tbody>
+    {% for sd in subjects_data %}
+        {% for comp in sd.competencies %}
+        <tr>
+            {% if forloop.first %}
+            <td class="subj-name" rowspan="{{ sd.competencies|length }}" style="padding:0; vertical-align:middle;">
+                <div style="display:table; width:100%; height:100%;">
+                    <div style="display:table-row;">
+                        <div style="display:table-cell; vertical-align:middle; text-align:left; padding:1px 4px;">{{ sd.subject.name }}</div>
+                    </div>
+                    {% if sd.teacher_name %}
+                    <div style="display:table-row;">
+                        <div style="display:table-cell; vertical-align:bottom; text-align:right; padding:0 4px; font-size:7.5pt;">{{ sd.teacher_name }}</div>
+                    </div>
+                    {% endif %}
+                </div>
+            </td>
+            {% endif %}
+            <td>{{ comp.description }}</td>
+            <td class="center{% if comp.score is not None and comp.score < 10 %} fail{% endif %}">
+                {% if comp.score is not None %}{{ comp.score|floatformat:2 }}{% endif %}
+            </td>
+            {% if forloop.first %}
+            <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %} score-val" rowspan="{{ sd.competencies|length }}">
+                {% if sd.average is not None %}{{ sd.average|floatformat:2 }}{% endif %}
+            </td>
+            <td class="center black coef-col" rowspan="{{ sd.competencies|length }}">{{ sd.coefficient }}</td>
+            <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %} score-val" rowspan="{{ sd.competencies|length }}">
+                {% if sd.av_coef is not None %}{{ sd.av_coef|floatformat:2 }}{% endif %}
+            </td>
+            <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}" rowspan="{{ sd.competencies|length }}">
+                {{ sd.grade }}
+            </td>
+            <td class="center{% if rank and average < 10 %} fail{% endif %}" rowspan="{{ sd.competencies|length }}">
+                {% if forloop.parentloop.first and rank %}{{ rank }}{% endif %}
+            </td>
+            <td rowspan="{{ sd.competencies|length }}">
+                <span class="{% if sd.average is not None and sd.average < 10 %}fail{% endif %}">{{ sd.remark }}</span>
+                {% if sd.teacher_signature %}
+                <span style="float:right;"><img src="{{ sd.teacher_signature }}" alt="Sig" style="width:2cm; max-width:none;"></span>
+                {% endif %}
+            </td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    {% endfor %}
+    <tr>
+        <td colspan="4" style="text-align:right; font-weight:bold; padding-right:8px;">TOTAL</td>
+        <td class="center coef-col" style="font-weight:bold;">{{ total_coef }}</td>
+        <td class="center score-val">{{ total_score|floatformat:2 }}</td>
+        <td colspan="3" style="font-weight:bold; text-align:center;">
+            Student's Average: <span class="score-val {% if average < 10 %}fail{% endif %}">{{ average|floatformat:2 }}</span>
+        </td>
+    </tr>
+</tbody>
+</table>
+{% endif %}
+
+<!-- Summary Grid (10-column, matches sample) -->
+<table class="sum-table">
+<colgroup>
+    <col style="width:14%"><col style="width:4%">
+    <col style="width:14%"><col style="width:5%">
+    <col style="width:13%"><col style="width:10%">
+    <col style="width:9%"><col style="width:5%">
+    <col style="width:16%"><col style="width:10%">
+</colgroup>
+<!-- Header row -->
+<tr>
+    <th colspan="4">Discipline</th>
+    <th colspan="4">Student's Performance</th>
+    <th colspan="2">Class Profile</th>
+</tr>
+<!-- Row 1: 10 individual cells -->
+<tr>
+    <td>Unjustified Abs. (h)</td>
+    <td class="val-center">{% if discipline %}{{ discipline.unjustified_abs_hours|floatformat:0 }}{% endif %}</td>
+    <td>Conduct Warning</td>
+    <td class="center">{% if discipline and discipline.conduct_decision == "warning" %}&#10004;{% endif %}</td>
+    <td>TOTAL SCORE</td>
+    <td class="val-right">{{ total_score|floatformat:2 }}</td>
+    <td colspan="2" style="font-weight:bold;">REMARK</td>
+    <td>CLASS AVERAGE</td>
+    <td class="val-right{% if class_profile.class_average < 10 %} fail{% endif %}">{{ class_profile.class_average|floatformat:2 }}</td>
+</tr>
+<!-- Rows 2-3: merged in cols 1-6, 9-10; individual cols 7-8 -->
+<tr>
+    <td rowspan="2">Justified Abs. (h)</td>
+    <td class="val-center" rowspan="2">{% if discipline %}{{ discipline.justified_abs_hours|floatformat:0 }}{% endif %}</td>
+    <td rowspan="2">Reprimand</td>
+    <td class="center" rowspan="2">{% if discipline and discipline.conduct_decision == "reprimand" %}&#10004;{% endif %}</td>
+    <td rowspan="2">COEF.</td>
+    <td class="val-right" rowspan="2">{{ total_coef }}</td>
+    <td>CVWA</td>
+    <td class="center">{% if remark == "CVWA" %}&#10004;{% endif %}</td>
+    <td rowspan="2">STUDENT RANK</td>
+    <td class="val-right{% if average < 10 %} fail{% endif %}" rowspan="2">{{ rank|default:"" }}</td>
+</tr>
+<tr>
+    <td>CWA</td>
+    <td class="center">{% if remark == "CWA" %}&#10004;{% endif %}</td>
+</tr>
+<!-- Rows 4-5: merged in cols 1-6, 9-10; individual cols 7-8 -->
+<tr>
+    <td rowspan="2">Lateness (# times)</td>
+    <td class="val-center" rowspan="2">{% if discipline %}{{ discipline.lateness_count|floatformat:0 }}{% endif %}</td>
+    <td rowspan="2">Suspension</td>
+    <td class="center" rowspan="2">{% if discipline and discipline.conduct_decision == "suspension" %}&#10004;{% endif %}</td>
+    <td rowspan="2">{% if is_annual %}ANNUAL AVERAGE{% else %}TERM AVERAGE{% endif %}</td>
+    <td class="val-right{% if average < 10 %} fail{% endif %}" rowspan="2">{{ average|floatformat:2 }}</td>
+    <td>CA</td>
+    <td class="center">{% if remark == "CA" %}&#10004;{% endif %}</td>
+    <td rowspan="2">NUMBER PASSED</td>
+    <td class="val-right" rowspan="2">{{ class_profile.number_passed }}</td>
+</tr>
+<tr>
+    <td>CAA</td>
+    <td class="center">{% if remark == "CAA" %}&#10004;{% endif %}</td>
+</tr>
+<!-- Row 6: 10 individual cells -->
+<tr>
+    <td>Punishment (h)</td>
+    <td class="val-center">{% if discipline %}{{ discipline.punishment_hours|floatformat:0 }}{% endif %}</td>
+    <td>Dismissal</td>
+    <td class="center">{% if discipline and discipline.conduct_decision == "dismissal" %}&#10004;{% endif %}</td>
+    <td>GRADE</td>
+    <td class="val-right{% if average < 10 %} fail{% endif %}">{{ grade }}</td>
+    <td>CNA</td>
+    <td class="center">{% if remark == "CNA" %}&#10004;{% endif %}</td>
+    <td>SUCCESS RATE (%)</td>
+    <td class="val-right">{{ class_profile.success_rate|floatformat:1 }}%</td>
+</tr>
+<!-- Empty separator -->
+<tr><td colspan="10" style="border:none; height:4px;"></td></tr>
+</table>
+
+<!-- Final table: Remark + Signatures (separate table, matches sample) -->
+<table class="bot-table" style="margin-top:1mm;">
+<colgroup>
+    <col style="width:27%"><col style="width:18%">
+    <col style="width:20%"><col style="width:35%">
+</colgroup>
+<tr>
+    <td>Remark on Student's Performance</td>
+    <td>Guardian's Signature</td>
+    <td>Class Master's Signature</td>
+    <td>THE PRINCIPAL</td>
+</tr>
+<tr>
+    <td style="font-weight:bold; font-size:9pt;">{% if is_annual %}{{ promotion_decision }}{% elif remark_on_performance %}{{ remark_on_performance }}{% elif average >= 10 %}PASSED{% else %}FAILED{% endif %}</td>
+    <td style="height:4.8cm;"></td>
+    <td style="height:4.8cm;">
+        {% if class_master_signature %}<img src="{{ class_master_signature }}" alt="Class Master Sig" class="sig-img" style="width:2cm; max-width:none;">{% endif %}
+    </td>
+    <td style="height:4.8cm;">
+        {% if school.seal %}<img src="{{ school.seal.url }}" alt="Seal" class="sig-img">{% endif %}
+    </td>
+</tr>
+</table>
+
+</div><!-- /page -->
+
+</body>
+</html>

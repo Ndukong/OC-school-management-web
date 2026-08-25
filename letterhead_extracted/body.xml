@@ -1,0 +1,1239 @@
+<w:body xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main" xmlns:wpc="http://schemas.microsoft.com/office/word/2010/wordprocessingCanvas" xmlns:cx="http://schemas.microsoft.com/office/drawing/2014/chartex" xmlns:cx1="http://schemas.microsoft.com/office/drawing/2015/9/8/chartex" xmlns:cx2="http://schemas.microsoft.com/office/drawing/2015/10/21/chartex" xmlns:cx3="http://schemas.microsoft.com/office/drawing/2016/5/9/chartex" xmlns:cx4="http://schemas.microsoft.com/office/drawing/2016/5/10/chartex" xmlns:cx5="http://schemas.microsoft.com/office/drawing/2016/5/11/chartex" xmlns:cx6="http://schemas.microsoft.com/office/drawing/2016/5/12/chartex" xmlns:cx7="http://schemas.microsoft.com/office/drawing/2016/5/13/chartex" xmlns:cx8="http://schemas.microsoft.com/office/drawing/2016/5/14/chartex" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:aink="http://schemas.microsoft.com/office/drawing/2016/ink" xmlns:am3d="http://schemas.microsoft.com/office/drawing/2017/model3d" xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:oel="http://schemas.microsoft.com/office/2019/extlst" xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships" xmlns:m="http://schemas.openxmlformats.org/officeDocument/2006/math" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:wp14="http://schemas.microsoft.com/office/word/2010/wordprocessingDrawing" xmlns:wp="http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing" xmlns:w10="urn:schemas-microsoft-com:office:word" xmlns:w14="http://schemas.microsoft.com/office/word/2010/wordml" xmlns:w15="http://schemas.microsoft.com/office/word/2012/wordml" xmlns:w16cex="http://schemas.microsoft.com/office/word/2018/wordml/cex" xmlns:w16cid="http://schemas.microsoft.com/office/word/2016/wordml/cid" xmlns:w16="http://schemas.microsoft.com/office/word/2018/wordml" xmlns:w16du="http://schemas.microsoft.com/office/word/2023/wordml/word16du" xmlns:w16sdtdh="http://schemas.microsoft.com/office/word/2020/wordml/sdtdatahash" xmlns:w16se="http://schemas.microsoft.com/office/word/2015/wordml/symex" xmlns:wpg="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup" xmlns:wpi="http://schemas.microsoft.com/office/word/2010/wordprocessingInk" xmlns:wne="http://schemas.microsoft.com/office/word/2006/wordml" xmlns:wps="http://schemas.microsoft.com/office/word/2010/wordprocessingShape">
+  <w:p w:rsidR="00FA5CB4" w:rsidRPr="00E65B72" w:rsidRDefault="00B068DF" w:rsidP="0022480E">
+    <w:pPr>
+      <w:spacing w:after="0"/>
+      <w:jc w:val="center"/>
+      <w:rPr>
+        <w:sz w:val="20"/>
+        <w:szCs w:val="20"/>
+        <w:lang w:val="en-CM"/>
+      </w:rPr>
+    </w:pPr>
+    <w:r w:rsidRPr="00E65B72">
+      <w:rPr>
+        <w:noProof/>
+        <w:sz w:val="20"/>
+        <w:szCs w:val="20"/>
+        <w:lang w:val="en-CM"/>
+      </w:rPr>
+      <mc:AlternateContent>
+        <mc:Choice Requires="wpg">
+          <w:drawing>
+            <wp:inline distT="0" distB="0" distL="0" distR="0">
+              <wp:extent cx="6564386" cy="2125980"/>
+              <wp:effectExtent l="0" t="0" r="0" b="7620"/>
+              <wp:docPr id="1522410957" name="Group 4"/>
+              <wp:cNvGraphicFramePr/>
+              <a:graphic xmlns:a="http://schemas.openxmlformats.org/drawingml/2006/main">
+                <a:graphicData uri="http://schemas.microsoft.com/office/word/2010/wordprocessingGroup">
+                  <wpg:wgp>
+                    <wpg:cNvGrpSpPr/>
+                    <wpg:grpSpPr>
+                      <a:xfrm>
+                        <a:off x="0" y="0"/>
+                        <a:ext cx="6564386" cy="2125980"/>
+                        <a:chOff x="0" y="0"/>
+                        <a:chExt cx="6564386" cy="1435791"/>
+                      </a:xfrm>
+                    </wpg:grpSpPr>
+                    <wps:wsp>
+                      <wps:cNvPr id="940291349" name="Text Box 1"/>
+                      <wps:cNvSpPr txBox="1"/>
+                      <wps:spPr>
+                        <a:xfrm>
+                          <a:off x="0" y="0"/>
+                          <a:ext cx="2426677" cy="1143000"/>
+                        </a:xfrm>
+                        <a:prstGeom prst="rect">
+                          <a:avLst/>
+                        </a:prstGeom>
+                        <a:noFill/>
+                        <a:ln w="6350">
+                          <a:noFill/>
+                        </a:ln>
+                      </wps:spPr>
+                      <wps:txbx>
+                        <w:txbxContent>
+                          <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="0014099F">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>REPUBLI</w:t>
+                            </w:r>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>C</w:t>
+                            </w:r>
+                            <w:r w:rsidRPr="0014099F">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t xml:space="preserve"> OF CAMEROON</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>Peace &#8211; Work &#8211; Fatherland</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>**********</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>REGIONAL DELEGATION FOR [REGION_EN</w:t>
+                            </w:r>
+                            <w:r w:rsidR="00173AF7">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>]</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>**********</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>DIVISIONAL DELEGATION FOR [DIVISION-EN]</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>**********</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>[NAME OF SCHOOL_EN]</w:t>
+                            </w:r>
+                          </w:p>
+                        </w:txbxContent>
+                      </wps:txbx>
+                      <wps:bodyPr rot="0" spcFirstLastPara="0" vertOverflow="overflow" horzOverflow="overflow" vert="horz" wrap="square" lIns="91440" tIns="45720" rIns="91440" bIns="45720" numCol="1" spcCol="0" rtlCol="0" fromWordArt="0" anchor="t" anchorCtr="0" forceAA="0" compatLnSpc="1">
+                        <a:prstTxWarp prst="textNoShape">
+                          <a:avLst/>
+                        </a:prstTxWarp>
+                        <a:noAutofit/>
+                      </wps:bodyPr>
+                    </wps:wsp>
+                    <wps:wsp>
+                      <wps:cNvPr id="1409019932" name="Text Box 1"/>
+                      <wps:cNvSpPr txBox="1"/>
+                      <wps:spPr>
+                        <a:xfrm>
+                          <a:off x="4079631" y="0"/>
+                          <a:ext cx="2484755" cy="1143000"/>
+                        </a:xfrm>
+                        <a:prstGeom prst="rect">
+                          <a:avLst/>
+                        </a:prstGeom>
+                        <a:noFill/>
+                        <a:ln w="6350">
+                          <a:noFill/>
+                        </a:ln>
+                      </wps:spPr>
+                      <wps:txbx>
+                        <w:txbxContent>
+                          <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="0014099F">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>REPUBLIQUE DU CAMEROUN</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="0014099F">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t xml:space="preserve">Paix </w:t>
+                            </w:r>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>&#8211;</w:t>
+                            </w:r>
+                            <w:r w:rsidRPr="0014099F">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t xml:space="preserve"> T</w:t>
+                            </w:r>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t xml:space="preserve">ravail </w:t>
+                            </w:r>
+                            <w:r w:rsidR="00173AF7">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>&#8211;</w:t>
+                            </w:r>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t xml:space="preserve"> Patrie</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="00173AF7" w:rsidRPr="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="00173AF7">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="00173AF7">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>**********</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="0014099F">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>DELEGATION REGIONALE DU [REGION_</w:t>
+                            </w:r>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>FR</w:t>
+                            </w:r>
+                            <w:r w:rsidR="00173AF7">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>]</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="00173AF7" w:rsidRPr="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="00173AF7">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="00173AF7">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>**********</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="005A1722">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="fr-CM"/>
+                              </w:rPr>
+                              <w:t>DELEGATION DEPARTEMENTALE DU [DIVISION-FR]</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="00173AF7">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>**********</w:t>
+                            </w:r>
+                          </w:p>
+                          <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                                <w:lang w:val="en-US"/>
+                              </w:rPr>
+                              <w:t>[NAME OF SCHOOL_EN]</w:t>
+                            </w:r>
+                          </w:p>
+                        </w:txbxContent>
+                      </wps:txbx>
+                      <wps:bodyPr rot="0" spcFirstLastPara="0" vertOverflow="overflow" horzOverflow="overflow" vert="horz" wrap="square" lIns="91440" tIns="45720" rIns="91440" bIns="45720" numCol="1" spcCol="0" rtlCol="0" fromWordArt="0" anchor="t" anchorCtr="0" forceAA="0" compatLnSpc="1">
+                        <a:prstTxWarp prst="textNoShape">
+                          <a:avLst/>
+                        </a:prstTxWarp>
+                        <a:noAutofit/>
+                      </wps:bodyPr>
+                    </wps:wsp>
+                    <wps:wsp>
+                      <wps:cNvPr id="2112520771" name="Rectangle 2"/>
+                      <wps:cNvSpPr/>
+                      <wps:spPr>
+                        <a:xfrm>
+                          <a:off x="2688688" y="142684"/>
+                          <a:ext cx="1188000" cy="802322"/>
+                        </a:xfrm>
+                        <a:prstGeom prst="rect">
+                          <a:avLst/>
+                        </a:prstGeom>
+                        <a:noFill/>
+                        <a:ln>
+                          <a:solidFill>
+                            <a:schemeClr val="tx1"/>
+                          </a:solidFill>
+                        </a:ln>
+                      </wps:spPr>
+                      <wps:style>
+                        <a:lnRef idx="2">
+                          <a:schemeClr val="accent1">
+                            <a:shade val="15000"/>
+                          </a:schemeClr>
+                        </a:lnRef>
+                        <a:fillRef idx="1">
+                          <a:schemeClr val="accent1"/>
+                        </a:fillRef>
+                        <a:effectRef idx="0">
+                          <a:schemeClr val="accent1"/>
+                        </a:effectRef>
+                        <a:fontRef idx="minor">
+                          <a:schemeClr val="lt1"/>
+                        </a:fontRef>
+                      </wps:style>
+                      <wps:txbx>
+                        <w:txbxContent>
+                          <w:p w:rsidR="0014099F" w:rsidRPr="00B068DF" w:rsidRDefault="00B068DF" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:outline/>
+                                <w:color w:val="000000" w:themeColor="text1"/>
+                                <w:sz w:val="20"/>
+                                <w:szCs w:val="20"/>
+                                <w:lang w:val="en-US"/>
+                                <w14:textOutline w14:w="9525" w14:cap="rnd" w14:cmpd="sng" w14:algn="ctr">
+                                  <w14:solidFill>
+                                    <w14:schemeClr w14:val="tx1"/>
+                                  </w14:solidFill>
+                                  <w14:prstDash w14:val="solid"/>
+                                  <w14:bevel/>
+                                </w14:textOutline>
+                                <w14:textFill>
+                                  <w14:noFill/>
+                                </w14:textFill>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="00B068DF">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:outline/>
+                                <w:color w:val="000000" w:themeColor="text1"/>
+                                <w:sz w:val="20"/>
+                                <w:szCs w:val="20"/>
+                                <w:lang w:val="en-US"/>
+                                <w14:textOutline w14:w="9525" w14:cap="rnd" w14:cmpd="sng" w14:algn="ctr">
+                                  <w14:solidFill>
+                                    <w14:schemeClr w14:val="tx1"/>
+                                  </w14:solidFill>
+                                  <w14:prstDash w14:val="solid"/>
+                                  <w14:bevel/>
+                                </w14:textOutline>
+                                <w14:textFill>
+                                  <w14:noFill/>
+                                </w14:textFill>
+                              </w:rPr>
+                              <w:t>LOGO.PNG</w:t>
+                            </w:r>
+                          </w:p>
+                        </w:txbxContent>
+                      </wps:txbx>
+                      <wps:bodyPr rot="0" spcFirstLastPara="0" vertOverflow="overflow" horzOverflow="overflow" vert="horz" wrap="square" lIns="91440" tIns="45720" rIns="91440" bIns="45720" numCol="1" spcCol="0" rtlCol="0" fromWordArt="0" anchor="ctr" anchorCtr="0" forceAA="0" compatLnSpc="1">
+                        <a:prstTxWarp prst="textNoShape">
+                          <a:avLst/>
+                        </a:prstTxWarp>
+                        <a:noAutofit/>
+                      </wps:bodyPr>
+                    </wps:wsp>
+                    <wps:wsp>
+                      <wps:cNvPr id="1960960034" name="Text Box 1"/>
+                      <wps:cNvSpPr txBox="1"/>
+                      <wps:spPr>
+                        <a:xfrm>
+                          <a:off x="1740669" y="1201014"/>
+                          <a:ext cx="3042139" cy="234777"/>
+                        </a:xfrm>
+                        <a:prstGeom prst="rect">
+                          <a:avLst/>
+                        </a:prstGeom>
+                        <a:noFill/>
+                        <a:ln w="6350">
+                          <a:noFill/>
+                        </a:ln>
+                      </wps:spPr>
+                      <wps:txbx>
+                        <w:txbxContent>
+                          <w:p w:rsidR="00B068DF" w:rsidRPr="00B068DF" w:rsidRDefault="00B068DF" w:rsidP="0014099F">
+                            <w:pPr>
+                              <w:spacing w:after="0"/>
+                              <w:jc w:val="center"/>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                              </w:rPr>
+                            </w:pPr>
+                            <w:r w:rsidRPr="00B068DF">
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                              </w:rPr>
+                              <w:t>Matricule: [Matricule] | Telephone: [School Phone No</w:t>
+                            </w:r>
+                            <w:r>
+                              <w:rPr>
+                                <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                                <w:sz w:val="18"/>
+                                <w:szCs w:val="18"/>
+                              </w:rPr>
+                              <w:t>.]</w:t>
+                            </w:r>
+                          </w:p>
+                        </w:txbxContent>
+                      </wps:txbx>
+                      <wps:bodyPr rot="0" spcFirstLastPara="0" vertOverflow="overflow" horzOverflow="overflow" vert="horz" wrap="square" lIns="91440" tIns="45720" rIns="91440" bIns="45720" numCol="1" spcCol="0" rtlCol="0" fromWordArt="0" anchor="t" anchorCtr="0" forceAA="0" compatLnSpc="1">
+                        <a:prstTxWarp prst="textNoShape">
+                          <a:avLst/>
+                        </a:prstTxWarp>
+                        <a:noAutofit/>
+                      </wps:bodyPr>
+                    </wps:wsp>
+                  </wpg:wgp>
+                </a:graphicData>
+              </a:graphic>
+            </wp:inline>
+          </w:drawing>
+        </mc:Choice>
+        <mc:Fallback>
+          <w:pict>
+            <v:group id="Group 4" o:spid="_x0000_s1026" style="width:516.9pt;height:167.4pt;mso-position-horizontal-relative:char;mso-position-vertical-relative:line" coordsize="65643,14357" o:gfxdata="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&#10;">
+              <v:shapetype id="_x0000_t202" coordsize="21600,21600" o:spt="202" path="m,l,21600r21600,l21600,xe">
+                <v:stroke joinstyle="miter"/>
+                <v:path gradientshapeok="t" o:connecttype="rect"/>
+              </v:shapetype>
+              <v:shape id="Text Box 1" o:spid="_x0000_s1027" type="#_x0000_t202" style="position:absolute;width:24266;height:11430;visibility:visible;mso-wrap-style:square;v-text-anchor:top" o:gfxdata="UEsDBBQABgAIAAAAIQDb4fbL7gAAAIUBAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbHyQz07DMAyH&#10;70i8Q+QralM4IITa7kDhCAiNB7ASt43WOlEcyvb2pNu4IODoPz9/n1xv9vOkForiPDdwXVagiI23&#10;jocG3rdPxR0oScgWJ8/UwIEENu3lRb09BBKV0ywNjCmFe63FjDSjlD4Q50nv44wpl3HQAc0OB9I3&#10;VXWrjedEnIq03oC27qjHjympx31un0wiTQLq4bS4shrAECZnMGVTvbD9QSnOhDInjzsyuiBXWQP0&#10;r4R18jfgnHvJr4nOknrFmJ5xzhraRtHWf3Kkpfz/yGo5S+H73hkquyhdjr3R8m2lj09svwAAAP//&#10;AwBQSwMEFAAGAAgAAAAhAFr0LFu/AAAAFQEAAAsAAABfcmVscy8ucmVsc2zPwWrDMAwG4Ptg72B0&#10;X5TuUMaI01uh19I+gLGVxCy2jGSy9e1nemrHjpL4P0nD4SetZiPRyNnCruvBUPYcYp4tXC/Htw8w&#10;Wl0ObuVMFm6kcBhfX4Yzra62kC6xqGlKVgtLreUTUf1CyWnHhXKbTCzJ1VbKjMX5LzcTvvf9HuXR&#10;gPHJNKdgQU5hB+ZyK23zHztFL6w81c5zQp6m6P9TMfB3PtPWFCczVQtB9N4U2rp2HOA44NMz4y8A&#10;AAD//wMAUEsDBBQABgAIAAAAIQDrqEVgzAAAAOIAAAAPAAAAZHJzL2Rvd25yZXYueG1sRI9Pa8JA&#10;FMTvBb/D8gRvdWO0YlJXkYC0SHvwz6W31+wzCc2+jdlVo5/eLRR6HGbmN8x82ZlaXKh1lWUFo2EE&#10;gji3uuJCwWG/fp6BcB5ZY22ZFNzIwXLRe5pjqu2Vt3TZ+UIECLsUFZTeN6mULi/JoBvahjh4R9sa&#10;9EG2hdQtXgPc1DKOoqk0WHFYKLGhrKT8Z3c2CjbZ+hO337GZ3evs7eO4ak6HrxelBv1u9QrCU+f/&#10;w3/td60gmURxMhpPEvi9FO6AXDwAAAD//wMAUEsBAi0AFAAGAAgAAAAhANvh9svuAAAAhQEAABMA&#10;AAAAAAAAAAAAAAAAAAAAAFtDb250ZW50X1R5cGVzXS54bWxQSwECLQAUAAYACAAAACEAWvQsW78A&#10;AAAVAQAACwAAAAAAAAAAAAAAAAAfAQAAX3JlbHMvLnJlbHNQSwECLQAUAAYACAAAACEA66hFYMwA&#10;AADiAAAADwAAAAAAAAAAAAAAAAAHAgAAZHJzL2Rvd25yZXYueG1sUEsFBgAAAAADAAMAtwAAAAAD&#10;AAAAAA==&#10;" filled="f" stroked="f" strokeweight=".5pt">
+                <v:textbox>
+                  <w:txbxContent>
+                    <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="0014099F">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>REPUBLI</w:t>
+                      </w:r>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>C</w:t>
+                      </w:r>
+                      <w:r w:rsidRPr="0014099F">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t xml:space="preserve"> OF CAMEROON</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>Peace &#8211; Work &#8211; Fatherland</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>**********</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>REGIONAL DELEGATION FOR [REGION_EN</w:t>
+                      </w:r>
+                      <w:r w:rsidR="00173AF7">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>]</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>**********</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>DIVISIONAL DELEGATION FOR [DIVISION-EN]</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>**********</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>[NAME OF SCHOOL_EN]</w:t>
+                      </w:r>
+                    </w:p>
+                  </w:txbxContent>
+                </v:textbox>
+              </v:shape>
+              <v:shape id="Text Box 1" o:spid="_x0000_s1028" type="#_x0000_t202" style="position:absolute;left:40796;width:24847;height:11430;visibility:visible;mso-wrap-style:square;v-text-anchor:top" o:gfxdata="UEsDBBQABgAIAAAAIQDb4fbL7gAAAIUBAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbHyQz07DMAyH&#10;70i8Q+QralM4IITa7kDhCAiNB7ASt43WOlEcyvb2pNu4IODoPz9/n1xv9vOkForiPDdwXVagiI23&#10;jocG3rdPxR0oScgWJ8/UwIEENu3lRb09BBKV0ywNjCmFe63FjDSjlD4Q50nv44wpl3HQAc0OB9I3&#10;VXWrjedEnIq03oC27qjHjympx31un0wiTQLq4bS4shrAECZnMGVTvbD9QSnOhDInjzsyuiBXWQP0&#10;r4R18jfgnHvJr4nOknrFmJ5xzhraRtHWf3Kkpfz/yGo5S+H73hkquyhdjr3R8m2lj09svwAAAP//&#10;AwBQSwMEFAAGAAgAAAAhAFr0LFu/AAAAFQEAAAsAAABfcmVscy8ucmVsc2zPwWrDMAwG4Ptg72B0&#10;X5TuUMaI01uh19I+gLGVxCy2jGSy9e1nemrHjpL4P0nD4SetZiPRyNnCruvBUPYcYp4tXC/Htw8w&#10;Wl0ObuVMFm6kcBhfX4Yzra62kC6xqGlKVgtLreUTUf1CyWnHhXKbTCzJ1VbKjMX5LzcTvvf9HuXR&#10;gPHJNKdgQU5hB+ZyK23zHztFL6w81c5zQp6m6P9TMfB3PtPWFCczVQtB9N4U2rp2HOA44NMz4y8A&#10;AAD//wMAUEsDBBQABgAIAAAAIQDa7YEKygAAAOMAAAAPAAAAZHJzL2Rvd25yZXYueG1sRE9LT8JA&#10;EL6b+B82Y+JNdqliaGEhpAnBGDnwuHAbukPb2J2t3QWqv941IfE433um89424kKdrx1rGA4UCOLC&#10;mZpLDfvd8mkMwgdkg41j0vBNHuaz+7spZsZdeUOXbShFDGGfoYYqhDaT0hcVWfQD1xJH7uQ6iyGe&#10;XSlNh9cYbhuZKPUqLdYcGypsKa+o+NyerYb3fLnGzTGx458mX32cFu3X/jDS+vGhX0xABOrDv/jm&#10;fjNx/otK1TBNnxP4+ykCIGe/AAAA//8DAFBLAQItABQABgAIAAAAIQDb4fbL7gAAAIUBAAATAAAA&#10;AAAAAAAAAAAAAAAAAABbQ29udGVudF9UeXBlc10ueG1sUEsBAi0AFAAGAAgAAAAhAFr0LFu/AAAA&#10;FQEAAAsAAAAAAAAAAAAAAAAAHwEAAF9yZWxzLy5yZWxzUEsBAi0AFAAGAAgAAAAhANrtgQrKAAAA&#10;4wAAAA8AAAAAAAAAAAAAAAAABwIAAGRycy9kb3ducmV2LnhtbFBLBQYAAAAAAwADALcAAAD+AgAA&#10;AAA=&#10;" filled="f" stroked="f" strokeweight=".5pt">
+                <v:textbox>
+                  <w:txbxContent>
+                    <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="0014099F">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>REPUBLIQUE DU CAMEROUN</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="0014099F">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t xml:space="preserve">Paix </w:t>
+                      </w:r>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>&#8211;</w:t>
+                      </w:r>
+                      <w:r w:rsidRPr="0014099F">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t xml:space="preserve"> T</w:t>
+                      </w:r>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t xml:space="preserve">ravail </w:t>
+                      </w:r>
+                      <w:r w:rsidR="00173AF7">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>&#8211;</w:t>
+                      </w:r>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t xml:space="preserve"> Patrie</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="00173AF7" w:rsidRPr="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="00173AF7">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="00173AF7">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>**********</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="0014099F">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>DELEGATION REGIONALE DU [REGION_</w:t>
+                      </w:r>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>FR</w:t>
+                      </w:r>
+                      <w:r w:rsidR="00173AF7">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>]</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="00173AF7" w:rsidRPr="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="00173AF7">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="00173AF7">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>**********</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="005A1722">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="fr-CM"/>
+                        </w:rPr>
+                        <w:t>DELEGATION DEPARTEMENTALE DU [DIVISION-FR]</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="00173AF7" w:rsidRDefault="00173AF7" w:rsidP="00173AF7">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>**********</w:t>
+                      </w:r>
+                    </w:p>
+                    <w:p w:rsidR="0014099F" w:rsidRPr="0014099F" w:rsidRDefault="0014099F" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                          <w:lang w:val="en-US"/>
+                        </w:rPr>
+                        <w:t>[NAME OF SCHOOL_EN]</w:t>
+                      </w:r>
+                    </w:p>
+                  </w:txbxContent>
+                </v:textbox>
+              </v:shape>
+              <v:rect id="Rectangle 2" o:spid="_x0000_s1029" style="position:absolute;left:26886;top:1426;width:11880;height:8024;visibility:visible;mso-wrap-style:square;v-text-anchor:middle" o:gfxdata="UEsDBBQABgAIAAAAIQDb4fbL7gAAAIUBAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbHyQz07DMAyH&#10;70i8Q+QralM4IITa7kDhCAiNB7ASt43WOlEcyvb2pNu4IODoPz9/n1xv9vOkForiPDdwXVagiI23&#10;jocG3rdPxR0oScgWJ8/UwIEENu3lRb09BBKV0ywNjCmFe63FjDSjlD4Q50nv44wpl3HQAc0OB9I3&#10;VXWrjedEnIq03oC27qjHjympx31un0wiTQLq4bS4shrAECZnMGVTvbD9QSnOhDInjzsyuiBXWQP0&#10;r4R18jfgnHvJr4nOknrFmJ5xzhraRtHWf3Kkpfz/yGo5S+H73hkquyhdjr3R8m2lj09svwAAAP//&#10;AwBQSwMEFAAGAAgAAAAhAFr0LFu/AAAAFQEAAAsAAABfcmVscy8ucmVsc2zPwWrDMAwG4Ptg72B0&#10;X5TuUMaI01uh19I+gLGVxCy2jGSy9e1nemrHjpL4P0nD4SetZiPRyNnCruvBUPYcYp4tXC/Htw8w&#10;Wl0ObuVMFm6kcBhfX4Yzra62kC6xqGlKVgtLreUTUf1CyWnHhXKbTCzJ1VbKjMX5LzcTvvf9HuXR&#10;gPHJNKdgQU5hB+ZyK23zHztFL6w81c5zQp6m6P9TMfB3PtPWFCczVQtB9N4U2rp2HOA44NMz4y8A&#10;AAD//wMAUEsDBBQABgAIAAAAIQCp9Qa/ywAAAOMAAAAPAAAAZHJzL2Rvd25yZXYueG1sRI9BS8NA&#10;FITvgv9heYKXYjcb0Erstoii5CBCqx68vWaf2djs25B9tvHfu4LgcZiZb5jlegq9OtCYusgWzLwA&#10;RdxE13Fr4fXl4eIaVBJkh31ksvBNCdar05MlVi4eeUOHrbQqQzhVaMGLDJXWqfEUMM3jQJy9jzgG&#10;lCzHVrsRjxkeel0WxZUO2HFe8DjQnadmv/0KFt7rSdpP8yhPe5y9zWq/a57vd9aen023N6CEJvkP&#10;/7VrZ6E0prwsi8XCwO+n/Af06gcAAP//AwBQSwECLQAUAAYACAAAACEA2+H2y+4AAACFAQAAEwAA&#10;AAAAAAAAAAAAAAAAAAAAW0NvbnRlbnRfVHlwZXNdLnhtbFBLAQItABQABgAIAAAAIQBa9CxbvwAA&#10;ABUBAAALAAAAAAAAAAAAAAAAAB8BAABfcmVscy8ucmVsc1BLAQItABQABgAIAAAAIQCp9Qa/ywAA&#10;AOMAAAAPAAAAAAAAAAAAAAAAAAcCAABkcnMvZG93bnJldi54bWxQSwUGAAAAAAMAAwC3AAAA/wIA&#10;AAAA&#10;" filled="f" strokecolor="black [3213]" strokeweight="1pt">
+                <v:textbox>
+                  <w:txbxContent>
+                    <w:p w:rsidR="0014099F" w:rsidRPr="00B068DF" w:rsidRDefault="00B068DF" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:outline/>
+                          <w:color w:val="000000" w:themeColor="text1"/>
+                          <w:sz w:val="20"/>
+                          <w:szCs w:val="20"/>
+                          <w:lang w:val="en-US"/>
+                          <w14:textOutline w14:w="9525" w14:cap="rnd" w14:cmpd="sng" w14:algn="ctr">
+                            <w14:solidFill>
+                              <w14:schemeClr w14:val="tx1"/>
+                            </w14:solidFill>
+                            <w14:prstDash w14:val="solid"/>
+                            <w14:bevel/>
+                          </w14:textOutline>
+                          <w14:textFill>
+                            <w14:noFill/>
+                          </w14:textFill>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="00B068DF">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:outline/>
+                          <w:color w:val="000000" w:themeColor="text1"/>
+                          <w:sz w:val="20"/>
+                          <w:szCs w:val="20"/>
+                          <w:lang w:val="en-US"/>
+                          <w14:textOutline w14:w="9525" w14:cap="rnd" w14:cmpd="sng" w14:algn="ctr">
+                            <w14:solidFill>
+                              <w14:schemeClr w14:val="tx1"/>
+                            </w14:solidFill>
+                            <w14:prstDash w14:val="solid"/>
+                            <w14:bevel/>
+                          </w14:textOutline>
+                          <w14:textFill>
+                            <w14:noFill/>
+                          </w14:textFill>
+                        </w:rPr>
+                        <w:t>LOGO.PNG</w:t>
+                      </w:r>
+                    </w:p>
+                  </w:txbxContent>
+                </v:textbox>
+              </v:rect>
+              <v:shape id="Text Box 1" o:spid="_x0000_s1030" type="#_x0000_t202" style="position:absolute;left:17406;top:12010;width:30422;height:2347;visibility:visible;mso-wrap-style:square;v-text-anchor:top" o:gfxdata="UEsDBBQABgAIAAAAIQDb4fbL7gAAAIUBAAATAAAAW0NvbnRlbnRfVHlwZXNdLnhtbHyQz07DMAyH&#10;70i8Q+QralM4IITa7kDhCAiNB7ASt43WOlEcyvb2pNu4IODoPz9/n1xv9vOkForiPDdwXVagiI23&#10;jocG3rdPxR0oScgWJ8/UwIEENu3lRb09BBKV0ywNjCmFe63FjDSjlD4Q50nv44wpl3HQAc0OB9I3&#10;VXWrjedEnIq03oC27qjHjympx31un0wiTQLq4bS4shrAECZnMGVTvbD9QSnOhDInjzsyuiBXWQP0&#10;r4R18jfgnHvJr4nOknrFmJ5xzhraRtHWf3Kkpfz/yGo5S+H73hkquyhdjr3R8m2lj09svwAAAP//&#10;AwBQSwMEFAAGAAgAAAAhAFr0LFu/AAAAFQEAAAsAAABfcmVscy8ucmVsc2zPwWrDMAwG4Ptg72B0&#10;X5TuUMaI01uh19I+gLGVxCy2jGSy9e1nemrHjpL4P0nD4SetZiPRyNnCruvBUPYcYp4tXC/Htw8w&#10;Wl0ObuVMFm6kcBhfX4Yzra62kC6xqGlKVgtLreUTUf1CyWnHhXKbTCzJ1VbKjMX5LzcTvvf9HuXR&#10;gPHJNKdgQU5hB+ZyK23zHztFL6w81c5zQp6m6P9TMfB3PtPWFCczVQtB9N4U2rp2HOA44NMz4y8A&#10;AAD//wMAUEsDBBQABgAIAAAAIQDuyVlyzAAAAOMAAAAPAAAAZHJzL2Rvd25yZXYueG1sRE9NawIx&#10;EL0X/A9hBG810baiq1FkQVqkPfhx8TZuxt3FzWS7ibr11zeFgvAuM2/ee/Nmi9ZW4kqNLx1rGPQV&#10;COLMmZJzDfvd6nkMwgdkg5Vj0vBDHhbzztMME+NuvKHrNuQimrBPUEMRQp1I6bOCLPq+q4kjd3KN&#10;xRDHJpemwVs0t5UcKjWSFkuOCQXWlBaUnbcXq2Gdrr5wcxza8b1K3z9Py/p7f3jTutdtl1MQgdrw&#10;OP5Xf5j4/mSkItTLK/x1iguQ818AAAD//wMAUEsBAi0AFAAGAAgAAAAhANvh9svuAAAAhQEAABMA&#10;AAAAAAAAAAAAAAAAAAAAAFtDb250ZW50X1R5cGVzXS54bWxQSwECLQAUAAYACAAAACEAWvQsW78A&#10;AAAVAQAACwAAAAAAAAAAAAAAAAAfAQAAX3JlbHMvLnJlbHNQSwECLQAUAAYACAAAACEA7slZcswA&#10;AADjAAAADwAAAAAAAAAAAAAAAAAHAgAAZHJzL2Rvd25yZXYueG1sUEsFBgAAAAADAAMAtwAAAAAD&#10;AAAAAA==&#10;" filled="f" stroked="f" strokeweight=".5pt">
+                <v:textbox>
+                  <w:txbxContent>
+                    <w:p w:rsidR="00B068DF" w:rsidRPr="00B068DF" w:rsidRDefault="00B068DF" w:rsidP="0014099F">
+                      <w:pPr>
+                        <w:spacing w:after="0"/>
+                        <w:jc w:val="center"/>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                        </w:rPr>
+                      </w:pPr>
+                      <w:r w:rsidRPr="00B068DF">
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                        </w:rPr>
+                        <w:t>Matricule: [Matricule] | Telephone: [School Phone No</w:t>
+                      </w:r>
+                      <w:r>
+                        <w:rPr>
+                          <w:rFonts w:ascii="Segoe UI" w:hAnsi="Segoe UI" w:cs="Segoe UI"/>
+                          <w:sz w:val="18"/>
+                          <w:szCs w:val="18"/>
+                        </w:rPr>
+                        <w:t>.]</w:t>
+                      </w:r>
+                    </w:p>
+                  </w:txbxContent>
+                </v:textbox>
+              </v:shape>
+              <w10:anchorlock/>
+            </v:group>
+          </w:pict>
+        </mc:Fallback>
+      </mc:AlternateContent>
+    </w:r>
+  </w:p>
+  <w:p w:rsidR="00FE739E" w:rsidRPr="00E65B72" w:rsidRDefault="00FE739E" w:rsidP="00FE739E">
+    <w:pPr>
+      <w:jc w:val="center"/>
+      <w:rPr>
+        <w:sz w:val="20"/>
+        <w:szCs w:val="20"/>
+        <w:lang w:val="en-CM"/>
+      </w:rPr>
+    </w:pPr>
+  </w:p>
+  <w:p w:rsidR="00FE739E" w:rsidRDefault="00FE739E" w:rsidP="00F260DB">
+    <w:pPr>
+      <w:spacing w:after="0" w:line="120" w:lineRule="auto"/>
+      <w:jc w:val="center"/>
+      <w:rPr>
+        <w:sz w:val="20"/>
+        <w:szCs w:val="20"/>
+        <w:lang w:val="en-CM"/>
+      </w:rPr>
+    </w:pPr>
+  </w:p>
+  <w:p w:rsidR="0022480E" w:rsidRPr="00E65B72" w:rsidRDefault="0022480E" w:rsidP="004D76B0">
+    <w:pPr>
+      <w:rPr>
+        <w:sz w:val="20"/>
+        <w:szCs w:val="20"/>
+        <w:lang w:val="en-CM"/>
+      </w:rPr>
+    </w:pPr>
+  </w:p>
+  <w:sectPr w:rsidR="0022480E" w:rsidRPr="00E65B72" w:rsidSect="0014099F">
+    <w:pgSz w:w="11906" w:h="16838"/>
+    <w:pgMar w:top="720" w:right="720" w:bottom="720" w:left="720" w:header="708" w:footer="708" w:gutter="0"/>
+    <w:cols w:space="708"/>
+    <w:docGrid w:linePitch="360"/>
+  </w:sectPr>
+</w:body>

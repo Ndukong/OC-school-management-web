@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Teacher Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">My Assignments</div>
+    <div class="card-body">
+        {% if assignments %}
+        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(250px, 1fr)); gap:12px;">
+            {% for a in assignments %}
+            <div style="border:1px solid var(--border); border-radius:var(--radius); padding:16px;">
+                <div style="font-weight:600; margin-bottom:4px;">{{ a.class }}</div>
+                <div class="text-muted" style="font-size:13px; margin-bottom:8px;">{{ a.subject }}</div>
+                {% if a.is_class_master %}<span class="badge badge-info" style="margin-bottom:8px;">Class Master</span>{% endif %}
+                <a href="{% url 'mark_entry' a.class.id a.subject.id %}" class="btn btn-primary btn-sm" style="width:100%;">Enter Marks</a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="alert alert-warning">No class/subject assignments found for your account.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

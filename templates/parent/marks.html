@@ -1,0 +1,66 @@
+{% extends "parent/base.html" %}
+{% block title %}Marks &amp; Results{% endblock %}
+{% block content %}
+
+<div class="profile">
+    <div class="avatar">{{ student.first_name|first }}</div>
+    <div>
+        <div class="name">{{ student }}</div>
+        <div class="meta">Marks &amp; Results</div>
+    </div>
+</div>
+
+{% if term %}
+<div class="card">
+    <h2>{{ term.label }} {{ term.year_start }}/{{ term.year_end }}</h2>
+    {% if result %}
+    <div class="stat-grid">
+        <div class="stat {% if result.average >= 10 %}success{% else %}danger{% endif %}">
+            <div class="value">{{ result.average }}</div>
+            <div class="label">Overall Average</div>
+        </div>
+        <div class="stat primary">
+            <div class="value">{{ result.rank|default:"—" }}</div>
+            <div class="label">Class Rank</div>
+        </div>
+    </div>
+    <div class="detail-row"><span class="k">Grade</span><span class="v">{{ result.grade|default:"N/A" }}</span></div>
+    <div class="detail-row"><span class="k">Remark</span><span class="v">{{ result.remark|default:"N/A" }}</span></div>
+    {% if result.remark_on_performance %}
+    <div style="margin-top:10px; font-size:13px; color:var(--muted); padding:10px; background:#f9fafb; border-radius:8px;">
+        <strong>Performance Note:</strong> {{ result.remark_on_performance }}
+    </div>
+    {% endif %}
+    {% else %}
+    <div class="empty">No results computed yet for this term.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Subject Averages</h2>
+    {% if averages %}
+    <table class="table">
+        <thead><tr><th>Subject</th><th>Average</th><th>Grade</th><th>Remark</th></tr></thead>
+        <tbody>
+            {% for avg in averages %}
+            <tr>
+                <td>{{ avg.subject.name }}</td>
+                <td><strong>{{ avg.average }}</strong></td>
+                <td>{{ avg.grade|default:"-" }}</td>
+                <td style="font-size:12px; color:var(--muted);">{{ avg.remark }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No subject averages available yet.</div>
+    {% endif %}
+</div>
+
+{% else %}
+<div class="card"><div class="empty">No active academic term.</div></div>
+{% endif %}
+
+<a href="{% url 'parent:dashboard' %}" class="btn-secondary">&larr; Back</a>
+
+{% endblock %}

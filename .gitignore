@@ -1,0 +1,35 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Virtual environment
+.venv/
+
+# Django
+db.sqlite3
+media/
+staticfiles/
+*.log
+
+# Backups contain full database dumps — never commit
+backups/
+
+# Test / tooling caches
+.pytest_cache/
+.ruff_cache/
+.coverage
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+Thumbs.db
+Desktop.ini
+
+# Environment
+.env

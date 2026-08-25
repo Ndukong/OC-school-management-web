@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Subjects{% endblock %}
+{% block page_title %}Subjects{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Subject Catalogue</span>
+        <div>
+            <a href="{% url 'class_subjects_all' %}" class="btn btn-sm">Class Subjects &amp; Coefficients</a>
+            <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if subjects %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Code</th>
+                        <th>Sort Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for subject in subjects %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td style="font-weight:600;">{{ subject.name }}</td>
+                        <td><span class="badge badge-info">{{ subject.code }}</span></td>
+                        <td>{{ subject.sort_order }}</td>
+                        <td>
+                            <form method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete {{ subject.name }}?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="subject_id" value="{{ subject.pk }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No subjects yet. Add the subject catalogue below.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Add Subject</span></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.name.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Code *</label>
+                    {{ form.code }}
+                    {% if form.code.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.code.errors }}</div>{% endif %}
+                    <div class="form-hint">3-letter code, e.g., ENL, MAT.</div>
+                </div>
+                <div class="form-group">
+                    <label>Sort order</label>
+                    {{ form.sort_order }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Subject</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

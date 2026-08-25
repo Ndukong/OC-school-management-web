@@ -1,0 +1,88 @@
+{% extends "base.html" %}
+{% block title %}Fee Status - {{ student.full_name }}{% endblock %}
+{% block page_title %}Fee Status{% endblock %}
+{% block content %}
+
+<div style="margin-bottom:16px;">
+    <a href="{% url 'finance_dashboard' %}" class="btn btn-sm">&larr; Back to Finance Dashboard</a>
+</div>
+
+<!-- Student info -->
+<div class="card">
+    <div class="card-body" style="display:flex; flex-wrap:wrap; gap:16px; align-items:center; justify-content:space-between;">
+        <div>
+            <h2 style="margin:0 0 4px; font-size:20px;">{{ student.full_name }}</h2>
+            <div class="text-muted" style="font-size:13px;">Student ID: <span style="font-family:monospace;">{{ student.unique_id }}</span></div>
+            <div style="font-size:13px; margin-top:6px;">
+                Current Class:
+                {% if term %}
+                    {% for e in student.enrollments.all %}{% if e.academic_term.id == term.id %}<strong>{{ e.school_class }}</strong>{% endif %}{% endfor %}
+                {% else %}
+                    <span class="text-muted">No term selected</span>
+                {% endif %}
+            </div>
+        </div>
+        <div>
+            <span class="form-hint" style="display:block; margin-bottom:4px;">Academic Term</span>
+            <select onchange="if(this.value){window.location='?term_id='+this.value;}" style="min-width:220px;">
+                {% for t in terms %}
+                <option value="{{ t.id }}" {% if term and t.id == term.id %}selected{% endif %}>{{ t }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+</div>
+
+<!-- Fee summary -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px; margin-top:16px;">
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:24px; font-weight:700; color:var(--primary);">{{ expected|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">Expected (FCFA)</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:24px; font-weight:700; color:var(--success);">{{ collected|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">Paid (FCFA)</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:24px; font-weight:700; color:var(--danger);">{{ outstanding|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">Outstanding (FCFA)</div>
+    </div></div>
+</div>
+
+<!-- Payment history -->
+<div class="card" style="margin-top:16px;">
+    <div class="card-header">Payment History{% if term %} - {{ term }}{% endif %}</div>
+    <div class="table-wrap">
+        {% if payments %}
+        <table class="table">
+            <thead>
+                <tr><th>Date</th><th>Receipt #</th><th>Fee Type</th><th>Category</th><th>Amount (FCFA)</th><th>Notes</th></tr>
+            </thead>
+            <tbody>
+                {% for r in payments %}
+                <tr>
+                    <td>{{ r.date_paid }}</td>
+                    <td>{{ r.receipt_number|default:"-" }}</td>
+                    <td>{{ r.fee_type|default:"-" }}</td>
+                    <td>
+                        {% if r.fee_type %}
+                        <span class="badge badge-{% if r.fee_type.category == 'PTA' %}success{% else %}info{% endif %}">{{ r.fee_type.get_category_display }}</span>
+                        {% else %}-{% endif %}
+                    </td>
+                    <td style="font-weight:600;">{{ r.amount|floatformat:2 }}</td>
+                    <td>{{ r.notes|default:"-" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="card-body"><p class="text-muted" style="margin:0;">No payments recorded for this term.</p></div>
+        {% endif %}
+    </div>
+    <div class="card-footer text-muted" style="font-size:12px;">Transactions are immutable and cannot be edited or deleted.</div>
+</div>
+
+<div style="margin-top:16px;">
+    <a href="{% url 'finance_dashboard' %}" class="btn btn-sm">&larr; Back to Finance Dashboard</a>
+</div>
+{% endblock %}

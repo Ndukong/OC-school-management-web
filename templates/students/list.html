@@ -1,0 +1,67 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Students{% endblock %}
+{% block page_title %}Students{% endblock %}
+{% block content %}
+<style>
+.stu-toolbar { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; }
+.stu-count { color:var(--text-muted); font-size:13px; }
+.stu-range { font-weight:600; color:var(--primary); }
+.pagination-x { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; margin-top:16px; }
+.page-nums { display:flex; align-items:center; gap:4px; flex-wrap:wrap; }
+.page-nums a, .page-nums span {
+    display:inline-block; min-width:32px; padding:4px 10px; text-align:center;
+    border:1px solid var(--border); border-radius:var(--radius); font-size:13px; text-decoration:none;
+}
+.page-nums a:hover { background:var(--accent); }
+.page-nums .cur { background:var(--primary); color:#fff; border-color:var(--primary); font-weight:700; }
+.page-nums .ellip { border:none; }
+.per-page { display:flex; align-items:center; gap:6px; font-size:13px; color:var(--text-muted); }
+.per-page select { padding:4px 6px; border:1px solid var(--border); border-radius:var(--radius); }
+.filters-bar { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px; }
+.filters-bar input[type=search] { flex:1; min-width:160px; }
+.filters-bar select { min-width:120px; }
+.filters-bar .htmx-indicator { display:none; }
+.filters-bar.htmx-request .htmx-indicator { display:inline-block; }
+</style>
+<div class="card">
+    <div class="card-header">
+        <span>All Students (<span id="students-count" class="stu-count">{{ total_count }}</span>)</span>
+        <div style="display:flex; gap:8px;">
+            <a href="{% url 'student_export_excel' %}?{% if class_filter %}class={{ class_filter }}&{% endif %}{% if sex_filter %}sex={{ sex_filter }}&{% endif %}{% if query %}q={{ query|urlencode }}{% endif %}" class="btn btn-sm">&#8681; Excel</a>
+            <a href="{% url 'student_create' %}" class="btn btn-sm btn-primary">+ Register</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <form method="get"
+              hx-get="{% url 'student_list' %}"
+              hx-target="#students-results"
+              hx-swap="outerHTML"
+              hx-push-url="true"
+              hx-trigger="submit, keyup changed delay:350ms, change delay:120ms"
+              class="filters-bar">
+            <input type="search" name="q" value="{{ query }}" placeholder="Search name or ID..." autofocus>
+            <select name="class">
+                <option value="">All Classes</option>
+                {% for cls in classes %}
+                <option value="{{ cls.id }}" {% if class_filter == cls.id|stringformat:"d" %}selected{% endif %}>{{ cls }}</option>
+                {% endfor %}
+            </select>
+            <select name="sex">
+                <option value="">All Sex</option>
+                <option value="M" {% if sex_filter == "M" %}selected{% endif %}>Male</option>
+                <option value="F" {% if sex_filter == "F" %}selected{% endif %}>Female</option>
+            </select>
+            <input type="hidden" name="per_page" value="{{ per_page }}">
+            <button type="submit" class="btn btn-primary btn-sm">Filter</button>
+            <span class="htmx-indicator" style="font-size:13px; color:var(--text-muted); align-self:center;">Searching&hellip;</span>
+            {% if query or class_filter or sex_filter %}
+            <a href="{% url 'student_list' %}" class="btn btn-sm">Clear</a>
+            {% endif %}
+        </form>
+
+        {% include "students/_list_results.html" %}
+    </div>
+</div>
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+{% endblock %}

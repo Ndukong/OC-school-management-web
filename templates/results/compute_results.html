@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Compute Results</title>
+<style>
+body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; margin: 0; color: #2d3a47; }
+.container { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+h1 { font-size: 22px; margin: 0; }
+.mb-4 { margin-bottom: 24px; }
+.d-flex { display: flex; }
+.justify-content-between { justify-content: space-between; }
+.align-items-center { align-items: center; }
+.btn { display: inline-block; padding: 8px 14px; border-radius: 8px; text-decoration: none; font-size: 13px; }
+.btn-outline-secondary { border: 1px solid #cbd5e1; color: #475569; }
+.alert { padding: 12px 16px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; }
+.alert-success { background: #e8f7ee; color: #1a7f4b; border: 1px solid #b6e8cd; }
+.alert-error { background: #fdecec; color: #a03232; border: 1px solid #f0c4c4; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 20px; margin-bottom: 24px; }
+.row { display: flex; gap: 12px; flex-wrap: wrap; }
+.col-md-5 { flex: 1; min-width: 200px; }
+.form-label { display: block; margin-bottom: 6px; font-weight: 600; font-size: 13px; }
+.form-select, .form-control { width: 100%; padding: 9px 12px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; box-sizing: border-box; }
+table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+th, td { border: 1px solid #e2e8f0; padding: 8px 10px; text-align: left; font-size: 13px; }
+th { background: #f8fafc; }
+.btn-primary { background: #1f4e78; color: #fff; border: none; cursor: pointer; font-weight: 600; }
+.btn-primary:hover { background: #163a5c; }
+.text-center { text-align: center; }
+</style>
+</head>
+<body class="bg-light">
+<div class="container py-4">
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h3">Compute Results</h1>
+    <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary btn-sm">Back to Dashboard</a>
+</div>
+
+{% if messages %}
+    {% for msg in messages %}
+        <div class="alert alert-{{ msg.tags }} alert-dismissible fade show">{{ msg }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="post" class="row g-3 align-items-end">
+            {% csrf_token %}
+            <div class="col-md-5">
+                <label for="class_id" class="form-label">Class</label>
+                <select name="class_id" id="class_id" class="form-select" required>
+                    <option value="">Select class...</option>
+                    {% for sc in classes %}
+                        <option value="{{ sc.id }}" {% if school_class.id == sc.id %}selected{% endif %}>{{ sc }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-5">
+                <label for="term_id" class="form-label">Term</label>
+                <select name="term_id" id="term_id" class="form-select" required>
+                    <option value="">Select term...</option>
+                    {% for t in terms %}
+                        <option value="{{ t.id }}" {% if term.id == t.id %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Compute</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if results %}
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body text-center">
+        <div class="fs-4 fw-bold">{{ results.enrolled }}</div>
+        <div class="text-muted small">Enrolled</div>
+    </div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body text-center">
+        <div class="fs-4 fw-bold">{{ results.num_sat }}</div>
+        <div class="text-muted small">Sat</div>
+    </div></div></div>
+    <div class="col-6 col-md-2"><div class="card shadow-sm"><div class="card-body text-center">
+        <div class="fs-4 fw-bold">{{ results.num_passed }}</div>
+        <div class="text-muted small">Passed</div>
+    </div></div></div>
+    <div class="col-6 col-md-3"><div class="card shadow-sm"><div class="card-body text-center">
+        <div class="fs-4 fw-bold">{{ results.class_average|floatformat:2 }}</div>
+        <div class="text-muted small">Class Average</div>
+    </div></div></div>
+    <div class="col-12 col-md-3"><div class="card shadow-sm"><div class="card-body text-center">
+        <div class="fs-4 fw-bold">{{ results.success_rate|floatformat:1 }}%</div>
+        <div class="text-muted small">Success Rate</div>
+    </div></div></div>
+</div>
+
+<div class="card shadow-sm mb-3">
+    <div class="card-header d-flex justify-content-between align-items-center">
+        <span>Results — {{ school_class }} / {{ term }}</span>
+        <a href="{% url 'preview_mark_sheet' school_class.id term.id %}" class="btn btn-outline-primary btn-sm">Preview Mark Sheet</a>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-sm table-striped table-hover mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Student</th>
+                    {% for cs in results.class_subjects %}
+                        <th class="text-center">{{ cs.subject.code }}</th>
+                    {% endfor %}
+                    <th class="text-center">Coef</th>
+                    <th class="text-center">Total</th>
+                    <th class="text-center">Average</th>
+                    <th class="text-center">Rank</th>
+                    <th class="text-center">Grade</th>
+                    <th class="text-center">Remark</th>
+                    <th class="text-center">Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for r in results.rows %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ r.student.full_name }}</td>
+                        {% for avg in r.averages %}
+                            <td class="text-center">
+                                {% if avg is not None %}{{ avg|floatformat:2 }}{% else %}-{% endif %}
+                            </td>
+                        {% endfor %}
+                        <td class="text-center">{{ r.total_coef }}</td>
+                        <td class="text-center">{{ r.total_score|floatformat:2 }}</td>
+                        <td class="text-center fw-semibold">{{ r.average|floatformat:2 }}</td>
+                        <td class="text-center">{{ r.rank }}</td>
+                        <td class="text-center">{{ r.grade }}</td>
+                        <td class="text-center">{{ r.remark }}</td>
+                        <td class="text-center">{{ r.promotion_decision|default:"-" }}</td>
+                    </tr>
+                {% empty %}
+                    <tr><td colspan="4" class="text-center text-muted py-3">
+                        No results — no enrolled students with scores for this class and term.
+                    </td></tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+</div>
+</body>
+</html>

@@ -1,0 +1,529 @@
+{% load static %}
+{% load school_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="csrf-token" content="{{ csrf_token }}">
+<title>Mark Entry — {{ subject.name }}</title>
+<style>
+    :root {
+        --primary: #1f4e78;
+        --primary-dark: #163a5a;
+        --bg: #eef2f6;
+        --card: #ffffff;
+        --border: #d7dee6;
+        --text: #1c2733;
+        --muted: #6b7785;
+        --red: #d93025;
+        --red-bg: #fdeceb;
+        --green: #188038;
+        --green-bg: #e6f4ea;
+        --amber: #b26a00;
+        --amber-bg: #fdf3e0;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+    }
+    .topbar {
+        background: var(--primary);
+        color: #fff;
+        padding: 14px 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        position: sticky;
+        top: 0;
+        z-index: 20;
+    }
+    .topbar h1 { font-size: 1rem; margin: 0; line-height: 1.3; }
+    .topbar small { display: block; color: #c8d8e8; font-size: 0.72rem; margin-top: 2px; }
+    .btn {
+        display: inline-block;
+        background: #fff;
+        color: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 9px 14px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        white-space: nowrap;
+        cursor: pointer;
+    }
+    .btn:hover { background: var(--green-bg); }
+    .btn-primary { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-compute { background: #0b6e4f; color: #fff; border-color: #0b6e4f; }
+    .btn-compute:hover { background: #08553c; }
+    .container { max-width: 900px; margin: 0 auto; padding: 12px 12px 40px; }
+    .toolbar {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .toolbar label { font-size: 0.82rem; color: var(--muted); }
+    .toolbar select {
+        font-size: 0.9rem;
+        padding: 8px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--text);
+        max-width: 220px;
+    }
+    .save-status {
+        margin-left: auto;
+        font-size: 0.85rem;
+        font-weight: 600;
+        min-height: 1.2em;
+        color: var(--muted);
+    }
+    .save-status.ok { color: var(--green); }
+    .save-status.err { color: var(--red); }
+    .save-status.warn { color: var(--amber); }
+    .save-status.htmx-request { opacity: 0.55; }
+    .flash { padding: 11px 14px; border-radius: 8px; margin-bottom: 12px; font-size: 0.85rem; }
+    .flash.warning { background: var(--amber-bg); border: 1px solid #f0c76a; color: #7a5200; }
+    .flash.info { background: #e8f0f7; border: 1px solid #b9d0e4; color: #22486d; }
+    .flash.success { background: var(--green-bg); border: 1px solid #a7d6b5; color: #14532d; }
+
+    .grid-wrap {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    table.score-grid {
+        border-collapse: collapse;
+        width: max-content;
+        min-width: 100%;
+        font-size: 0.82rem;
+    }
+    .score-grid th, .score-grid td {
+        border: 1px solid var(--border);
+        padding: 0;
+    }
+    .score-grid thead th {
+        background: #eaf1f7;
+        color: var(--primary-dark);
+        font-weight: 600;
+        text-align: center;
+        padding: 6px 4px;
+        white-space: nowrap;
+        vertical-align: middle;
+    }
+    .name-col, .avg-col, .grade-col { padding: 8px 6px; }
+    .name-col {
+        position: sticky;
+        left: 0;
+        background: #fff;
+        z-index: 2;
+        font-weight: 600;
+        white-space: nowrap;
+        max-width: 140px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .score-grid thead th.name-head { position: sticky; left: 0; z-index: 4; background: #eaf1f7; }
+    .comp-label {
+        writing-mode: vertical-lr;
+        transform: rotate(180deg);
+        font-size: 0.7rem;
+        line-height: 1.15;
+        max-height: 130px;
+        max-width: 60px;
+        text-align: left;
+    }
+    .score-grid td.cell { text-align: center; min-width: 56px; }
+    input.score-input {
+        width: 100%;
+        min-width: 52px;
+        min-height: 44px;
+        border: none;
+        background: transparent;
+        text-align: center;
+        font-size: 1.02rem;
+        color: var(--text);
+        -moz-appearance: textfield;
+    }
+    input.score-input::-webkit-outer-spin-button,
+    input.score-input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+    input.score-input:focus { outline: 2px solid var(--primary); background: #fff; }
+    input.score-input.fail { color: var(--red); font-weight: 700; }
+    td.cell-fail { background: var(--red-bg); }
+    input.score-input.invalid { background: #ffe6e6; box-shadow: inset 0 0 0 2px var(--red); }
+    input.score-input.saved { background: var(--green-bg); box-shadow: inset 0 0 0 2px var(--green); transition: background 0.4s; }
+    input.score-input.save-error { background: #ffe6e6; box-shadow: inset 0 0 0 2px var(--red); }
+    input.score-input.queued { background: var(--amber-bg); box-shadow: inset 0 0 0 2px var(--amber); }
+    .row-avg { font-weight: 700; }
+    .row-avg.danger { color: var(--red); }
+    .grade-badge {
+        display: inline-block;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 5px;
+        padding: 2px 7px;
+        font-size: 0.72rem;
+        font-weight: 700;
+    }
+    .grade-note { display: block; color: var(--muted); font-size: 0.68rem; margin-top: 2px; }
+    .rank-pill { color: var(--muted); font-size: 0.72rem; }
+
+    .action-bar {
+        margin-top: 14px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        align-items: center;
+    }
+    .action-hint { font-size: 0.78rem; color: var(--muted); }
+
+    .results-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-top: 18px;
+        overflow: hidden;
+    }
+    .results-card h2 {
+        margin: 0;
+        padding: 12px 14px;
+        background: #0b6e4f;
+        color: #fff;
+        font-size: 0.95rem;
+    }
+    .stats-row { display: flex; gap: 12px; padding: 12px 14px; flex-wrap: wrap; }
+    .stat {
+        background: var(--bg);
+        border-radius: 8px;
+        padding: 10px 14px;
+        flex: 1;
+        min-width: 120px;
+        text-align: center;
+    }
+    .stat b { display: block; font-size: 1.2rem; color: var(--primary-dark); }
+    .stat span { font-size: 0.72rem; color: var(--muted); }
+    .results-table-wrap { overflow-x: auto; }
+    .results-table { border-collapse: collapse; width: 100%; font-size: 0.82rem; }
+    .results-table th, .results-table td { border: 1px solid var(--border); padding: 7px 10px; text-align: center; }
+    .results-table th { background: #eaf1f7; }
+    .results-table td.name { text-align: left; }
+    .pill-ok { color: var(--green); font-weight: 700; }
+    .pill-bad { color: var(--red); font-weight: 700; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div>
+        <h1>{{ subject.name }} &middot; {{ school_class }}</h1>
+        <small>{{ term }} &middot; Scores on 20 &middot; Step 2: enter marks</small>
+    </div>
+    <a class="btn" href="{% url 'mark_entry_select' %}">&larr; Back</a>
+</header>
+
+<div class="container">
+
+<div class="toolbar">
+    <label for="term-select">Term</label>
+    {% if terms %}
+        <select id="term-select" onchange="if(this.value){window.location=this.value;}">
+            {% for t in terms %}
+                <option value="{% url 'mark_entry_grid' school_class.id subject.id t.id %}"
+                        {% if t.id == term.id %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    {% endif %}
+    <span id="save-status" class="save-status htmx-indicator"></span>
+</div>
+
+{% if messages %}
+    {% for msg in messages %}
+        <div class="flash {{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+{% endif %}
+
+{% if not students %}
+    <div class="flash warning">No students enrolled in this class for {{ term }}.</div>
+{% elif not competencies %}
+    <div class="flash warning">No competencies defined for {{ subject.name }} in {{ term }} (form level {{ school_class.form_level }}).</div>
+{% else %}
+
+<form method="post" id="score-form">
+    {% csrf_token %}
+    <div class="grid-wrap">
+        <table class="score-grid">
+            <thead>
+                <tr>
+                    <th class="name-head">Student</th>
+                    {% for comp in competencies %}
+                        <th><div class="comp-label">{{ comp.description }}</div></th>
+                    {% endfor %}
+                    <th>AV/20</th>
+                    {% if has_computed %}<th>Grade</th>{% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for student in students %}
+                <tr>
+                    <td class="name-col" title="{{ student.full_name }}">{{ student.full_name }}</td>
+                    {% for comp in competencies %}
+                        {% with student_scores=existing|get_item:student.pk %}
+                        <td class="cell">
+                            <input type="number" inputmode="decimal" min="0" max="20" step="0.25"
+                                   name="score_{{ student.pk }}_{{ comp.pk }}"
+                                   value="{% if student_scores %}{{ student_scores|get_item:comp.pk }}{% endif %}"
+                                   class="score-input"
+                                   data-student="{{ student.pk }}"
+                                   data-competency="{{ comp.pk }}"
+                                   hx-post="{% url 'save_score_cell' %}"
+                                   hx-trigger="blur changed"
+                                   hx-vals='{"student_id": "{{ student.pk }}", "competency_id": "{{ comp.pk }}", "term_id": "{{ term.id }}"}'
+                                   hx-swap="none">
+                        </td>
+                        {% endwith %}
+                    {% endfor %}
+                    <td class="avg-col row-avg" id="avg-{{ student.pk }}">-</td>
+                    {% if has_computed %}
+                        <td class="grade-col">
+                            {% with sa=subject_averages|get_item:student.pk %}
+                                {% if sa %}
+                                    <span class="grade-badge">{{ sa.grade }}</span>
+                                    <span class="grade-note">{{ sa.average }} &middot; {{ sa.remark }}</span>
+                                {% else %}
+                                    <span class="grade-note">—</span>
+                                {% endif %}
+                            {% endwith %}
+                        </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="action-bar">
+        <button type="submit" class="btn btn-primary">Save All Scores</button>
+        {% if is_compute_allowed %}
+            <button type="submit" id="compute-btn" name="action" value="compute" class="btn btn-compute">Compute Results</button>
+        {% else %}
+            <span class="action-hint">Results are computed by the administrator.</span>
+        {% endif %}
+        <span class="action-hint">Scores auto-save as you move between cells. Values 0–20, step 0.25.</span>
+    </div>
+</form>
+
+{% endif %}
+
+{% if results %}
+<div class="results-card">
+    <h2>Results — {{ results.school_class }} ({{ results.term }})</h2>
+    <div class="stats-row">
+        <div class="stat"><b>{{ results.num_sat }}</b><span>Sat for exams</span></div>
+        <div class="stat"><b>{{ results.num_passed }}</b><span>Passed (AV &ge; 10)</span></div>
+        <div class="stat"><b>{{ results.class_average }}</b><span>Class average</span></div>
+        <div class="stat"><b>{{ results.success_rate }}%</b><span>Success rate</span></div>
+    </div>
+    <div class="results-table-wrap">
+        <table class="results-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th class="name">Student</th>
+                    <th>AV/20</th>
+                    <th>Rank</th>
+                    <th>Grade</th>
+                    <th>Remark</th>
+                    <th>Decision</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for row in results.rows %}
+                <tr>
+                    <td>{{ forloop.counter }}</td>
+                    <td class="name">{{ row.student.full_name }}</td>
+                    <td>{{ row.average }}</td>
+                    <td>{{ row.rank }}</td>
+                    <td>{{ row.grade }}</td>
+                    <td>{{ row.remark }}</td>
+                    <td>
+                        {% if row.promotion_decision == "PROMOTED" %}
+                            <span class="pill-ok">Promoted</span>
+                        {% elif row.promotion_decision == "PROMOTED BY CLEMENCY OF COUNCIL" %}
+                            <span class="pill-ok">Clemency</span>
+                        {% elif row.promotion_decision == "REPEAT" %}
+                            <span class="pill-bad">Repeat</span>
+                        {% else %}
+                            <span class="rank-pill">—</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
+
+</div>
+
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+<script>
+(function () {
+    'use strict';
+
+    var TERM_ID = {{ term.id }};
+    var SAVE_URL = "{% url 'save_score_cell' %}";
+    var QUEUE_KEY = 'mark_entry_offline_queue';
+    var queue = [];
+
+    function csrf() {
+        var m = document.querySelector('meta[name="csrf-token"]');
+        return m ? m.content : '';
+    }
+    function loadQueue() {
+        try { return JSON.parse(localStorage.getItem(QUEUE_KEY) || '[]'); } catch (e) { return []; }
+    }
+    function persistQueue() {
+        try { localStorage.setItem(QUEUE_KEY, JSON.stringify(queue)); } catch (e) {}
+    }
+    function status(text, cls) {
+        var el = document.getElementById('save-status');
+        if (el) {
+            el.textContent = text;
+            el.className = 'save-status' + (cls ? ' ' + cls : '');
+        }
+    }
+    function parseScore(raw) {
+        if (raw === '' || raw === null || raw === undefined) return null;
+        var v = parseFloat(raw);
+        return isNaN(v) ? null : v;
+    }
+    function flash(input, cls) {
+        input.classList.add(cls);
+        setTimeout(function () { input.classList.remove(cls); }, 900);
+    }
+    function updateRow(input) {
+        var tr = input.closest('tr');
+        if (!tr) return;
+        var inputs = tr.querySelectorAll('input.score-input');
+        var sum = 0, count = 0;
+        inputs.forEach(function (inp) {
+            var v = parseScore(inp.value);
+            if (v !== null) { sum += v; count++; }
+            var fail = v !== null && v < 10;
+            inp.classList.toggle('fail', fail);
+            var td = inp.closest('td');
+            if (td) td.classList.toggle('cell-fail', fail);
+        });
+        var avgCell = tr.querySelector('.row-avg');
+        if (avgCell) {
+            var avg = count ? (sum / count) : null;
+            avgCell.textContent = avg !== null ? avg.toFixed(2) : '-';
+            avgCell.classList.toggle('danger', avg !== null && avg < 10);
+        }
+    }
+
+    document.body.addEventListener('htmx:configRequest', function (e) {
+        e.detail.headers['X-CSRFToken'] = csrf();
+    });
+
+    document.body.addEventListener('htmx:afterRequest', function (e) {
+        var input = e.detail.elt;
+        if (!input || !input.matches || !input.matches('.score-input')) return;
+        var data;
+        try { data = JSON.parse(e.detail.xhr.responseText); } catch (err) { return; }
+        if (data.saved) {
+            flash(input, 'saved');
+            status('Saved \u2713', 'ok');
+            var avgCell = document.getElementById('avg-' + data.student_id);
+            if (avgCell && data.average !== null && data.average !== undefined) {
+                avgCell.textContent = data.average;
+                avgCell.classList.toggle('danger', parseFloat(data.average) < 10);
+            }
+        } else if (data.error) {
+            flash(input, 'save-error');
+            status(data.error, 'err');
+        }
+    });
+
+    document.body.addEventListener('htmx:sendError', function (e) {
+        var input = e.detail.elt;
+        if (!input || !input.matches || !input.matches('.score-input')) return;
+        queue.push({
+            student_id: input.dataset.student,
+            competency_id: input.dataset.competency,
+            term_id: TERM_ID,
+            score: input.value,
+            csrf: csrf()
+        });
+        persistQueue();
+        input.classList.add('queued');
+        status(queue.length + ' save' + (queue.length > 1 ? 's' : '') + ' queued offline — retrying', 'warn');
+    });
+
+    function flushQueue() {
+        if (!queue.length) return;
+        var item = queue[0];
+        fetch(SAVE_URL, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': item.csrf,
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: new URLSearchParams({
+                student_id: item.student_id,
+                competency_id: item.competency_id,
+                term_id: item.term_id,
+                score: item.score
+            }).toString()
+        }).then(function (resp) {
+            if (resp.ok) {
+                queue.shift();
+                persistQueue();
+                var input = document.querySelector(
+                    'input.score-input[data-student="' + item.student_id +
+                    '"][data-competency="' + item.competency_id + '"]');
+                if (input) input.classList.remove('queued');
+                if (queue.length) { status(queue.length + ' queued save(s) remaining', 'warn'); }
+                else { status('Queued saves sent \u2713', 'ok'); }
+                flushQueue();
+            } else {
+                status('Server busy — will retry', 'warn');
+            }
+        }).catch(function () {
+            status('Still offline — will retry', 'warn');
+        });
+    }
+
+    window.addEventListener('online', flushQueue);
+
+    document.addEventListener('DOMContentLoaded', function () {
+        queue = loadQueue();
+        document.querySelectorAll('input.score-input').forEach(updateRow);
+        var form = document.getElementById('score-form');
+        if (form) {
+            form.addEventListener('input', function (e) {
+                if (e.target.matches && e.target.matches('.score-input')) updateRow(e.target);
+            });
+        }
+        if (queue.length) flushQueue();
+    });
+})();
+</script>
+</body>
+</html>

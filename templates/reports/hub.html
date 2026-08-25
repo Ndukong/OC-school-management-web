@@ -1,0 +1,440 @@
+{% extends "base.html" %}
+{% block title %}Reports Hub{% endblock %}
+{% block page_title %}Reports Hub{% endblock %}
+{% block content %}
+{% if not school %}
+<div class="alert alert-warning">No school linked to your account.</div>
+{% else %}
+
+<style>
+.report-card { border:1px solid var(--border); border-radius:var(--radius); background:var(--white); margin-bottom:16px; }
+.report-card-header { display:flex; align-items:center; justify-content:space-between; padding:14px 18px; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px; }
+.report-card-header .title { font-weight:700; font-size:15px; display:flex; align-items:center; gap:10px; }
+.report-card-body { padding:16px 18px; }
+.picker { display:flex; flex-wrap:wrap; gap:10px; align-items:end; margin-bottom:14px; }
+.picker .form-group { flex:1; min-width:150px; margin-bottom:0; }
+.btn-group-x { display:flex; gap:8px; flex-wrap:wrap; }
+@media (max-width: 600px) { .report-card-header { flex-direction:column; align-items:flex-start; } }
+</style>
+
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(340px, 1fr)); gap:16px;">
+
+    <!-- Report Cards -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128196; Report Cards</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="rc-class">
+                        <option value="">Select class...</option>
+                        {% for c in classes %}<option value="{{ c.id }}">{{ c }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Term</label>
+                    <select id="rc-term">
+                        <option value="">Select term...</option>
+                        {% for t in terms %}<option value="{{ t.id }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Student</label>
+                    <select id="rc-student">
+                        <option value="">All (batch)</option>
+                        {% for s in students %}<option value="{{ s.id }}">{{ s.full_name }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a id="rc-preview" href="#" class="btn btn-sm" onclick="return openReport('rc')">Preview</a>
+                <a id="rc-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('rc','download')">Download</a>
+                <a id="rc-batch" href="#" class="btn btn-sm" onclick="return batchCards()">Batch (whole class)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Annual Report Cards -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128196; Annual Report Cards</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="ar-class">
+                        <option value="">Select class...</option>
+                        {% for c in classes %}<option value="{{ c.id }}">{{ c }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Year Range</label>
+                    <select id="ar-years">
+                        <option value="">Select year...</option>
+                        {% for y in years %}<option value="{{ y }}/{{ y|add:1 }}">{{ y }}/{{ y|add:1 }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Student</label>
+                    <select id="ar-student">
+                        <option value="">All (batch)</option>
+                        {% for s in students %}<option value="{{ s.id }}">{{ s.full_name }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a id="ar-preview" href="#" class="btn btn-sm" onclick="return annualReport('preview')">Preview</a>
+                <a id="ar-download" href="#" class="btn btn-sm btn-primary" onclick="return annualReport('download')">Download</a>
+                <a id="ar-batch" href="#" class="btn btn-sm" onclick="return annualReportBatch()">Batch (whole class)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mark Sheets -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128203; Mark Sheets</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="ms-class">
+                        <option value="">Select class...</option>
+                        {% for c in classes %}<option value="{{ c.id }}">{{ c }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Term</label>
+                    <select id="ms-term">
+                        <option value="">Select term...</option>
+                        {% for t in terms %}<option value="{{ t.id }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Year Range (Annual)</label>
+                    <select id="ms-years">
+                        <option value="">Select year...</option>
+                        {% for y in years %}<option value="{{ y }}/{{ y|add:1 }}">{{ y }}/{{ y|add:1 }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a id="ms-preview" href="#" class="btn btn-sm" onclick="return openReport('ms')">Preview (Term)</a>
+                <a id="ms-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('ms','download')">Download (Term)</a>
+                <a id="ms-excel" href="#" class="btn btn-sm" onclick="return openReport('ms','excel')">Excel (Term)</a>
+                <a id="ams-preview" href="#" class="btn btn-sm" onclick="return openAnnualMarkSheet('preview')">Preview (Annual)</a>
+                <a id="ams-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualMarkSheet('download')">Download (Annual)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Student ID Cards -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128100; Student ID Cards</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Students (select up to 4)</label>
+                    <select id="id-students" multiple size="6">
+                        {% for s in students %}<option value="{{ s.id }}">{{ s.full_name }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a href="#" class="btn btn-sm" onclick="return openIdCards('preview')">Preview</a>
+                <a href="#" class="btn btn-sm btn-primary" onclick="return openIdCards('download')">Download HTML</a>
+            </div>
+            <p class="text-muted" style="font-size:12px; margin:10px 0 0;">Select 1&ndash;4 students. Fewer than 4 are replicated to fill the booklet.</p>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128202; Results Summary</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Term</label>
+                    <select id="rs-term">
+                        <option value="">Select term...</option>
+                        {% for t in terms %}<option value="{{ t.id }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Year Range (Annual)</label>
+                    <select id="rs-years">
+                        <option value="">Select year...</option>
+                        {% for y in years %}<option value="{{ y }}/{{ y|add:1 }}">{{ y }}/{{ y|add:1 }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a id="rs-preview" href="#" class="btn btn-sm" onclick="return openReport('rs')">Preview (Term)</a>
+                <a id="rs-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('rs','download')">Download (Term)</a>
+                <a id="rs-excel" href="#" class="btn btn-sm" onclick="return openReport('rs','excel')">Excel (Term)</a>
+                <a id="ars-preview" href="#" class="btn btn-sm" onclick="return openAnnualResultsSummary('preview')">Preview (Annual)</a>
+                <a id="ars-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualResultsSummary('download')">Download (Annual)</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Class Council Report -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128104; Class Council Report</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Term</label>
+                    <select id="cc-term">
+                        <option value="">Select term...</option>
+                        {% for t in terms %}<option value="{{ t.id }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Year Range (Annual)</label>
+                    <select id="cc-years">
+                        <option value="">Select year...</option>
+                        {% for y in years %}<option value="{{ y }}/{{ y|add:1 }}">{{ y }}/{{ y|add:1 }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a id="cc-preview" href="#" class="btn btn-sm" onclick="return openReport('cc')">Preview (Term)</a>
+                <a id="cc-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('cc','download')">Download PDF (Term)</a>
+                <a id="acc-preview" href="#" class="btn btn-sm" onclick="return openAnnualClassCouncil('preview')">Preview (Annual)</a>
+                <a id="acc-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualClassCouncil('download')">Download PDF (Annual)</a>
+            </div>
+            <p class="text-muted" style="font-size:12px; margin:10px 0 0;">
+                <a href="{% url 'class_council_motifs' %}">Manage withheld-class remarks (motifs)</a>
+            </p>
+        </div>
+    </div>
+
+    <!-- PTA Financial Report -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128176; PTA Financial Report</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Term</label>
+                    <select id="pf-term">
+                        <option value="">Select term...</option>
+                        {% for t in terms %}<option value="{{ t.id }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="btn-group-x">
+                <a id="pf-preview" href="#" class="btn btn-sm" onclick="return openReport('pf')">Preview</a>
+                <a id="pf-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('pf','download')">Download PDF</a>
+                <a id="pf-excel" href="#" class="btn btn-sm" onclick="return openReport('pf','excel')">Excel</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Attendance Export -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128203; Attendance Export</span>
+        </div>
+        <div class="report-card-body">
+            <div class="picker">
+                <div class="form-group">
+                    <label>Class</label>
+                    <select id="at-class">
+                        <option value="">Select class...</option>
+                        {% for c in classes %}<option value="{{ c.id }}">{{ c }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Term</label>
+                    <select id="at-term">
+                        <option value="">Select term...</option>
+                        {% for t in terms %}<option value="{{ t.id }}">{{ t }}</option>{% endfor %}
+                    </select>
+                </div>
+            </div>
+            <a id="at-excel" href="#" class="btn btn-sm btn-primary" onclick="return openReport('at','excel')">Export Excel</a>
+        </div>
+    </div>
+
+    <!-- Students Export -->
+    <div class="report-card">
+        <div class="report-card-header">
+            <span class="title">&#128100; Students Export</span>
+        </div>
+        <div class="report-card-body">
+            <a href="{% url 'student_export_excel' %}" class="btn btn-sm btn-primary">Export Excel</a>
+        </div>
+    </div>
+
+</div>
+
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script>
+function openReport(kind, action) {
+    var urls = {
+        rc: { base: "{% url 'download_term_report' 0 0 %}", preview: "{% url 'preview_term_report' 0 0 %}" },
+        ms: { base: "{% url 'download_mark_sheet' 0 0 %}", preview: "{% url 'preview_mark_sheet' 0 0 %}", excel: "{% url 'export_marks_excel' 0 0 %}" },
+        rs: { base: "{% url 'download_results_summary' 0 %}", preview: "{% url 'preview_results_summary' 0 %}", excel: "{% url 'export_results_excel' 0 %}" },
+        cc: { base: "{% url 'class_council' 0 %}" },
+        pf: { base: "{% url 'pta_financial' 0 %}", excel: "{% url 'export_finance_excel' 0 %}" },
+        at: { excel: "{% url 'export_attendance_excel' 0 0 %}" }
+    };
+    var cfg = urls[kind];
+    var url;
+    if (kind === 'rc') {
+        var student = document.getElementById('rc-student').value;
+        var term = document.getElementById('rc-term').value;
+        if (!term) { alert('Select a term.'); return false; }
+        if (!student) {
+            // "All (batch)" selected -> batch the whole class.
+            var cls = document.getElementById('rc-class').value;
+            if (!cls) { alert('Select a class for the batch.'); return false; }
+            url = "{% url 'batch_report_cards' 0 0 %}".replace('/0/0/', '/' + cls + '/' + term + '/');
+            window.open(url, '_blank');
+            return false;
+        }
+        var path = (action === 'download') ? cfg.base : cfg.preview;
+        url = path.replace('/0/0/', '/' + student + '/' + term + '/');
+    } else if (kind === 'ms') {
+        var cls = document.getElementById('ms-class').value;
+        var term2 = document.getElementById('ms-term').value;
+        if (!cls || !term2) { alert('Select a class and term.'); return false; }
+        var p2 = action === 'excel' ? cfg.excel : (action === 'download' ? cfg.base : cfg.preview);
+        url = p2.replace('/0/0/', '/' + cls + '/' + term2 + '/');
+    } else if (kind === 'rs') {
+        var term3 = document.getElementById('rs-term').value;
+        if (!term3) { alert('Select a term.'); return false; }
+        var p3 = action === 'excel' ? cfg.excel : (action === 'download' ? cfg.base : cfg.preview);
+        url = p3.replace('/0/', '/' + term3 + '/');
+    } else if (kind === 'cc') {
+        var term4 = document.getElementById('cc-term').value;
+        if (!term4) { alert('Select a term.'); return false; }
+        url = cfg.base.replace('/0/', '/' + term4 + '/');
+        if (action === 'download') url += '?format=pdf';
+    } else if (kind === 'pf') {
+        var term5 = document.getElementById('pf-term').value;
+        if (!term5) { alert('Select a term.'); return false; }
+        var p5 = action === 'excel' ? cfg.excel : cfg.base;
+        url = p5.replace('/0/', '/' + term5 + '/');
+        if (action === 'download') url += '?format=pdf';
+    } else if (kind === 'at') {
+        var cls3 = document.getElementById('at-class').value;
+        var term6 = document.getElementById('at-term').value;
+        if (!cls3 || !term6) { alert('Select a class and term.'); return false; }
+        url = cfg.excel.replace('/0/0/', '/' + cls3 + '/' + term6 + '/');
+    }
+    window.open(url, '_blank');
+    return false;
+}
+
+function batchCards() {
+    var cls = document.getElementById('rc-class').value;
+    var term = document.getElementById('rc-term').value;
+    if (!cls || !term) { alert('Select a class and term.'); return false; }
+    var url = "{% url 'batch_report_cards' 0 0 %}".replace('/0/0/', '/' + cls + '/' + term + '/');
+    window.open(url, '_blank');
+    return false;
+}
+
+function annualReport(action) {
+    var student = document.getElementById('ar-student').value;
+    var yr = document.getElementById('ar-years').value;
+    if (!yr) { alert('Select a year range.'); return false; }
+    var parts = yr.split('/');
+    var y1 = parts[0], y2 = parts[1];
+    if (!student) {
+        // "All (batch)" selected -> batch the whole class.
+        var cls = document.getElementById('ar-class').value;
+        if (!cls) { alert('Select a class for the batch.'); return false; }
+        var url = "{% url 'batch_annual_report_cards' 0 2025 2026 %}".replace('/0/2025/2026/', '/' + cls + '/' + y1 + '/' + y2 + '/');
+        window.open(url, '_blank');
+        return false;
+    }
+    var baseUrl = "{% url 'download_annual_report' 0 2025 2026 %}";
+    var previewUrl = "{% url 'preview_annual_report' 0 2025 2026 %}";
+    var path = (action === 'download') ? baseUrl : previewUrl;
+    var url = path.replace('/0/2025/2026/', '/' + student + '/' + y1 + '/' + y2 + '/');
+    window.open(url, '_blank');
+    return false;
+}
+
+function annualReportBatch() {
+    var cls = document.getElementById('ar-class').value;
+    var yr = document.getElementById('ar-years').value;
+    if (!cls || !yr) { alert('Select a class and year range.'); return false; }
+    var parts = yr.split('/');
+    var y1 = parts[0], y2 = parts[1];
+    var url = "{% url 'batch_annual_report_cards' 0 2025 2026 %}".replace('/0/2025/2026/', '/' + cls + '/' + y1 + '/' + y2 + '/');
+    window.open(url, '_blank');
+    return false;
+}
+
+function openAnnualMarkSheet(action) {
+    var cls = document.getElementById('ms-class').value;
+    var yr = document.getElementById('ms-years').value;
+    if (!cls || !yr) { alert('Select a class and year range.'); return false; }
+    var parts = yr.split('/');
+    var y1 = parts[0], y2 = parts[1];
+    var baseUrl = "{% url 'download_annual_mark_sheet' 0 2025 2026 %}";
+    var previewUrl = "{% url 'preview_annual_mark_sheet' 0 2025 2026 %}";
+    var path = (action === 'download') ? baseUrl : previewUrl;
+    var url = path.replace('/0/2025/2026/', '/' + cls + '/' + y1 + '/' + y2 + '/');
+    window.open(url, '_blank');
+    return false;
+}
+
+function openAnnualResultsSummary(action) {
+    var yr = document.getElementById('rs-years').value;
+    if (!yr) { alert('Select a year range.'); return false; }
+    var parts = yr.split('/');
+    var y1 = parts[0], y2 = parts[1];
+    var baseUrl = "{% url 'download_annual_results_summary' 2025 2026 %}";
+    var previewUrl = "{% url 'preview_annual_results_summary' 2025 2026 %}";
+    var path = (action === 'download') ? baseUrl : previewUrl;
+    var url = path.replace('/2025/2026/', '/' + y1 + '/' + y2 + '/');
+    window.open(url, '_blank');
+    return false;
+}
+
+function openAnnualClassCouncil(action) {
+    var yr = document.getElementById('cc-years').value;
+    if (!yr) { alert('Select a year range.'); return false; }
+    var parts = yr.split('/');
+    var y1 = parts[0], y2 = parts[1];
+    var url = "{% url 'class_council_annual' 2025 2026 %}".replace('/2025/2026/', '/' + y1 + '/' + y2 + '/');
+    if (action === 'download') url += '?format=pdf';
+    window.open(url, '_blank');
+    return false;
+}
+
+function openIdCards(action) {
+    var select = document.getElementById('id-students');
+    var selected = [];
+    for (var i = 0; i < select.options.length; i++) {
+        if (select.options[i].selected) selected.push(select.options[i].value);
+    }
+    if (selected.length === 0) { alert('Select at least one student.'); return false; }
+    if (selected.length > 4) { alert('Select at most 4 students.'); return false; }
+    var baseUrl = (action === 'download') ? "{% url 'download_id_cards' %}" : "{% url 'preview_id_cards' %}";
+    var url = baseUrl + '?students=' + selected.join(',');
+    window.open(url, '_blank');
+    return false;
+}
+</script>
+{% endblock %}

@@ -1,0 +1,32 @@
+<div class="lh-wrap" style="width:18cm; margin:0 auto;">
+<table class="lh-table" role="presentation" style="width:18cm; border-collapse:collapse; border:none; table-layout:fixed;">
+<tr>
+<td class="lh-col" style="width:42%; vertical-align:top; text-align:center; border:none; padding:0 6px;">
+    <p class="lh-line lh-bold">{{ school.letterhead_line1_en|default:"REPUBLIC OF CAMEROON" }}</p>
+    <p class="lh-line">{{ school.letterhead_line2_en|default:"PEACE – WORK – FATHERLAND" }}</p>
+    <p class="lh-star">**********</p>
+    <p class="lh-line">REGIONAL DELEGATION FOR {{ school.region_en }}</p>
+    <p class="lh-star">**********</p>
+    <p class="lh-line">DIVISIONAL DELEGATION FOR {{ school.division_en }}</p>
+    <p class="lh-star">**********</p>
+    {% if school.letterhead_line3_en %}<p class="lh-line">{{ school.letterhead_line3_en }}</p>{% endif %}
+    <p class="lh-line lh-bold">{{ school.name_en }}</p>
+</td>
+<td class="lh-logo" style="width:16%; vertical-align:middle; text-align:center; border:none; padding:0 4px;">
+    {% if school.logo %}<img src="{{ school.logo.url }}" alt="Logo" style="max-width:100%; max-height:80px;">{% endif %}
+</td>
+<td class="lh-col" style="width:42%; vertical-align:top; text-align:center; border:none; padding:0 6px;">
+    <p class="lh-line lh-bold">{{ school.letterhead_line1_fr|default:"RÉPUBLIQUE DU CAMEROUN" }}</p>
+    <p class="lh-line">{{ school.letterhead_line2_fr|default:"PAIX – TRAVAIL – PATRIE" }}</p>
+    <p class="lh-star">**********</p>
+    <p class="lh-line">DÉLÉGATION RÉGIONALE DU {{ school.region_fr }}</p>
+    <p class="lh-star">**********</p>
+    <p class="lh-line">DÉLÉGATION DÉPARTEMENTALE DU {{ school.division_fr }}</p>
+    <p class="lh-star">**********</p>
+    {% if school.letterhead_line3_fr %}<p class="lh-line">{{ school.letterhead_line3_fr }}</p>{% endif %}
+    <p class="lh-line lh-bold">{{ school.name_fr|default:school.name_en }}</p>
+</td>
+</tr>
+</table>
+<p class="lh-matricule" style="text-align:center; font-size:9pt; margin:4px 0 0;">Matricule: {{ school.matricule }}{% if school.phone %} | Telephone: {{ school.phone }}{% endif %}</p>
+</div>

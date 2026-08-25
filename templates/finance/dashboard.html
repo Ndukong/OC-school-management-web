@@ -1,0 +1,250 @@
+{% extends "base.html" %}
+{% block title %}Finance Dashboard{% endblock %}
+{% block page_title %}Finance Dashboard{% endblock %}
+{% block content %}
+
+{% if not term %}
+    <div class="alert alert-info">No term configured. Create an academic term and mark it as current to begin tracking finances.</div>
+{% endif %}
+
+<!-- 1. Top stat cards -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px; margin-bottom:20px;">
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:26px; font-weight:700; color:var(--success);">{{ totals.total_income|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">Total Income (FCFA)</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:26px; font-weight:700; color:var(--danger);">{{ totals.total_expenditure|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">Total Expenditure (FCFA)</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:26px; font-weight:700; color:var(--primary);">{{ totals.balance|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">Balance (FCFA)</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:18px; font-weight:700; color:var(--success);">{{ totals.pta_balance|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">PTA Balance (FCFA)</div>
+        <div style="font-size:18px; font-weight:700; color:var(--info); margin-top:10px;">{{ totals.state_balance|floatformat:2 }}</div>
+        <div class="text-muted" style="font-size:12px;">State Balance (FCFA)</div>
+    </div></div>
+</div>
+
+{% if term %}
+<!-- 2. Chart row -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:16px;">
+    <div class="card">
+        <div class="card-header">Income vs Expenditure</div>
+        <div class="card-body">
+            <div style="display:flex; align-items:flex-end; gap:12px; height:180px; padding:10px; border:1px solid var(--border); border-radius:var(--radius);">
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                    <div style="flex:1; width:100%; display:flex; align-items:flex-end;">
+                        <div style="width:100%; background:var(--success); height:{% widthratio chart.pta_income chart.max_value 100 %}%; border-radius:4px 4px 0 0; min-height:2px;"></div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">PTA Income</div>
+                    <div style="font-size:11.5px; font-weight:700;">{{ chart.pta_income|floatformat:2 }} FCFA</div>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                    <div style="flex:1; width:100%; display:flex; align-items:flex-end;">
+                        <div style="width:100%; background:var(--success); height:{% widthratio chart.state_income chart.max_value 100 %}%; border-radius:4px 4px 0 0; min-height:2px;"></div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">State Income</div>
+                    <div style="font-size:11.5px; font-weight:700;">{{ chart.state_income|floatformat:2 }} FCFA</div>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                    <div style="flex:1; width:100%; display:flex; align-items:flex-end;">
+                        <div style="width:100%; background:var(--danger); height:{% widthratio chart.pta_exp chart.max_value 100 %}%; border-radius:4px 4px 0 0; min-height:2px;"></div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">PTA Expenditure</div>
+                    <div style="font-size:11.5px; font-weight:700;">{{ chart.pta_exp|floatformat:2 }} FCFA</div>
+                </div>
+                <div style="flex:1; display:flex; flex-direction:column; align-items:center;">
+                    <div style="flex:1; width:100%; display:flex; align-items:flex-end;">
+                        <div style="width:100%; background:var(--danger); height:{% widthratio chart.state_exp chart.max_value 100 %}%; border-radius:4px 4px 0 0; min-height:2px;"></div>
+                    </div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:6px;">State Expenditure</div>
+                    <div style="font-size:11.5px; font-weight:700;">{{ chart.state_exp|floatformat:2 }} FCFA</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">PTA Collection Tracking</div>
+        <div class="card-body">
+            {% if total_expected > 0 %}
+                {% widthratio total_collected total_expected 100 as pct %}
+                <div style="margin-bottom:16px;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:6px;">
+                        <span style="font-weight:600;">Collected</span>
+                        <span style="font-weight:700;">{{ pct }}%</span>
+                    </div>
+                    <div style="background:var(--accent); border:1px solid var(--border); border-radius:999px; height:16px; overflow:hidden;">
+                        <div style="height:100%; width:{{ pct }}%; {% if pct|add:0 >= 80 %}background:var(--success);{% elif pct|add:0 >= 50 %}background:var(--warning);{% else %}background:var(--danger);{% endif %} border-radius:999px;"></div>
+                    </div>
+                </div>
+                <div style="font-size:13.5px; line-height:1.8;">
+                    <div><strong>Expected:</strong> {{ total_expected|floatformat:2 }} FCFA</div>
+                    <div><strong>Collected:</strong> {{ total_collected|floatformat:2 }} FCFA</div>
+                    <div><strong>Outstanding:</strong> {{ total_outstanding|floatformat:2 }} FCFA</div>
+                </div>
+            {% else %}
+                <p class="text-muted" style="margin:0;">Set up PTA dues in Settings to track collection.</p>
+            {% endif %}
+            <div style="margin-top:16px;">
+                <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-primary">View student fee status</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 3. PTA collection by class -->
+<div class="card" style="margin-top:16px;">
+    <div class="card-header">PTA Collection by Class</div>
+    <div class="card-body">
+        {% if breakdown %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Enrolled</th>
+                        <th>Due (FCFA)</th>
+                        <th>Expected (FCFA)</th>
+                        <th>Collected (FCFA)</th>
+                        <th>Outstanding (FCFA)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for b in breakdown %}
+                    <tr>
+                        <td>{{ b.school_class }}</td>
+                        <td>{{ b.enrolled }}</td>
+                        <td>{{ b.due|floatformat:2 }}</td>
+                        <td>{{ b.expected|floatformat:2 }}</td>
+                        <td>{{ b.collected|floatformat:2 }}</td>
+                        <td style="font-weight:600;">{{ b.outstanding|floatformat:2 }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+                <tfoot>
+                    <tr style="background:var(--accent); font-weight:700;">
+                        <td colspan="3">Total</td>
+                        <td>{{ total_expected|floatformat:2 }}</td>
+                        <td>{{ total_collected|floatformat:2 }}</td>
+                        <td>{{ total_outstanding|floatformat:2 }}</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+        {% else %}
+        <p class="text-muted" style="margin:0;">Set up PTA dues in Settings to track collection.</p>
+        {% endif %}
+    </div>
+</div>
+{% endif %}
+
+<!-- 4. Entry forms -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:16px; {% if term %}margin-top:16px;{% endif %}">
+    <div class="card">
+        <div class="card-header">Record Income</div>
+        <div class="card-body">
+            <p class="form-hint" style="margin-top:0;">Income is classified as <strong>PTA</strong> or <strong>State</strong> based on the selected fee type.</p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="income">
+                {% for field in income_form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div style="color:var(--danger); font-size:12px; margin-top:4px;">{{ field.errors|striptags }}</div>{% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn" style="width:100%; background:var(--success); border-color:var(--success); color:#fff;">Save Income</button>
+            </form>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">Record Expenditure</div>
+        <div class="card-body">
+            <p class="form-hint" style="margin-top:0;">Expenditure is classified as <strong>PTA</strong> or <strong>State</strong> via the category field.</p>
+            <form method="post">
+                {% csrf_token %}
+                <input type="hidden" name="form_type" value="expenditure">
+                {% for field in expenditure_form %}
+                <div class="form-group">
+                    <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                    {{ field }}
+                    {% if field.errors %}<div style="color:var(--danger); font-size:12px; margin-top:4px;">{{ field.errors|striptags }}</div>{% endif %}
+                </div>
+                {% endfor %}
+                <button type="submit" class="btn btn-danger" style="width:100%;">Save Expenditure</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if term %}
+<!-- 5. Reports / exports -->
+<div class="card" style="margin-top:16px;">
+    <div class="card-header">Reports &amp; Exports</div>
+    <div class="card-body" style="display:flex; flex-wrap:wrap; gap:10px;">
+        <a href="{% url 'pta_financial' term.id %}" class="btn btn-primary">PTA Financial Report (Preview)</a>
+        <a href="{% url 'pta_financial' term.id %}?format=pdf" class="btn btn-outline-primary">Download PDF</a>
+        <a href="{% url 'export_finance_excel' term.id %}" class="btn btn-outline-primary">Export Excel</a>
+    </div>
+</div>
+{% endif %}
+
+<!-- 6. Recent transactions -->
+<div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(340px, 1fr)); gap:16px; {% if term %}margin-top:16px;{% endif %}">
+    <div class="card">
+        <div class="card-header">Recent Income</div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>Date</th><th>Fee Type</th><th>Student</th><th>Amount</th><th>Receipt</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in recent_income %}
+                    <tr>
+                        <td>{{ r.date_paid }}</td>
+                        <td>{{ r.fee_type|default:"-" }}</td>
+                        <td>
+                            {% if r.student %}
+                            <a href="{% url 'student_fee_status' r.student.pk %}" title="View fee status">{{ r.student.full_name }}</a>
+                            {% else %}-{% endif %}
+                        </td>
+                        <td>{{ r.amount|floatformat:2 }}</td>
+                        <td>{{ r.receipt_number|default:"-" }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="5" class="text-muted" style="text-align:center; padding:16px;">No income recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card">
+        <div class="card-header">Recent Expenditure</div>
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>Date</th><th>Category</th><th>Amount</th><th>Description</th></tr>
+                </thead>
+                <tbody>
+                    {% for r in recent_expenditure %}
+                    <tr>
+                        <td>{{ r.date }}</td>
+                        <td><span class="badge badge-{% if r.category == 'PTA' %}success{% else %}info{% endif %}">{{ r.get_category_display }}</span></td>
+                        <td>{{ r.amount|floatformat:2 }}</td>
+                        <td>{{ r.description|default:"-"|truncatechars:40 }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="4" class="text-muted" style="text-align:center; padding:16px;">No expenditure recorded yet.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

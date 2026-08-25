@@ -1,0 +1,50 @@
+{% extends "parent/base.html" %}
+{% block title %}Student Details{% endblock %}
+{% block content %}
+
+<div class="profile">
+    <div class="avatar">{{ student.first_name|first }}</div>
+    <div>
+        <div class="name">{{ student }}</div>
+        <div class="meta">ID: {{ student.unique_id }}</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Personal Information</h2>
+    <div class="detail-row"><span class="k">Full Name</span><span class="v">{{ student }}</span></div>
+    <div class="detail-row"><span class="k">Sex</span><span class="v">{{ student.get_sex_display }}</span></div>
+    <div class="detail-row"><span class="k">Date of Birth</span><span class="v">{{ student.date_of_birth|date:"M d, Y" }}</span></div>
+    <div class="detail-row"><span class="k">Place of Birth</span><span class="v">{{ student.place_of_birth }}</span></div>
+    <div class="detail-row"><span class="k">Region of Origin</span><span class="v">{{ student.region_of_origin }}</span></div>
+    <div class="detail-row"><span class="k">Division of Origin</span><span class="v">{{ student.division_of_origin }}</span></div>
+    {% if student.sub_division_of_origin %}
+    <div class="detail-row"><span class="k">Sub-division</span><span class="v">{{ student.sub_division_of_origin }}</span></div>
+    {% endif %}
+    {% if student.repeater %}
+    <div class="detail-row"><span class="k">Status</span><span class="v">Repeater</span></div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Enrolment</h2>
+    {% if enrollment %}
+    <div class="detail-row"><span class="k">Class</span><span class="v">{{ enrollment.school_class.name }}{% if enrollment.school_class.stream %} ({{ enrollment.school_class.stream }}){% endif %}</span></div>
+    <div class="detail-row"><span class="k">Academic Term</span><span class="v">{{ enrollment.academic_term }}</span></div>
+    {% else %}
+    <div class="empty">No enrolment record found.</div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Guardian Information</h2>
+    <div class="detail-row"><span class="k">Guardian Name</span><span class="v">{{ student.guardian_name }}</span></div>
+    <div class="detail-row"><span class="k">Guardian Contact</span><span class="v">{{ student.guardian_contact }}</span></div>
+    {% if student.guardian_address %}
+    <div class="detail-row"><span class="k">Address</span><span class="v">{{ student.guardian_address }}</span></div>
+    {% endif %}
+</div>
+
+<a href="{% url 'parent:dashboard' %}" class="btn-secondary">&larr; Back</a>
+
+{% endblock %}

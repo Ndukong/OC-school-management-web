@@ -1,0 +1,80 @@
+{% extends "parent/base.html" %}
+{% block title %}Attendance{% endblock %}
+{% block content %}
+
+<div class="profile">
+    <div class="avatar">{{ student.first_name|first }}</div>
+    <div>
+        <div class="name">{{ student }}</div>
+        <div class="meta">Attendance Record</div>
+    </div>
+</div>
+
+{% if term %}
+<div class="card">
+    <h2>{{ term.label }} {{ term.year_start }}/{{ term.year_end }}</h2>
+    <div class="stat-grid">
+        <div class="stat success">
+            <div class="value">{{ attendance.present }}</div>
+            <div class="label">Present</div>
+        </div>
+        <div class="stat warning">
+            <div class="value">{{ attendance.absent_justified }}</div>
+            <div class="label">On Permission</div>
+        </div>
+        <div class="stat danger">
+            <div class="value">{{ attendance.absent_unjustified }}</div>
+            <div class="label">Absences</div>
+        </div>
+        <div class="stat primary">
+            <div class="value">{{ attendance.late }}</div>
+            <div class="label">Late Arrivals</div>
+        </div>
+    </div>
+
+    {% if attendance.total_days > 0 %}
+    <div class="progress-wrap">
+        <div class="progress-label">
+            <span>Attendance Rate</span>
+            <span>{% widthratio attendance.present attendance.total_days 100 %}%</span>
+        </div>
+        <div class="progress">
+            <div style="background: var(--success); width: {% widthratio attendance.present attendance.total_days 100 %}%;"></div>
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h2>Recent Daily Records</h2>
+    {% if records %}
+    <table class="table">
+        <thead><tr><th>Date</th><th>Period</th><th>Status</th></tr></thead>
+        <tbody>
+            {% for record in records %}
+            <tr>
+                <td>{{ record.register.date|date:"D, M d" }}</td>
+                <td>P{{ record.register.period }}</td>
+                <td>
+                    {% if record.status == "P" %}<span class="badge success">Present</span>
+                    {% elif record.status == "L" %}<span class="badge info">Late</span>
+                    {% elif record.status == "A" %}<span class="badge danger">Absent</span>
+                    {% elif record.status == "PRM" %}<span class="badge warning">Permission</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <div class="empty">No attendance records for this term.</div>
+    {% endif %}
+</div>
+
+{% else %}
+<div class="card"><div class="empty">No active academic term.</div></div>
+{% endif %}
+
+<a href="{% url 'parent:dashboard' %}" class="btn-secondary">&larr; Back</a>
+
+{% endblock %}

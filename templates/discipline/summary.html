@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% load school_tags %}
+
+{% block title %}Discipline Summary{% endblock %}
+{% block page_title %}Discipline Summary{% endblock %}
+
+{% block content %}
+<style>
+    .filter-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .filter-form .field { display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1; }
+    .filter-form label { font-size: 13px; font-weight: 600; color: var(--text); }
+    .filter-form .btn { flex-shrink: 0; }
+
+    .layout-grid { display: grid; grid-template-columns: 320px 1fr; gap: 20px; align-items: start; }
+    .layout-grid .results-col { min-width: 0; }
+    @media (max-width: 900px) {
+        .layout-grid { grid-template-columns: 1fr; }
+    }
+
+    .threshold-item {
+        padding: 10px 0;
+        border-bottom: 1px solid var(--border);
+    }
+    .threshold-item:last-child { border-bottom: none; }
+    .threshold-item .level {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-weight: 600;
+    }
+    .threshold-item ul {
+        margin: 8px 0 0;
+        padding: 0;
+        list-style: none;
+        font-size: 12.5px;
+        color: var(--text-muted);
+    }
+    .threshold-item li { padding: 2px 0; }
+
+    .decision-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 999px;
+        font-size: 11.5px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+    .decision-warning   { background: #e8f1f7; color: var(--info); }
+    .decision-reprimand { background: #fdf3e3; color: var(--warning); }
+    .decision-suspension{ background: #fdecec; color: var(--danger); }
+    .decision-dismissal { background: var(--danger); color: #fff; }
+
+    .field-label { font-size: 12.5px; font-weight: 600; color: var(--text); margin-bottom: 6px; }
+    .form-group { margin-bottom: 14px; }
+    .form-group label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; }
+    .form-errors { color: var(--danger); font-size: 12.5px; margin-bottom: 8px; }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <span>Select Class &amp; Term</span>
+        <a href="{% url 'dashboard' %}" class="btn btn-sm">Back to Dashboard</a>
+    </div>
+    <div class="card-body">
+        <form method="get" action="{% url 'discipline_summary' %}" class="filter-form">
+            <div class="field">
+                <label for="class_id">Class</label>
+                <select name="class_id" id="class_id" onchange="this.form.submit()" required>
+                    <option value="">Select class...</option>
+                    {% for sc in classes %}
+                        <option value="{{ sc.id }}" {% if school_class and school_class.id == sc.id %}selected{% endif %}>{{ sc }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="term_id">Term</label>
+                <select name="term_id" id="term_id" onchange="this.form.submit()" required>
+                    <option value="">Select term...</option>
+                    {% for t in terms %}
+                        <option value="{{ t.id }}" {% if term and term.id == t.id %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Compute</button>
+        </form>
+    </div>
+</div>
+
+{% if school_class and term %}
+<div class="layout-grid">
+    <div class="sidebar-col">
+        <div class="card">
+            <div class="card-header">
+                <span>Record Punishment</span>
+            </div>
+            <div class="card-body">
+                <form method="post" action="{% url 'discipline_summary' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="class_id" value="{{ school_class.id }}">
+                    <input type="hidden" name="term_id" value="{{ term.id }}">
+                    <input type="hidden" name="add_punishment" value="1">
+                    {% for field in punishment_form %}
+                        <div class="form-group">
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                            {{ field }}
+                            {% if field.errors %}
+                                <div class="form-errors">{{ field.errors|striptags }}</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    <button type="submit" class="btn btn-primary" style="width:100%;">Save Punishment</button>
+                </form>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <span>Conduct Thresholds</span>
+                <a href="{% url 'conduct_config' %}" class="btn btn-sm">Configure</a>
+            </div>
+            <div class="card-body" style="padding-top:6px; padding-bottom:6px;">
+                {% if thresholds %}
+                    {% for t in thresholds %}
+                        <div class="threshold-item">
+                            <div class="level">
+                                <span>{{ t.get_conduct_type_display }}</span>
+                                <span class="text-muted" style="font-size:12px;">met only if all criteria hit</span>
+                            </div>
+                            <ul>
+                                <li>Unjustified absences: {{ t.min_unjustified_abs }}</li>
+                                <li>Justified absences: {{ t.min_justified_abs }}</li>
+                                <li>Lateness count: {{ t.min_lateness }}</li>
+                                <li>Punishment hours: {{ t.min_punishment_hours|floatformat:1 }}</li>
+                            </ul>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted" style="font-size:13px; padding:8px 0;">
+                            No thresholds configured yet.
+                        </p>
+                    {% endfor %}
+                {% else %}
+                    <p class="text-muted" style="font-size:13px; padding:8px 0;">
+                        No thresholds configured yet.
+                    </p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="results-col">
+        <div class="card">
+            <div class="card-header">
+                <span>Discipline Summary — {{ school_class }} / {{ term }}</span>
+            </div>
+            {% if results and results.rows %}
+            <div class="table-wrap">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Student</th>
+                            <th class="text-right">Unjust. Abs (h)</th>
+                            <th class="text-right">Just. Abs (h)</th>
+                            <th class="text-right">Lateness</th>
+                            <th class="text-right">Punishment (h)</th>
+                            <th>Decision</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for row in results.rows %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td style="font-weight:600; white-space:nowrap;">{{ row.student.full_name }}</td>
+                                <td class="text-right">{{ row.summary.unjustified_abs_hours|floatformat:1 }}</td>
+                                <td class="text-right">{{ row.summary.justified_abs_hours|floatformat:1 }}</td>
+                                <td class="text-right">{{ row.summary.lateness_count }}</td>
+                                <td class="text-right">{{ row.summary.punishment_hours|floatformat:1 }}</td>
+                                <td>
+                                    {% if row.summary.conduct_decision %}
+                                        <span class="decision-badge decision-{{ row.summary.conduct_decision }}">
+                                            {{ row.summary.get_conduct_decision_display }}
+                                        </span>
+                                    {% else %}
+                                        <span class="text-muted">&mdash;</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="card-body">
+                <p class="text-muted">No students or attendance data for this class and term.</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">Select a class and term above to compute the discipline summary.</div>
+{% endif %}
+{% endblock %}

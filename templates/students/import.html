@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Import Students{% endblock %}
+{% block page_title %}Bulk Import Students{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+
+    {% if messages %}
+        {% for msg in messages %}
+            <div class="alert {% if msg.tags == 'success' %}alert-success{% elif msg.tags == 'error' %}alert-danger{% elif msg.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}">
+                {{ msg }}
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if preview %}
+    <div style="background:var(--accent); padding:14px; border-radius:var(--radius); margin-bottom:18px; font-size:13px;">
+        <strong>Preview &mdash; {{ file_name }}</strong> ({{ school }} / {{ term }})<br>
+        <span class="badge badge-success"><strong>{{ preview.new_count }}</strong> new</span>
+        <span class="badge badge-info"><strong>{{ preview.existing_count }}</strong> existing</span>
+        {% if preview.skipped_count %}
+            <span class="badge badge-danger"><strong>{{ preview.skipped_count }}</strong> skipped</span>
+        {% endif %}
+        <br><em class="text-muted">Nothing has been saved yet. Review the rows below, then confirm or cancel.</em>
+    </div>
+
+    <div class="table-wrap" style="max-height:420px; overflow:auto; border:1px solid var(--border); border-radius:6px; margin-bottom:18px;">
+        <table class="table" style="font-size:12px;">
+            <thead style="position:sticky; top:0; background:#f8f9fa;">
+                <tr>
+                    <th>Row</th>
+                    <th>Register</th>
+                    <th>Name</th>
+                    <th>Sex</th>
+                    <th>DOB</th>
+                    <th>Class</th>
+                    <th>Status</th>
+                    <th>Note</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for rec in preview.records %}
+                <tr style="{% if rec.status == 'skipped' %}background:#fdf3e3;{% elif rec.status == 'existing' %}background:var(--accent);{% endif %}">
+                    <td>{{ rec.row }}</td>
+                    <td style="font-family:monospace;">{{ rec.register }}</td>
+                    <td>{{ rec.first_name }} {{ rec.other_names }}</td>
+                    <td>{{ rec.sex }}</td>
+                    <td>{{ rec.dob }}</td>
+                    <td>{{ rec.class_display }}</td>
+                    <td>
+                        {% if rec.status == "new" %}
+                            <span class="badge badge-success">New</span>
+                        {% elif rec.status == "existing" %}
+                            <span class="badge badge-info">Existing</span>
+                        {% else %}
+                            <span class="badge badge-danger">Skipped</span>
+                        {% endif %}
+                    </td>
+                    <td class="text-muted" style="font-size:12px;">{{ rec.error|default:rec.note }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div style="display:flex; gap:10px;">
+        <form method="post" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" name="confirm" value="1" class="btn btn-primary">&#10004; Confirm Import</button>
+        </form>
+        <a href="{% url 'import_students' %}?cancel=1" class="btn">&#10008; Cancel</a>
+    </div>
+
+    {% else %}
+    <div style="display:flex; gap:24px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:280px;">
+            <h4 style="margin:0 0 6px;">Upload a .xlsx spreadsheet</h4>
+            <p class="text-muted" style="font-size:13px; margin:0 0 16px;">
+                The file must contain a header row with columns like
+                <code>Register</code>, <code>Name</code>, <code>Sex</code>,
+                <code>Date of Birth</code>, <code>Place of Birth</code>, <code>Class</code>.
+                Rows are validated first, previewed for review, and only saved when you confirm.
+            </p>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="form-group">
+                    <label>School</label>
+                    {{ form.school }}
+                    <div class="form-hint">Your account is linked to this school.</div>
+                </div>
+                <div class="form-group">
+                    <label>Academic Term</label>
+                    {{ form.term }}
+                    <div class="form-hint">Leave empty to auto-detect the current term.</div>
+                </div>
+                <div class="form-group">
+                    <label>Spreadsheet (.xlsx)</label>
+                    {{ form.file }}
+                </div>
+                {% if form.errors %}
+                <div class="alert alert-danger" style="padding:8px 12px; font-size:13px;">
+                    {% for field, errs in form.errors.items %}{% for e in errs %}{{ e }}<br>{% endfor %}{% endfor %}
+                </div>
+                {% endif %}
+                <button type="submit" class="btn btn-primary">&#128196; Preview Import</button>
+            </form>
+        </div>
+        <div style="flex:1; min-width:240px;">
+            <h4 style="margin:0 0 6px;">Current totals</h4>
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+                <div style="background:var(--accent); border-radius:var(--radius); padding:14px; text-align:center;">
+                    <div style="font-size:24px; font-weight:700; color:var(--primary);">{{ stats.students }}</div>
+                    <div class="text-muted" style="font-size:12px;">Students</div>
+                </div>
+                <div style="background:var(--accent); border-radius:var(--radius); padding:14px; text-align:center;">
+                    <div style="font-size:24px; font-weight:700; color:var(--primary);">{{ stats.enrollments }}</div>
+                    <div class="text-muted" style="font-size:12px;">Enrollments</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+    </div>
+</div>
+{% endblock %}

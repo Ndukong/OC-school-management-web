@@ -1,0 +1,27 @@
+<h3>{{ school_class.name }}</h3>
+
+<ul class="stats-list">
+    <li><span class="label">Enrolment (M / F / T):</span> <span class="value">{{ enrolment_m }} / {{ enrolment_f }} / {{ enrolment_total }}</span></li>
+    <li><span class="label">Sat (M / F / T):</span> <span class="value">{{ sat_m }} / {{ sat_f }} / {{ num_sat }}</span></li>
+    <li><span class="label">Passed (M / F / T):</span> <span class="value">{{ passed_m }} / {{ passed_f }} / {{ num_passed }}</span></li>
+    <li><span class="label">Percentage Pass:</span> <span class="value {% if success_rate < 50 %}fail{% endif %}">{{ success_rate|floatformat:1 }}%</span></li>
+    <li><span class="label">Class Average:</span> <span class="value {% if class_average < 10 %}fail{% endif %}">{{ class_average|floatformat:2 }}</span></li>
+</ul>
+
+{% if top3 %}
+<div class="heading-underline"><strong>Best 3 Students</strong></div>
+<ul class="student-list">
+    {% for rank, st, avg in top3 %}
+    <li><span class="st-name">{{ rank }}. {{ st.full_name }}</span> — <span class="st-avg {% if avg < 10 %}fail{% endif %}">{{ avg|floatformat:2 }}</span></li>
+    {% endfor %}
+</ul>
+{% endif %}
+
+{% if bottom3 %}
+<div class="heading-underline"><strong>Last 3 Students</strong></div>
+<ul class="student-list">
+    {% for rank, st, avg in bottom3 %}
+    <li><span class="st-name">{{ rank }}. {{ st.full_name }}</span> — <span class="st-avg {% if avg < 10 %}fail{% endif %}">{{ avg|floatformat:2 }}</span></li>
+    {% endfor %}
+</ul>
+{% endif %}

@@ -1,0 +1,195 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mark Entry — Select Class &amp; Subject</title>
+<style>
+    :root {
+        --primary: #1f4e78;
+        --primary-dark: #163a5a;
+        --bg: #f1f4f8;
+        --card: #ffffff;
+        --border: #d7dee6;
+        --text: #1c2733;
+        --muted: #6b7785;
+        --accent: #e8f0f7;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        min-height: 100vh;
+    }
+    .topbar {
+        background: var(--primary);
+        color: #fff;
+        padding: 16px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+    .topbar h1 { font-size: 1.05rem; margin: 0; line-height: 1.3; }
+    .topbar small { display: block; color: #c8d8e8; font-size: 0.75rem; margin-top: 2px; }
+    .btn {
+        display: inline-block;
+        background: #fff;
+        color: var(--primary);
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 8px 14px;
+        font-size: 0.85rem;
+        text-decoration: none;
+        white-space: nowrap;
+    }
+    .btn:hover { background: var(--accent); }
+    .container { max-width: 720px; margin: 0 auto; padding: 16px; }
+    .term-bar {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        padding: 12px 14px;
+        margin-bottom: 16px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-wrap: wrap;
+    }
+    .term-bar label { font-size: 0.85rem; color: var(--muted); }
+    .term-bar select {
+        flex: 1;
+        min-width: 0;
+        font-size: 0.95rem;
+        padding: 10px;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        background: #fff;
+        color: var(--text);
+    }
+    .class-card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        margin-bottom: 14px;
+        overflow: hidden;
+    }
+    .class-card h2 {
+        margin: 0;
+        padding: 12px 14px;
+        background: var(--accent);
+        font-size: 0.95rem;
+        color: var(--primary-dark);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    .class-card h2 .badge {
+        font-size: 0.68rem;
+        background: var(--primary);
+        color: #fff;
+        border-radius: 20px;
+        padding: 3px 10px;
+    }
+    .subject-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        gap: 10px;
+        padding: 12px 14px;
+    }
+    .subject-btn {
+        display: block;
+        text-align: center;
+        text-decoration: none;
+        color: var(--text);
+        background: #f7fafc;
+        border: 1px solid var(--border);
+        border-radius: 8px;
+        padding: 14px 8px;
+        font-size: 0.85rem;
+        font-weight: 600;
+        min-height: 48px;
+        line-height: 1.2;
+    }
+    .subject-btn:hover { border-color: var(--primary); background: var(--accent); }
+    .subject-btn small {
+        display: block;
+        font-weight: 400;
+        color: var(--muted);
+        font-size: 0.7rem;
+        margin-top: 4px;
+    }
+    .empty { text-align: center; color: var(--muted); padding: 40px 16px; }
+    .flash { padding: 12px 14px; border-radius: 8px; margin-bottom: 14px; font-size: 0.85rem; }
+    .flash.warn { background: #fff4e0; border: 1px solid #f0c76a; color: #7a5200; }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+    <div>
+        <h1>Mark Entry</h1>
+        <small>{{ school.name_en }} &middot; Step 1: choose class &amp; subject</small>
+    </div>
+    <a class="btn" href="{% url 'teacher_dashboard' %}">&larr; Dashboard</a>
+</header>
+
+<div class="container">
+
+{% if messages %}
+    {% for msg in messages %}
+        <div class="flash {{ msg.tags }}">{{ msg }}</div>
+    {% endfor %}
+{% endif %}
+
+<div class="term-bar">
+    <label for="term-select">Term</label>
+    {% if terms %}
+        <select id="term-select" onchange="if(this.value){window.location='?term='+this.value;}">
+            {% for t in terms %}
+                <option value="{{ t.id }}" {% if selected_term and t.id == selected_term.id %}selected{% endif %}>{{ t }}</option>
+            {% endfor %}
+        </select>
+    {% else %}
+        <span style="color:var(--muted);font-size:0.85rem;">No academic term configured yet.</span>
+    {% endif %}
+</div>
+
+{% if groups %}
+    {% for school_class, subjects in groups.items %}
+        <div class="class-card">
+            <h2>
+                {{ school_class }}
+                <span class="badge">{{ subjects|length }} subject{% if subjects|length != 1 %}s{% endif %}</span>
+            </h2>
+            <div class="subject-grid">
+                {% for subject in subjects %}
+                    {% if selected_term %}
+                        <a class="subject-btn"
+                           href="{% url 'mark_entry_grid' school_class.id subject.id selected_term.id %}">
+                            {{ subject.name }}
+                            <small>{{ subject.code }}</small>
+                        </a>
+                    {% else %}
+                        <a class="subject-btn" href="{% url 'mark_entry' school_class.id subject.id %}">
+                            {{ subject.name }}
+                            <small>{{ subject.code }}</small>
+                        </a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+{% else %}
+    <div class="empty">
+        <p><strong>No assignments found.</strong></p>
+        <p>Ask an administrator to assign you to a class and subject.</p>
+    </div>
+{% endif %}
+
+</div>
+</body>
+</html>

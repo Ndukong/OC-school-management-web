@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>{% block title %}Parent Portal{% endblock %} | {{ school.name_en|default:"School" }}</title>
+    <style>
+        :root {
+            --primary: #1a5fb4;
+            --primary-dark: #124584;
+            --success: #2e7d32;
+            --danger: #c62828;
+            --warning: #b26a00;
+            --muted: #6b7280;
+            --bg: #f4f6f9;
+            --card: #ffffff;
+            --border: #e2e8f0;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg);
+            color: #1f2937;
+            line-height: 1.5;
+        }
+        .app-header {
+            background: var(--primary);
+            color: #fff;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            box-shadow: 0 1px 4px rgba(0,0,0,.15);
+        }
+        .app-header .brand { font-weight: 700; font-size: 15px; line-height: 1.2; }
+        .app-header .brand small { display: block; font-weight: 400; font-size: 11px; opacity: .85; }
+        .app-header .logout {
+            color: #fff; text-decoration: none; font-size: 13px;
+            padding: 6px 10px; border: 1px solid rgba(255,255,255,.5);
+            border-radius: 6px;
+        }
+        .container { max-width: 520px; margin: 0 auto; padding: 14px; }
+        .card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 14px;
+        }
+        .card h2 { font-size: 15px; margin-bottom: 10px; color: var(--primary); }
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-bottom: 14px;
+        }
+        .stat {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 14px;
+            text-align: center;
+        }
+        .stat .value { font-size: 22px; font-weight: 700; }
+        .stat .label { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .04em; margin-top: 2px; }
+        .stat.success .value { color: var(--success); }
+        .stat.danger .value { color: var(--danger); }
+        .stat.warning .value { color: var(--warning); }
+        .stat.primary .value { color: var(--primary); }
+        .profile {
+            display: flex; align-items: center; gap: 12px;
+            background: var(--card); border: 1px solid var(--border);
+            border-radius: 12px; padding: 16px; margin-bottom: 14px;
+        }
+        .avatar {
+            width: 56px; height: 56px; border-radius: 50%;
+            background: var(--primary); color: #fff;
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 20px; flex-shrink: 0;
+        }
+        .profile .name { font-size: 17px; font-weight: 700; }
+        .profile .meta { font-size: 12px; color: var(--muted); }
+        .nav-list { list-style: none; }
+        .nav-list li + li { border-top: 1px solid var(--border); }
+        .nav-list a {
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 14px 4px; text-decoration: none; color: inherit;
+            font-weight: 500; font-size: 14px;
+        }
+        .nav-list a .arrow { color: var(--muted); }
+        .detail-row {
+            display: flex; justify-content: space-between;
+            padding: 9px 0; border-bottom: 1px solid var(--border);
+            font-size: 14px;
+        }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row .k { color: var(--muted); }
+        .detail-row .v { font-weight: 600; text-align: right; }
+        .badge {
+            display: inline-block; padding: 3px 9px; border-radius: 999px;
+            font-size: 11px; font-weight: 600;
+        }
+        .badge.success { background: #e6f4ea; color: var(--success); }
+        .badge.danger { background: #fdecec; color: var(--danger); }
+        .badge.warning { background: #fdf3e3; color: var(--warning); }
+        .badge.info { background: #e8f0fe; color: var(--primary); }
+        .table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .table th {
+            text-align: left; color: var(--muted); font-weight: 600;
+            padding: 8px 6px; border-bottom: 2px solid var(--border);
+            font-size: 11px; text-transform: uppercase; letter-spacing: .04em;
+        }
+        .table td { padding: 9px 6px; border-bottom: 1px solid var(--border); }
+        .table tr:last-child td { border-bottom: none; }
+        .alert {
+            padding: 12px 14px; border-radius: 8px; font-size: 14px;
+            margin-bottom: 14px;
+        }
+        .alert.error { background: #fdecec; color: var(--danger); border: 1px solid #f5c2c2; }
+        .alert.info { background: #e8f0fe; color: var(--primary); border: 1px solid #c6dafc; }
+        .empty { text-align: center; color: var(--muted); padding: 20px 0; font-size: 13px; }
+        .login-card { margin-top: 40px; }
+        .login-card .logo {
+            text-align: center; margin-bottom: 20px;
+        }
+        .login-card .logo .school-name { font-weight: 700; font-size: 17px; color: var(--primary); }
+        .login-card .logo .sub { font-size: 12px; color: var(--muted); }
+        .field { margin-bottom: 14px; }
+        .field label { display: block; font-size: 12px; font-weight: 600; color: var(--muted); margin-bottom: 5px; }
+        .field input {
+            width: 100%; padding: 12px 14px; border: 1px solid var(--border);
+            border-radius: 8px; font-size: 15px; background: #fff;
+        }
+        .field input:focus { outline: none; border-color: var(--primary); }
+        .btn {
+            display: block; width: 100%; padding: 13px;
+            border: none; border-radius: 8px; font-size: 15px; font-weight: 600;
+            background: var(--primary); color: #fff; cursor: pointer;
+        }
+        .btn:hover { background: var(--primary-dark); }
+        .btn-secondary {
+            background: #fff; color: var(--primary);
+            border: 1px solid var(--primary); width: auto; display: inline-block;
+            padding: 9px 16px; border-radius: 8px; text-decoration: none;
+            font-size: 13px; font-weight: 600;
+        }
+        .hint { font-size: 11px; color: var(--muted); margin-top: 4px; }
+        .divider { height: 1px; background: var(--border); margin: 14px 0; }
+        .progress-wrap { margin-bottom: 8px; }
+        .progress-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 4px; }
+        .progress {
+            height: 8px; border-radius: 999px; background: var(--border); overflow: hidden;
+        }
+        .progress > div { height: 100%; border-radius: 999px; }
+    </style>
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    {% if student %}
+    <header class="app-header">
+        <div class="brand">
+            {{ school.name_en|default:"School" }}
+            <small>Parent Portal</small>
+        </div>
+        <a href="{% url 'parent:logout' %}" class="logout">Log out</a>
+    </header>
+    {% endif %}
+
+    <main class="container">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'error' %}error{% else %}info{% endif %}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if student %}
+    <footer style="text-align:center; padding:16px; font-size:11px; color:var(--muted);">
+        School Management System &mdash; Parent Portal
+    </footer>
+    {% endif %}
+</body>
+</html>

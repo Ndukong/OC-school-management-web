@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block title %}Notifications{% endblock %}
+{% block page_title %}Notifications{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Notifications ({{ unread_count }} unread)</span>
+        {% if unread_count > 0 %}
+        <form method="post" action="{% url 'mark_all_read' %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-sm btn-outline-primary">Mark all read</button>
+        </form>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if notifications %}
+        <div style="display:flex; flex-direction:column; gap:8px;">
+            {% for notif in notifications %}
+            <div style="padding:12px 16px; border:1px solid var(--border); border-radius:var(--radius); background:{% if not notif.is_read %}#f0f7ff{% else %}var(--card-bg){% endif %}; display:flex; justify-content:space-between; align-items:flex-start; gap:12px;">
+                <div style="min-width:0;">
+                    <div style="display:flex; align-items:center; gap:8px; margin-bottom:4px;">
+                        {% if notif.notification_type == "report_ready" %}
+                            <span class="badge badge-success">Report</span>
+                        {% elif notif.notification_type == "absence" %}
+                            <span class="badge badge-danger">Absence</span>
+                        {% elif notif.notification_type == "fee_reminder" %}
+                            <span class="badge badge-warning">Fee</span>
+                        {% else %}
+                            <span class="badge badge-info">System</span>
+                        {% endif %}
+                        <span style="font-weight:600; font-size:14px;">{{ notif.title }}</span>
+                    </div>
+                    <div style="font-size:13px; color:var(--text-muted);">{{ notif.message }}</div>
+                    <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">{{ notif.created_at|timesince }} ago</div>
+                </div>
+                {% if not notif.is_read %}
+                <form method="post" action="{% url 'mark_notification_read' notif.pk %}" style="flex-shrink:0;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-sm">Read</button>
+                </form>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+            <p class="text-muted mb-0" style="text-align:center; padding:20px;">No notifications yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

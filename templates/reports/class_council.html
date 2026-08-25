@@ -1,0 +1,220 @@
+{% load school_tags %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@page {
+    size: A4 landscape;
+    margin: 12mm 10mm 12mm 10mm;
+}
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 9pt;
+    line-height: 1.25;
+    color: #000;
+}
+.lh-line { margin:0; line-height:1.15; }
+.lh-star { margin:0; font-size:9pt; letter-spacing:1px; line-height:1.1; }
+.lh-matricule { text-align:center; font-size:9pt; margin:2px 0 0; }
+.addressee {
+    text-align:left;
+    font-weight:bold;
+    font-size:10.5pt;
+    margin:12px 0 4px;
+    text-transform:uppercase;
+    line-height:1.4;
+}
+.sir-madam {
+    margin:6px 0 0 24px;
+    text-indent:0;
+}
+.report-title {
+    text-align:center;
+    font-weight:bold;
+    font-size:12pt;
+    letter-spacing:1px;
+    margin:8px 0 10px;
+    text-transform:uppercase;
+}
+table.cc {
+    width:100%;
+    border-collapse:collapse;
+    font-size:8.5pt;
+    table-layout:fixed;
+}
+table.cc th, table.cc td {
+    border:1px solid #000;
+    padding:3px 4px;
+    text-align:center;
+    vertical-align:middle;
+}
+table.cc thead th { font-weight:bold; background:#f0f0f0; }
+table.cc tbody tr.total td { font-weight:bold; }
+table.cc td.cls { text-align:left; font-weight:bold; padding-left:6px; }
+.withheld-row td { font-style:italic; color:#333; text-align:left; padding:6px 8px; }
+.principal {
+    margin-top:34px;
+    text-align:center;
+}
+.principal .line { margin:0; }
+.seal-area { text-align:center; margin-top:6px; }
+.seal-area img { max-height:4.6cm; width:auto; }
+</style>
+</head>
+<body>
+
+{% include "reports/_letterhead.html" with max_width="21cm" %}
+
+<div class="addressee">
+    THE DIVISIONAL DELEGATION OF<br>
+    SECONDARY EDUCATION,<br>
+    {{ school.division_en|upper }} DIVISION.
+</div>
+<div class="sir-madam">SIR/MADAM,</div>
+
+<div class="report-title">
+    {% if is_annual %}
+        END OF YEAR CLASS COUNCIL REPORT FOR {{ year_start }}/{{ year_end }} ACADEMIC YEAR
+    {% else %}
+        CLASS COUNCIL REPORT FOR THE {{ term.label|upper }} OF THE {{ term.year_start }}/{{ term.year_end }} ACADEMIC YEAR
+    {% endif %}
+</div>
+
+{% if is_annual %}
+<table class="cc">
+    <colgroup>
+        <col style="width:6.2%">
+        <col style="width:4.4%"><col style="width:4.4%"><col style="width:4.4%">
+        <col style="width:4.4%"><col style="width:4.4%"><col style="width:4.4%">
+        <col style="width:4.4%"><col style="width:4.4%"><col style="width:4.4%">
+        <col style="width:9.6%">
+        <col style="width:5.0%"><col style="width:5.0%"><col style="width:5.0%">
+        <col style="width:5.0%"><col style="width:5.0%"><col style="width:5.0%">
+        <col style="width:5.0%"><col style="width:5.0%"><col style="width:5.0%">
+    </colgroup>
+    <thead>
+        <tr>
+            <th rowspan="2">CLASS</th>
+            <th colspan="3">ON ROLL</th>
+            <th colspan="3">SAT</th>
+            <th colspan="3">PROMOTED</th>
+            <th rowspan="2">% PROMOTED</th>
+            <th colspan="3">REPEAT</th>
+            <th colspan="3">DISMISSED</th>
+            <th colspan="3">ABANDONNED</th>
+        </tr>
+        <tr>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in classes_data %}
+            {% if c.withheld %}
+            <tr class="withheld-row">
+                <td class="cls">{{ c.school_class }}</td>
+                <td colspan="19">{% if c.motif %}{{ c.motif }}{% else %}Results withheld{% endif %}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td class="cls">{{ c.school_class }}</td>
+                <td>{{ c.stats.on_roll_m }}</td><td>{{ c.stats.on_roll_f }}</td><td>{{ c.stats.on_roll_t }}</td>
+                <td>{{ c.stats.sat_m }}</td><td>{{ c.stats.sat_f }}</td><td>{{ c.stats.sat_t }}</td>
+                <td>{{ c.stats.promoted_m }}</td><td>{{ c.stats.promoted_f }}</td><td>{{ c.stats.promoted_t }}</td>
+                <td>{{ c.stats.pct_promoted|floatformat:1 }}%</td>
+                <td>{{ c.stats.repeat_m }}</td><td>{{ c.stats.repeat_f }}</td><td>{{ c.stats.repeat_t }}</td>
+                <td>{{ c.stats.dismissed_m }}</td><td>{{ c.stats.dismissed_f }}</td><td>{{ c.stats.dismissed_t }}</td>
+                <td>{{ c.stats.abandoned_m }}</td><td>{{ c.stats.abandoned_f }}</td><td>{{ c.stats.abandoned_t }}</td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        <tr class="total">
+            <td class="cls">TOTAL</td>
+            <td>{{ totals.on_roll_m }}</td><td>{{ totals.on_roll_f }}</td><td>{{ totals.on_roll_t }}</td>
+            <td>{{ totals.sat_m }}</td><td>{{ totals.sat_f }}</td><td>{{ totals.sat_t }}</td>
+            <td>{{ totals.promoted_m }}</td><td>{{ totals.promoted_f }}</td><td>{{ totals.promoted_t }}</td>
+            <td>{{ totals.pct_promoted|floatformat:1 }}%</td>
+            <td>{{ totals.repeat_m }}</td><td>{{ totals.repeat_f }}</td><td>{{ totals.repeat_t }}</td>
+            <td>{{ totals.dismissed_m }}</td><td>{{ totals.dismissed_f }}</td><td>{{ totals.dismissed_t }}</td>
+            <td>{{ totals.abandoned_m }}</td><td>{{ totals.abandoned_f }}</td><td>{{ totals.abandoned_t }}</td>
+        </tr>
+    </tbody>
+</table>
+{% else %}
+<table class="cc">
+    <colgroup>
+        <col style="width:7.3%"><col style="width:5.1%">
+        <col style="width:6.1%"><col style="width:6.1%">
+        <col style="width:6.1%"><col style="width:6.1%">
+        <col style="width:6.1%"><col style="width:6.1%">
+        <col style="width:6.1%"><col style="width:6.1%">
+        <col style="width:6.1%"><col style="width:6.1%">
+        <col style="width:6.1%"><col style="width:6.2%">
+        <col style="width:7.0%"><col style="width:7.0%">
+    </colgroup>
+    <thead>
+        <tr>
+            <th rowspan="2">CLASS</th>
+            <th colspan="3">ON ROLL</th>
+            <th colspan="3">SAT</th>
+            <th colspan="3">PASSED</th>
+            <th colspan="3">FAILED</th>
+            <th rowspan="2">% PASS</th>
+            <th rowspan="2">CLASS AVERAGE</th>
+            <th rowspan="2">REMARK</th>
+        </tr>
+        <tr>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+            <th>M</th><th>F</th><th>T</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for c in classes_data %}
+            {% if c.withheld %}
+            <tr class="withheld-row">
+                <td class="cls">{{ c.school_class }}</td>
+                <td colspan="15">{% if c.motif %}{{ c.motif }}{% else %}Results withheld{% endif %}</td>
+            </tr>
+            {% else %}
+            <tr>
+                <td class="cls">{{ c.school_class }}</td>
+                <td>{{ c.stats.on_roll_m }}</td><td>{{ c.stats.on_roll_f }}</td><td>{{ c.stats.on_roll_t }}</td>
+                <td>{{ c.stats.sat_m }}</td><td>{{ c.stats.sat_f }}</td><td>{{ c.stats.sat_t }}</td>
+                <td>{{ c.stats.passed_m }}</td><td>{{ c.stats.passed_f }}</td><td>{{ c.stats.passed_t }}</td>
+                <td>{{ c.stats.failed_m }}</td><td>{{ c.stats.failed_f }}</td><td>{{ c.stats.failed_t }}</td>
+                <td>{{ c.stats.pct_pass|floatformat:1 }}%</td>
+                <td>{{ c.stats.class_average|floatformat:2 }}</td>
+                <td>{{ c.stats.remark }}</td>
+            </tr>
+            {% endif %}
+        {% endfor %}
+        <tr class="total">
+            <td class="cls">TOTAL</td>
+            <td>{{ totals.on_roll_m }}</td><td>{{ totals.on_roll_f }}</td><td>{{ totals.on_roll_t }}</td>
+            <td>{{ totals.sat_m }}</td><td>{{ totals.sat_f }}</td><td>{{ totals.sat_t }}</td>
+            <td>{{ totals.passed_m }}</td><td>{{ totals.passed_f }}</td><td>{{ totals.passed_t }}</td>
+            <td>{{ totals.failed_m }}</td><td>{{ totals.failed_f }}</td><td>{{ totals.failed_t }}</td>
+            <td>{{ totals.pct_pass|floatformat:1 }}%</td>
+            <td>{{ totals.class_average|floatformat:2 }}</td>
+            <td>{{ totals.remark }}</td>
+        </tr>
+    </tbody>
+</table>
+{% endif %}
+
+<div class="principal">
+    <p class="line">THE PRINCIPAL</p>
+    <div class="seal-area">
+        {% if school.seal %}<img src="{{ school.seal.url }}" alt="Seal">{% endif %}
+    </div>
+</div>
+
+</body>
+</html>

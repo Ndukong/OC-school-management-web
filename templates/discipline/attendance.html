@@ -1,0 +1,231 @@
+{% extends "base.html" %}
+{% load school_tags %}
+{% load static %}
+
+{% block title %}Attendance Entry{% endblock %}
+{% block page_title %}Attendance Entry{% endblock %}
+
+{% block content %}
+<script>document.documentElement.classList.add('js');</script>
+<style>
+    .filter-form { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+    .filter-form .field { display: flex; flex-direction: column; gap: 6px; min-width: 180px; flex: 1; }
+    .filter-form label { font-size: 13px; font-weight: 600; color: var(--text); }
+
+    .summary-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 18px;
+        padding: 10px 20px;
+        background: var(--accent);
+        border-bottom: 1px solid var(--border);
+        font-size: 13px;
+        font-weight: 600;
+        color: var(--primary);
+    }
+    .summary-bar span { white-space: nowrap; }
+
+    .legend { display: flex; flex-wrap: wrap; gap: 6px 16px; padding: 8px 20px; font-size: 12px; color: var(--text-muted); }
+    .legend .chip { display: inline-flex; align-items: center; gap: 5px; }
+    .legend .dot { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
+
+    .status-cell {
+        min-width: 54px;
+        min-height: 42px;
+        padding: 6px 8px;
+        border-radius: var(--radius);
+        border: 2px solid var(--border);
+        background: #fff;
+        color: var(--text-muted);
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        cursor: pointer;
+        touch-action: manipulation;
+        transition: background .15s ease, color .15s ease, border-color .15s ease;
+    }
+    .status-cell:active { transform: scale(.96); }
+    .cell-p   { color: var(--success); border-color: #b7dfc4; }
+    .cell-p.active   { background: var(--success); border-color: var(--success); color: #fff; }
+    .cell-l   { color: var(--info);    border-color: #b9d0e4; }
+    .cell-l.active   { background: var(--info);    border-color: var(--info);    color: #fff; }
+    .cell-a   { color: var(--danger);  border-color: #f0c4c4; }
+    .cell-a.active   { background: var(--danger);  border-color: var(--danger);  color: #fff; }
+    .cell-prm { color: var(--warning); border-color: #f0d7a9; }
+    .cell-prm.active { background: var(--warning); border-color: var(--warning); color: #fff; }
+    .status-cell.error  { background: #fff2f2; border-color: var(--danger); color: var(--danger); }
+    .status-cell.saving { opacity: .55; }
+
+    .student-name { font-weight: 600; white-space: nowrap; min-width: 140px; }
+    .period-head { text-align: center; white-space: nowrap; font-size: 12px; color: var(--text-muted); }
+    .fallback-select { display: none; }
+    html:not(.js) .status-cell { display: none; }
+    html:not(.js) .fallback-select { display: block; width: 100%; max-width: 120px; }
+
+    @media (max-width: 768px) {
+        .filter-form .field { min-width: 100%; }
+    }
+</style>
+
+<div class="card">
+    <div class="card-header">
+        <span>Load Register</span>
+        <a href="{% url 'dashboard' %}" class="btn btn-sm">Back to Dashboard</a>
+    </div>
+    <div class="card-body">
+        <form method="get" action="{% url 'attendance_entry' %}" class="filter-form">
+            <div class="field">
+                <label for="class_id">Class</label>
+                <select name="class_id" id="class_id" onchange="this.form.submit()" required>
+                    <option value="">Select class...</option>
+                    {% for sc in classes %}
+                        <option value="{{ sc.id }}" {% if school_class and school_class.id == sc.id %}selected{% endif %}>{{ sc }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="field">
+                <label for="date">Date</label>
+                <input type="date" name="date" id="date" value="{{ selected_date|date:'Y-m-d' }}" onchange="this.form.submit()">
+            </div>
+        </form>
+    </div>
+</div>
+
+{% if school_class %}
+<div class="card">
+    <div class="card-header">
+        <span>Register — {{ school_class }} / {{ selected_date }} ({{ periods|length }} periods)</span>
+        <button type="button" class="btn btn-primary btn-sm" onclick="markAllPresent()">Mark All Present</button>
+    </div>
+    <div class="summary-bar" id="summary-bar">
+        <span>Present: {{ summary.present }}</span>
+        <span>Late: {{ summary.late }}</span>
+        <span>Absent: {{ summary.absent }}</span>
+        <span>Permission: {{ summary.permission }}</span>
+        <span>Total: {{ summary.total }}</span>
+    </div>
+    <div class="legend">
+        <span class="chip"><span class="dot" style="background:var(--success);"></span> Present</span>
+        <span class="chip"><span class="dot" style="background:var(--info);"></span> Late</span>
+        <span class="chip"><span class="dot" style="background:var(--danger);"></span> Absent</span>
+        <span class="chip"><span class="dot" style="background:var(--warning);"></span> Permission</span>
+        <span class="chip" style="margin-left:auto;">Click a cell to cycle: Present → Late → Absent → Permission → unmarked</span>
+    </div>
+    <form method="post" action="{% url 'attendance_entry' %}">
+        {% csrf_token %}
+        <input type="hidden" name="action" value="save">
+        <input type="hidden" name="class_id" value="{{ school_class.id }}">
+        <input type="hidden" name="date" value="{{ selected_date|date:'Y-m-d' }}">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        {% for period in periods %}
+                            <th class="period-head">P{{ period }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr class="status-row">
+                        <td>{{ forloop.counter }}</td>
+                        <td class="student-name">{{ student.full_name }}</td>
+                        {% for period in periods %}
+                            {% with period_records=records_by_period|get_item:period %}
+                            {% with current=period_records|get_item:student.id %}
+                            <td>
+                                <button type="button"
+                                    class="status-cell {% if current %}cell-{{ current|lower }} active{% endif %}"
+                                    data-status="{{ current|default:'' }}"
+                                    hx-post="{% url 'save_attendance_cell' %}"
+                                    hx-vals='{"class_id": "{{ school_class.id }}", "date": "{{ selected_date|date:"Y-m-d" }}", "period": "{{ period }}", "student_id": "{{ student.id }}", "status": "js:this.dataset.status"}'
+                                    hx-trigger="click"
+                                    hx-swap="none"
+                                    hx-on::after-request="onAttendanceSaved(this, event)">{% if current %}{{ current }}{% else %}&middot;{% endif %}</button>
+                                <select name="status_{{ student.id }}_{{ period }}" class="fallback-select">
+                                    <option value="">—</option>
+                                    {% for value, label in status_choices %}
+                                        <option value="{{ value }}" {% if current == value %}selected{% endif %}>{{ label }}</option>
+                                    {% endfor %}
+                                </select>
+                            </td>
+                            {% endwith %}
+                            {% endwith %}
+                        {% endfor %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="{{ periods|length|add:2 }}" class="text-muted" style="text-align:center; padding:16px;">
+                            No enrolled students found for this class.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+            <button type="submit" class="btn btn-primary">Save All</button>
+            <span class="text-muted" style="font-size:12.5px;">Cell changes auto-save. Save All is a fallback when JavaScript is off.</span>
+        </div>
+    </form>
+</div>
+{% else %}
+<div class="alert alert-info">Select a class and date above to load the register.</div>
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+<script>
+(function () {
+    'use strict';
+
+    function csrf() {
+        var m = document.querySelector('meta[name="csrf-token"]');
+        return m ? m.content : '';
+    }
+
+    function updateSummary(s) {
+        var el = document.getElementById('summary-bar');
+        if (!el || !s) return;
+        el.innerHTML = '<span>Present: ' + (s.present || 0) + '</span>' +
+            '<span>Late: ' + (s.late || 0) + '</span>' +
+            '<span>Absent: ' + (s.absent || 0) + '</span>' +
+            '<span>Permission: ' + (s.permission || 0) + '</span>' +
+            '<span>Total: ' + (s.total || 0) + '</span>';
+    }
+
+    window.onAttendanceSaved = function (btn, evt) {
+        var data;
+        try { data = JSON.parse(evt.detail.xhr.responseText); } catch (err) { return; }
+        if (data.saved) {
+            btn.classList.remove('saving');
+            btn.dataset.status = data.status;
+            btn.className = 'status-cell' + (data.status ? ' cell-' + data.status.toLowerCase() + ' active' : '');
+            btn.innerHTML = data.status ? data.status : '&middot;';
+            updateSummary(data.summary);
+        } else if (data.error) {
+            btn.classList.remove('saving');
+            btn.classList.add('error');
+            setTimeout(function () { btn.classList.remove('error'); }, 900);
+        }
+    };
+
+    window.markAllPresent = function () {
+        document.querySelectorAll('.status-cell').forEach(function (b) {
+            if (b.dataset.status !== 'P') {
+                b.classList.add('saving');
+                b.dataset.status = '';
+                b.click();
+            }
+        });
+    };
+
+    document.body.addEventListener('htmx:configRequest', function (e) {
+        e.detail.headers['X-CSRFToken'] = csrf();
+    });
+})();
+</script>
+{% endblock %}

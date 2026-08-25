@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+{% load school_tags %}
+{% block title %}Class Master Dashboard{% endblock %}
+{% block page_title %}Class Master Dashboard{% endblock %}
+{% block content %}
+<style>
+    .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card {
+        background: var(--card-bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow-sm);
+        padding: 18px 20px;
+    }
+    .stat-card .stat-value { font-size: 28px; font-weight: 700; color: var(--primary); line-height: 1.1; }
+    .stat-card .stat-value.warn { color: var(--warning); }
+    .stat-card .stat-label { font-size: 12px; color: var(--text-muted); margin-top: 4px; text-transform: uppercase; letter-spacing: .04em; }
+
+    .class-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 12px 0;
+        border-bottom: 1px solid var(--border);
+        flex-wrap: wrap;
+    }
+    .class-row:last-child { border-bottom: none; }
+    .class-name { font-weight: 600; }
+    .class-meta { display: flex; flex-direction: column; gap: 2px; }
+    .attend-meter { display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: var(--text-muted); }
+    .meter-bar { width: 120px; height: 8px; border-radius: 999px; background: var(--border); overflow: hidden; }
+    .meter-fill { height: 100%; border-radius: 999px; background: var(--success); }
+    .class-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+
+    .quick-actions { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
+    .quick-action {
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        background: var(--card-bg);
+        text-decoration: none;
+        color: var(--text);
+        box-shadow: var(--shadow-sm);
+        transition: background .15s ease, border-color .15s ease;
+    }
+    .quick-action:hover { background: var(--accent); border-color: #c9daea; color: var(--primary); }
+    .quick-action .qa-title { font-weight: 600; font-size: 14px; }
+    .quick-action .qa-sub { font-size: 12px; color: var(--text-muted); }
+</style>
+
+<div class="stat-grid">
+    <div class="stat-card">
+        <div class="stat-value">{{ master_classes|length }}</div>
+        <div class="stat-label">My Classes</div>
+    </div>
+    <div class="stat-card">
+        <div class="stat-value {% if pending_discipline %}warn{% endif %}">{{ pending_discipline }}</div>
+        <div class="stat-label">Pending Discipline</div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">My Classes</div>
+    <div class="card-body">
+        {% if master_classes %}
+            {% for cls in master_classes %}
+            {% with att=class_attendance|get_item:cls.id %}
+            <div class="class-row">
+                <div class="class-meta">
+                    <span class="class-name">{{ cls }}</span>
+                    <span class="attend-meter">
+                        <span class="meter-bar"><span class="meter-fill" style="width:{{ att.percent }}%;"></span></span>
+                        <span>This week: {{ att.present }}/{{ att.total }} present ({{ att.percent }}%)</span>
+                    </span>
+                </div>
+                <div class="class-actions">
+                    <a href="{% url 'mark_entry_select' %}" class="btn btn-sm btn-primary">Marks</a>
+                    <a href="{% url 'attendance_entry' %}?class_id={{ cls.id }}" class="btn btn-sm">Attendance</a>
+                </div>
+            </div>
+            {% endwith %}
+            {% endfor %}
+        {% else %}
+            <div class="alert alert-info">You are not assigned as a class master for any class.</div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">Quick Actions</div>
+    <div class="card-body">
+        <div class="quick-actions">
+            <a href="{% url 'mark_entry_select' %}" class="quick-action">
+                <span class="qa-title">Mark Entry</span>
+                <span class="qa-sub">Enter scores per subject</span>
+            </a>
+            <a href="{% url 'attendance_entry' %}" class="quick-action">
+                <span class="qa-title">Attendance</span>
+                <span class="qa-sub">Daily class register</span>
+            </a>
+            <a href="{% url 'discipline_summary' %}" class="quick-action">
+                <span class="qa-title">Discipline</span>
+                <span class="qa-sub">Summary &amp; punishments</span>
+            </a>
+            <a href="{% url 'reports_hub' %}" class="quick-action">
+                <span class="qa-title">Reports</span>
+                <span class="qa-sub">Term &amp; annual reports</span>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

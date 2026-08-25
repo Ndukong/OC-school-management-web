@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+{% load school_tags %}
+{% block title %}PTA Configuration{% endblock %}
+{% block page_title %}PTA Configuration{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>PTA Rubric Heads &amp; Sub-Heads</span>
+        <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+    </div>
+    <div class="card-body">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:20px;">
+            <div>
+                <h3 style="margin:0 0 10px; font-size:14px; color:var(--primary);">Rubric Heads</h3>
+                {% if heads %}
+                <div class="table-wrap" style="margin-bottom:12px;">
+                    <table class="table">
+                        <thead><tr><th>Head</th><th>Code</th><th></th></tr></thead>
+                        <tbody>
+                            {% for head in heads %}
+                            <tr>
+                                <td style="font-weight:600;">{{ head.name }}</td>
+                                <td>{{ head.code|default:"—" }}</td>
+                                <td>
+                                    <form method="post" style="display:inline;"
+                                          onsubmit="return confirm('Delete {{ head.name }}?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_head">
+                                        <input type="hidden" name="head_id" value="{{ head.pk }}">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="text-muted">No rubric heads yet.</p>
+                {% endif %}
+                <form method="post" style="display:flex; gap:8px; flex-wrap:wrap;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_head">
+                    <input type="text" name="name" placeholder="Head name, e.g., Infrastructure" required style="flex:1; min-width:160px;">
+                    <input type="text" name="code" placeholder="Code" maxlength="10" style="width:110px;">
+                    <input type="number" name="sort_order" value="0" placeholder="Order" style="width:80px;">
+                    <button type="submit" class="btn btn-primary btn-sm">Add Head</button>
+                </form>
+            </div>
+
+            <div>
+                <h3 style="margin:0 0 10px; font-size:15px; color:var(--primary);">Sub-Heads</h3>
+                {% if sub_heads %}
+                <div class="table-wrap" style="margin-bottom:12px;">
+                    <table class="table">
+                        <thead><tr><th>Head</th><th>Sub-Head</th><th></th></tr></thead>
+                        <tbody>
+                            {% for sub in sub_heads %}
+                            <tr>
+                                <td>{{ sub.rubric_head.name }}</td>
+                                <td>{{ sub.name }}</td>
+                                <td>
+                                    <form method="post" style="display:inline;"
+                                          onsubmit="return confirm('Delete {{ sub.name }}?');">
+                                        {% csrf_token %}
+                                        <input type="hidden" name="action" value="delete_subhead">
+                                        <input type="hidden" name="sub_id" value="{{ sub.pk }}">
+                                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                                    </form>
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                    <p class="text-muted">No sub-heads yet.</p>
+                {% endif %}
+                <form method="post" style="display:flex; gap:8px; flex-wrap:wrap;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="add_subhead">
+                    <select name="rubric_head" required style="min-width:140px; width:auto; flex:1;">
+                        {% for h in heads %}
+                            <option value="{{ h.pk }}">{{ h.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="text" name="name" placeholder="Sub-head" required maxlength="255" style="width:180px;">
+                    <input type="text" name="code" placeholder="Code" maxlength="10" style="width:100px;">
+                    <button type="submit" class="btn btn-primary btn-sm">Add Sub-Head</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>PTA Dues per Class</span></div>
+    <div class="card-body">
+        <p class="text-muted" style="font-size:13px;">Amount each enrolled student is expected to pay per term. Leave blank to keep current value.</p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_dues">
+            <div class="table-wrap">
+                <table class="table">
+                    <thead><tr><th>Class</th><th>Expected PTA Due (FCFA)</th></tr></thead>
+                    <tbody>
+                        {% for cls in classes %}
+                        <tr>
+                            <td style="font-weight:600;">{{ cls.name }} {% if cls.stream %}({{ cls.stream }}){% endif %}</td>
+                            <td style="width:220px;">
+                                <input type="number" name="due_{{ cls.pk }}" min="0" step="0.01"
+                                       value="{{ due_configs|get_item:cls.pk|default_if_none:'' }}"
+                                       placeholder="Not set">
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            <button type="submit" class="btn btn-primary" style="margin-top:12px;">Save PTA Dues</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Fee Types</span></div>
+    <div class="card-body">
+        <p class="text-muted" style="font-size:13px;">Fee types power the income ledger (PTA vs State collections).</p>
+        {% if fee_types %}
+        <div class="table-wrap" style="margin-bottom:12px;">
+            <table class="table">
+                <thead><tr><th>Name</th><th>Category</th><th>Active</th><th></th></tr></thead>
+                <tbody>
+                    {% for ft in fee_types %}
+                    <tr>
+                        <td style="font-weight:600;">{{ ft.name }}</td>
+                        <td><span class="badge {% if ft.category == 'PTA' %}badge-success{% else %}badge-info{% endif %}">{{ ft.get_category_display }}</span></td>
+                        <td>{% if ft.is_active %}<span class="badge badge-success">Active</span>{% else %}<span class="badge badge-danger">Inactive</span>{% endif %}</td>
+                        <td>
+                            <form method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete {{ ft.name }}?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete_feetype">
+                                <input type="hidden" name="feetype_id" value="{{ ft.pk }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+        <form method="post" style="display:flex; gap:8px; flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="add_feetype">
+            {{ feetype_form.name }}
+            <select name="category" style="width:120px;">
+                <option value="PTA">PTA</option>
+                <option value="state">State</option>
+            </select>
+            <label style="display:flex; align-items:center; gap:6px;">
+                <input type="checkbox" name="is_active" checked> Active
+            </label>
+            <button type="submit" class="btn btn-primary btn-sm">Add Fee Type</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+{% block title %}Competencies{% endblock %}
+{% block page_title %}Competencies{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Competencies by Subject / Term / Form</span>
+        <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+    </div>
+    <div class="card-body">
+        <form method="get" style="display:flex; flex-wrap:wrap; gap:12px; align-items:flex-end; margin-bottom:16px;">
+            <div class="form-group mb-0">
+                <label>Subject</label>
+                <select name="subject_id" style="width:220px;">
+                    <option value="">All subjects</option>
+                    {% for s in subjects %}
+                        <option value="{{ s.pk }}" {% if subject_id == s.pk|stringformat:"s" %}selected{% endif %}>{{ s.name }} ({{ s.code }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mb-0">
+                <label>Term</label>
+                <select name="term_id" style="width:200px;">
+                    <option value="">All terms</option>
+                    {% for t in terms %}
+                        <option value="{{ t.pk }}" {% if term_id == t.pk|stringformat:"s" %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="form-group mb-0">
+                <label>Form level</label>
+                <select name="form_level" style="width:120px;">
+                    <option value="">All</option>
+                    {% for i in "1234567" %}
+                        <option value="{{ i }}" {% if form_level == i %}selected{% endif %}>Form {{ i }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-outline-primary">Filter</button>
+        </form>
+
+        {% if competencies %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Subject</th>
+                        <th>Form</th>
+                        <th>Term</th>
+                        <th>Competency</th>
+                        <th>Order</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for c in competencies %}
+                    <tr>
+                        <td style="font-weight:600;">{{ c.subject.name }} ({{ c.subject.code }})</td>
+                        <td>Form {{ c.form_level }}</td>
+                        <td>{{ c.term.label }}</td>
+                        <td>{{ c.description }}</td>
+                        <td>{{ c.sort_order }}</td>
+                        <td>
+                            <form method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete this competency?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="competency_id" value="{{ c.pk }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No competencies match the filters.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Add Competency</span></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Subject *</label>
+                    <select name="subject" required>
+                        {% for s in form.fields.subject.queryset %}
+                            <option value="{{ s.pk }}">{{ s.name }} ({{ s.code }})</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Term *</label>
+                    <select name="term" required>
+                        {% for t in form.fields.term.queryset %}
+                            <option value="{{ t.pk }}">{{ t }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Form level *</label>
+                    <input type="number" name="form_level" min="1" max="7" value="1" required>
+                </div>
+                <div class="form-group">
+                    <label>Sort order</label>
+                    <input type="number" name="sort_order" value="0">
+                </div>
+            </div>
+            <div class="form-group">
+                <label>Description *</label>
+                <textarea name="description" rows="3" required placeholder="e.g., Write a coherent paragraph expressing an opinion."></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Competency</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

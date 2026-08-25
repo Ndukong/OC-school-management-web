@@ -1,0 +1,81 @@
+<style>
+@page { size: A4 landscape; margin: 0; }
+body { margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+.id-page {
+    display: inline-block;
+    width: 74.25mm;
+    height: 105mm;
+    vertical-align: top;
+    overflow: hidden;
+    position: relative;
+}
+.margin-box {
+    position: absolute;
+    top: 5mm; left: 5.125mm;
+    width: 64mm; height: 95mm;
+    border: 0.2mm solid #000;
+    box-sizing: border-box;
+    font-size: 0; line-height: 0;
+}
+/* Page 1 */
+.p1 { padding: 1.5mm 2mm; display: flex; flex-direction: column; }
+.p1-row { width: 100%; text-align: center; line-height: 1.3; }
+.p1-flag { height: 10%; display: flex; justify-content: space-between; align-items: flex-start; }
+.p1-gap { height: 2.5%; }
+.p1-motto { height: 7.5%; }
+.p1-ministry { height: 6.5%; }
+.p1-school { height: 6.5%; }
+.p1-title { height: 12%; }
+.p1-year { height: 6%; }
+.p1-matric { height: 6%; }
+.p1-fill { flex: 1; min-height: 1%; }
+
+.flag { display: flex; height: 100%; width: 15mm; }
+.flag-g { width: 5mm; background: #009A44; }
+.flag-r { width: 5mm; background: #CE1126; position: relative; }
+.flag-y { width: 5mm; background: #FCD116; }
+.flag-star { position: absolute; top: 40%; left: 30%; width: 40%; height: 40%; background: #FCD116; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.logo-area { height: 100%; display: flex; align-items: center; }
+.logo-area img { max-height: 100%; max-width: 20mm; }
+.logo-placeholder { font-size: 5pt; color: #999; line-height: normal; }
+
+.title-box { border: 0.4mm solid #322575; padding: 1.5mm 0; height: calc(100% - 3mm); display: flex; flex-direction: column; justify-content: center; }
+
+.tl-center { text-align: center; }
+.tl-bold { font-weight: bold; }
+.tl-italic { font-style: italic; }
+.tl-purple { color: #322575; }
+.tl-red { color: red; }
+.tl-black { color: #000; }
+.fs-55 { font-size: 5.5pt; line-height: 1.3; }
+.fs-6 { font-size: 6pt; line-height: 1.3; }
+.fs-65 { font-size: 6.5pt; line-height: 1.3; }
+.fs-7 { font-size: 7pt; line-height: 1.3; }
+
+/* Page 2 */
+.p2 { padding: 1.5mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.id-fields { width: 100%; border-collapse: collapse; font-size: 5.5pt; line-height: 1.35; flex: 1; }
+.id-fields td { padding: 0; vertical-align: middle; border-bottom: 0.1mm solid #ddd; }
+.id-label { width: 40%; font-weight: bold; }
+.id-value { width: 60%; font-weight: bold; }
+
+/* Page 3 */
+.p3 { padding: 2mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.photo-box { width: auto; height: 25mm; margin: 0 auto; border: 0.2mm solid #000; display: flex; align-items: center; justify-content: center; font-size: 6pt; color: #999; overflow: hidden; flex-shrink: 0; }
+.photo-box img { height: 25mm; width: auto; }
+.issue-date { text-align: center; font-size: 5.5pt; line-height: 1.4; }
+.seal-box { margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 5pt; color: #999; flex-shrink: 0; }
+.seal-box img { height: 30mm; width: auto; }
+.signature-line { text-align: center; font-size: 5.5pt; line-height: 1.4; }
+.p3-gap { flex: 1; min-height: 1mm; }
+
+/* Page 4 */
+.p4 { padding: 1.5mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.renewals-title { text-align: center; font-size: 6pt; color: #322575; font-weight: bold; line-height: 1.4; flex-shrink: 0; }
+.renewals-table { width: 100%; border-collapse: collapse; font-size: 5pt; line-height: 1.3; flex: 1; }
+.renewals-table th, .renewals-table td { border: 0.15mm solid #666; padding: 0.2mm 0.5mm; vertical-align: top; }
+.renewals-table th { text-align: left; color: #322575; font-weight: bold; height: 6mm; }
+</style>
+{% for page_html in pages %}
+<div class="id-page">{{ page_html|safe }}</div>
+{% endfor %}

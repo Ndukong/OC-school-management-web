@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Bursar Dashboard{% endblock %}
+{% block page_title %}Finance Dashboard{% endblock %}
+{% block content %}
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(220px, 1fr)); gap:16px; margin-bottom:24px;">
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:24px; font-weight:700; color:var(--success);">{{ term_income|default:"0" }} FCFA</div>
+        <div class="text-muted" style="font-size:13px;">Term Income</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:24px; font-weight:700; color:var(--danger);">{{ term_expenditure|default:"0" }} FCFA</div>
+        <div class="text-muted" style="font-size:13px;">Term Expenditure</div>
+    </div></div>
+</div>
+<div class="card">
+    <div class="card-header">Quick Actions</div>
+    <div class="card-body" style="display:flex; flex-wrap:wrap; gap:10px;">
+        <a href="{% url 'finance_dashboard' %}" class="btn btn-primary">Finance Module</a>
+    </div>
+</div>
+{% endblock %}

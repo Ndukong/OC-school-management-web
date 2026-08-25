@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+{% block content %}
+<div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(200px, 1fr)); gap:16px; margin-bottom:24px;">
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--primary);">{{ total_students|default:"0" }}</div>
+        <div class="text-muted" style="font-size:13px;">Students</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--primary);">{{ total_teachers|default:"0" }}</div>
+        <div class="text-muted" style="font-size:13px;">Teachers</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--primary);">{{ total_classes|default:"0" }}</div>
+        <div class="text-muted" style="font-size:13px;">Classes</div>
+    </div></div>
+    <div class="card"><div class="card-body" style="text-align:center;">
+        <div style="font-size:28px; font-weight:700; color:var(--success);">{{ total_enrolled|default:"0" }}</div>
+        <div class="text-muted" style="font-size:13px;">Enrolled ({{ current_term|default:"-" }})</div>
+    </div></div>
+</div>
+<div class="card">
+    <div class="card-header">Quick Actions</div>
+    <div class="card-body" style="display:flex; flex-wrap:wrap; gap:10px;">
+        <a href="{% url 'mark_entry_select' %}" class="btn btn-primary">Mark Entry</a>
+        <a href="{% url 'compute_results' %}" class="btn">Compute Results</a>
+        <a href="{% url 'import_students' %}" class="btn">Import Students</a>
+        <a href="{% url 'finance_dashboard' %}" class="btn">Finance</a>
+        <a href="{% url 'attendance_entry' %}" class="btn">Attendance</a>
+    </div>
+</div>
+{% endblock %}

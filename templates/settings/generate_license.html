@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Generate License Key{% endblock %}
+{% block page_title %}Generate License Key{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>License Key Generator</span>
+        <a href="{% url 'license_info' %}" class="btn btn-sm">Back</a>
+    </div>
+    <div class="card-body">
+        <p class="text-muted" style="font-size:13px; margin-bottom:16px;">
+            Generate a product key for offline activation. This creates a signed key that
+            can be validated without internet access.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>School Name *</label>
+                    <input type="text" name="school_name" required placeholder="e.g., Government Bilingual Secondary School">
+                </div>
+                <div class="form-group">
+                    <label>Max Students</label>
+                    <input type="number" name="max_students" value="500" min="10">
+                </div>
+                <div class="form-group">
+                    <label>Max Devices</label>
+                    <input type="number" name="max_devices" value="3" min="1">
+                </div>
+                <div class="form-group">
+                    <label>Validity (days)</label>
+                    <input type="number" name="validity_days" value="365" min="30">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Generate Product Key</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

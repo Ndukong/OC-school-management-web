@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+{% block title %}Classes &amp; Streams{% endblock %}
+{% block page_title %}Classes &amp; Streams{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Classes &amp; Streams</span>
+        <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+    </div>
+    <div class="card-body">
+        {% if classes %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Class</th>
+                        <th>Code</th>
+                        <th>Stream</th>
+                        <th>Cycle</th>
+                        <th>Level</th>
+                        <th>Promotion Mark</th>
+                        <th>Subjects</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for cls in classes %}
+                    <tr>
+                        <td style="font-weight:600;">{{ cls.name }}</td>
+                        <td>{{ cls.code }}</td>
+                        <td>{{ cls.stream|default:"—" }}</td>
+                        <td>{{ cls.get_cycle_display }}</td>
+                        <td>Form {{ cls.form_level }}</td>
+                        <td>{{ cls.promotion_mark }}</td>
+                        <td>
+                            <a href="{% url 'class_subjects_manage' cls.pk %}" class="btn btn-sm">Configure</a>
+                        </td>
+                        <td>
+                            <form method="post" style="display:inline;"
+                                  onsubmit="return confirm('Delete {{ cls }}?');">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="delete">
+                                <input type="hidden" name="class_id" value="{{ cls.pk }}">
+                                <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No classes yet. Add the first class below.</p>
+        {% endif %}
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Add Class</span></div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Name *</label>
+                    {{ form.name }}
+                    {% if form.name.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.name.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Code *</label>
+                    {{ form.code }}
+                    {% if form.code.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.code.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Stream</label>
+                    {{ form.stream }}
+                    <div class="form-hint">Leave blank for a single-stream class.</div>
+                </div>
+                <div class="form-group">
+                    <label>Cycle</label>
+                    {{ form.cycle }}
+                </div>
+                <div class="form-group">
+                    <label>Form level</label>
+                    {{ form.form_level }}
+                    <div class="form-hint">1&ndash;5 = first cycle, 6&ndash;7 = sixth forms.</div>
+                </div>
+                <div class="form-group">
+                    <label>Promotion mark</label>
+                    {{ form.promotion_mark }}
+                </div>
+                <div class="form-group">
+                    <label>Sort order</label>
+                    {{ form.sort_order }}
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Class</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

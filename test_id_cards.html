@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@page { size: A4 landscape; margin: 0; }
+body { margin: 0; padding: 0; font-family: 'Segoe UI', Arial, sans-serif; }
+.page { page-break-after: always; width: 297mm; height: 210mm; position: relative; font-size: 0; line-height: 0; }
+.id-cell { display: inline-block; width: 74.25mm; height: 105mm; vertical-align: top; overflow: hidden; position: relative; }
+.cut-v1, .cut-v2, .cut-v3 { position: absolute; top: 0; width: 0; height: 210mm; border-left: 0.1mm dashed #ccc; z-index: 10; pointer-events: none; }
+.cut-v1 { left: 74.25mm; }
+.cut-v2 { left: 148.5mm; }
+.cut-v3 { left: 222.75mm; }
+.cut-h { position: absolute; left: 0; top: 105mm; width: 297mm; height: 0; border-top: 0.1mm dashed #ccc; z-index: 10; pointer-events: none; }
+
+/* --- ID Card Styles --- */
+.margin-box {
+    position: absolute;
+    top: 5mm; left: 5.125mm;
+    width: 64mm; height: 95mm;
+    border: 0.2mm solid #000;
+    box-sizing: border-box;
+    font-size: 0; line-height: 0;
+}
+.p1 { padding: 1.5mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.p1-row { width: 100%; text-align: center; line-height: 1.3; }
+.p1-flag { height: 10%; display: flex; justify-content: space-between; align-items: flex-start; }
+.p1-gap { height: 2.5%; }
+.p1-motto { height: 7.5%; }
+.p1-ministry { height: 6.5%; }
+.p1-school { height: 6.5%; }
+.p1-title { height: 12%; }
+.p1-year { height: 6%; }
+.p1-matric { height: 6%; }
+.p1-fill { flex: 1; min-height: 1%; }
+
+.flag { display: flex; height: 100%; width: 15mm; }
+.flag-g { width: 5mm; background: #009A44; }
+.flag-r { width: 5mm; background: #CE1126; position: relative; }
+.flag-y { width: 5mm; background: #FCD116; }
+.flag-star { position: absolute; top: 40%; left: 30%; width: 40%; height: 40%; background: #FCD116; clip-path: polygon(50% 0%, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.logo-area { height: 100%; display: flex; align-items: center; }
+.logo-area img { max-height: 100%; max-width: 20mm; }
+.logo-placeholder { font-size: 5pt; color: #999; line-height: normal; }
+
+.title-box { border: 0.4mm solid #322575; padding: 1.5mm 0; height: calc(100% - 3mm); display: flex; flex-direction: column; justify-content: center; }
+
+.tl-center { text-align: center; }
+.tl-bold { font-weight: bold; }
+.tl-italic { font-style: italic; }
+.tl-purple { color: #322575; }
+.tl-red { color: red; }
+.tl-black { color: #000; }
+.fs-55 { font-size: 5.5pt; line-height: 1.3; }
+.fs-6 { font-size: 6pt; line-height: 1.3; }
+.fs-65 { font-size: 6.5pt; line-height: 1.3; }
+.fs-7 { font-size: 7pt; line-height: 1.3; }
+
+.p2 { padding: 1.5mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.id-fields { width: 100%; border-collapse: collapse; font-size: 5.5pt; line-height: 1.35; flex: 1; }
+.id-fields td { padding: 0; vertical-align: middle; border-bottom: 0.1mm solid #ddd; }
+.id-label { width: 40%; font-weight: bold; }
+.id-value { width: 60%; font-weight: bold; }
+
+.p3 { padding: 2mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.photo-box { width: auto; height: 25mm; margin: 0 auto; border: 0.2mm solid #000; display: flex; align-items: center; justify-content: center; font-size: 6pt; color: #999; overflow: hidden; flex-shrink: 0; }
+.photo-box img { height: 25mm; width: auto; }
+.issue-date { text-align: center; font-size: 5.5pt; line-height: 1.4; }
+.seal-box { margin: 0 auto; display: flex; align-items: center; justify-content: center; font-size: 5pt; color: #999; flex-shrink: 0; }
+.seal-box img { height: 30mm; width: auto; }
+.signature-line { text-align: center; font-size: 5.5pt; line-height: 1.4; }
+.p3-gap { flex: 1; min-height: 1mm; }
+
+.p4 { padding: 1.5mm 2mm; display: flex; flex-direction: column; height: 95mm; box-sizing: border-box; }
+.renewals-title { text-align: center; font-size: 6pt; color: #322575; font-weight: bold; line-height: 1.4; flex-shrink: 0; }
+.renewals-table { width: 100%; border-collapse: collapse; font-size: 5pt; line-height: 1.3; flex: 1; }
+.renewals-table th, .renewals-table td { border: 0.15mm solid #666; padding: 0.2mm 0.5mm; vertical-align: top; }
+.renewals-table th { text-align: left; color: #322575; font-weight: bold; height: 6mm; }
+</style>
+</head>
+<body>
+
+<div class="page">
+    <div class="cut-v1"></div><div class="cut-v2"></div><div class="cut-v3"></div><div class="cut-h"></div>
+    <div class="id-cell">
+<div class="margin-box p2">
+    <table class="id-fields">
+        <tr><td class="id-label">Surname:<br><em>Nom</em></td><td class="id-value">ABIH</td></tr>
+        <tr><td class="id-label">Other Names:<br><em>Prénom</em></td><td class="id-value">BRENDALYNE MBULI</td></tr>
+        <tr><td class="id-label">Date of Birth:<br><em>Né(e) le:</em></td><td class="id-value">11-03-2012</td></tr>
+        <tr><td class="id-label">Place of birth:<br><em>Lieu de naissance</em></td><td class="id-value">DUMBU</td></tr>
+        <tr><td class="id-label">Sex:<br><em>Sexe</em></td><td class="id-value">Female</td></tr>
+        <tr><td class="id-label">Nationality:<br><em>Nationalité</em></td><td class="id-value">Cameroonian / Camerounaise</td></tr>
+        <tr><td class="id-label">Father's Name:<br><em>Nom du Père</em></td><td class="id-value">ABIH GEORGE</td></tr>
+        <tr><td class="id-label">Mother's Name:<br><em>Nom de la mère</em></td><td class="id-value">ABIH PRODENCIA</td></tr>
+        <tr><td class="id-label">Region of Origin:<br><em>Région d'origine</em></td><td class="id-value">NORTH WEST</td></tr>
+        <tr><td class="id-label">Division:<br><em>Département</em></td><td class="id-value">DONGA-MANTUN</td></tr>
+        <tr><td class="id-label">Sub-Division:<br><em>Arrondissement</em></td><td class="id-value">DONGA-MANTUN</td></tr>
+        <tr><td class="id-label">Guardian/Contact:<br><em>Tuteur/Contact</em></td><td class="id-value">675823695</td></tr>
+    </table>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p3">
+    <div class="p3-gap"></div>
+    <div class="photo-box">
+        <img src="/media/students/photos/ABIH_BRENDALINE_MBURLI.jpg" alt="Photo">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="issue-date">
+        <strong>Issued on:</strong> <em>20-07-2026</em><br>
+        <strong>Délivrée le:</strong> <em>20-07-2026</em>
+    </div>
+    <div class="p3-gap"></div>
+    <div class="seal-box">
+        <img src="/media/schools/seals/School_Seal.png" alt="Seal">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="signature-line">
+        _____________________<br>
+        <strong>Principal's Signature</strong><br>
+        <em>Signature du Chef d'Établissement</em>
+    </div>
+    <div class="p3-gap"></div>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p2">
+    <table class="id-fields">
+        <tr><td class="id-label">Surname:<br><em>Nom</em></td><td class="id-value">ADAMU</td></tr>
+        <tr><td class="id-label">Other Names:<br><em>Prénom</em></td><td class="id-value">SALE</td></tr>
+        <tr><td class="id-label">Date of Birth:<br><em>Né(e) le:</em></td><td class="id-value">30-05-2011</td></tr>
+        <tr><td class="id-label">Place of birth:<br><em>Lieu de naissance</em></td><td class="id-value">DUMBU</td></tr>
+        <tr><td class="id-label">Sex:<br><em>Sexe</em></td><td class="id-value">Male</td></tr>
+        <tr><td class="id-label">Nationality:<br><em>Nationalité</em></td><td class="id-value">Cameroonian / Camerounaise</td></tr>
+        <tr><td class="id-label">Father's Name:<br><em>Nom du Père</em></td><td class="id-value">ABUBAKAR GOROJI</td></tr>
+        <tr><td class="id-label">Mother's Name:<br><em>Nom de la mère</em></td><td class="id-value">HELMINA AWUDU</td></tr>
+        <tr><td class="id-label">Region of Origin:<br><em>Région d'origine</em></td><td class="id-value">NORTH WEST</td></tr>
+        <tr><td class="id-label">Division:<br><em>Département</em></td><td class="id-value">DONGA-MANTUN</td></tr>
+        <tr><td class="id-label">Sub-Division:<br><em>Arrondissement</em></td><td class="id-value">DONGA-MANTUN</td></tr>
+        <tr><td class="id-label">Guardian/Contact:<br><em>Tuteur/Contact</em></td><td class="id-value">680265698</td></tr>
+    </table>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p3">
+    <div class="p3-gap"></div>
+    <div class="photo-box">
+        <img src="/media/students/photos/ADAMU_SALE.jpg" alt="Photo">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="issue-date">
+        <strong>Issued on:</strong> <em>20-07-2026</em><br>
+        <strong>Délivrée le:</strong> <em>20-07-2026</em>
+    </div>
+    <div class="p3-gap"></div>
+    <div class="seal-box">
+        <img src="/media/schools/seals/School_Seal.png" alt="Seal">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="signature-line">
+        _____________________<br>
+        <strong>Principal's Signature</strong><br>
+        <em>Signature du Chef d'Établissement</em>
+    </div>
+    <div class="p3-gap"></div>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p2">
+    <table class="id-fields">
+        <tr><td class="id-label">Surname:<br><em>Nom</em></td><td class="id-value">AMADOU</td></tr>
+        <tr><td class="id-label">Other Names:<br><em>Prénom</em></td><td class="id-value">SOKU THANKGOD</td></tr>
+        <tr><td class="id-label">Date of Birth:<br><em>Né(e) le:</em></td><td class="id-value">09-09-2011</td></tr>
+        <tr><td class="id-label">Place of birth:<br><em>Lieu de naissance</em></td><td class="id-value">NDAKA</td></tr>
+        <tr><td class="id-label">Sex:<br><em>Sexe</em></td><td class="id-value">Male</td></tr>
+        <tr><td class="id-label">Nationality:<br><em>Nationalité</em></td><td class="id-value">Cameroonian / Camerounaise</td></tr>
+        <tr><td class="id-label">Father's Name:<br><em>Nom du Père</em></td><td class="id-value"></td></tr>
+        <tr><td class="id-label">Mother's Name:<br><em>Nom de la mère</em></td><td class="id-value"></td></tr>
+        <tr><td class="id-label">Region of Origin:<br><em>Région d'origine</em></td><td class="id-value"></td></tr>
+        <tr><td class="id-label">Division:<br><em>Département</em></td><td class="id-value"></td></tr>
+        <tr><td class="id-label">Sub-Division:<br><em>Arrondissement</em></td><td class="id-value"></td></tr>
+        <tr><td class="id-label">Guardian/Contact:<br><em>Tuteur/Contact</em></td><td class="id-value"></td></tr>
+    </table>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p3">
+    <div class="p3-gap"></div>
+    <div class="photo-box">
+        PHOTO
+    </div>
+    <div class="p3-gap"></div>
+    <div class="issue-date">
+        <strong>Issued on:</strong> <em>20-07-2026</em><br>
+        <strong>Délivrée le:</strong> <em>20-07-2026</em>
+    </div>
+    <div class="p3-gap"></div>
+    <div class="seal-box">
+        <img src="/media/schools/seals/School_Seal.png" alt="Seal">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="signature-line">
+        _____________________<br>
+        <strong>Principal's Signature</strong><br>
+        <em>Signature du Chef d'Établissement</em>
+    </div>
+    <div class="p3-gap"></div>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p2">
+    <table class="id-fields">
+        <tr><td class="id-label">Surname:<br><em>Nom</em></td><td class="id-value">AMIDO</td></tr>
+        <tr><td class="id-label">Other Names:<br><em>Prénom</em></td><td class="id-value">JOHARIYATOU HAJEYA</td></tr>
+        <tr><td class="id-label">Date of Birth:<br><em>Né(e) le:</em></td><td class="id-value">19-11-2010</td></tr>
+        <tr><td class="id-label">Place of birth:<br><em>Lieu de naissance</em></td><td class="id-value">WUM</td></tr>
+        <tr><td class="id-label">Sex:<br><em>Sexe</em></td><td class="id-value">Female</td></tr>
+        <tr><td class="id-label">Nationality:<br><em>Nationalité</em></td><td class="id-value">Cameroonian / Camerounaise</td></tr>
+        <tr><td class="id-label">Father's Name:<br><em>Nom du Père</em></td><td class="id-value">AMIDOU YAKUBU</td></tr>
+        <tr><td class="id-label">Mother's Name:<br><em>Nom de la mère</em></td><td class="id-value">SALAMA AMIDOU</td></tr>
+        <tr><td class="id-label">Region of Origin:<br><em>Région d'origine</em></td><td class="id-value">NORTH WEST</td></tr>
+        <tr><td class="id-label">Division:<br><em>Département</em></td><td class="id-value">DONGA-MANTUN</td></tr>
+        <tr><td class="id-label">Sub-Division:<br><em>Arrondissement</em></td><td class="id-value">DONGA-MANTUN</td></tr>
+        <tr><td class="id-label">Guardian/Contact:<br><em>Tuteur/Contact</em></td><td class="id-value">698656536</td></tr>
+    </table>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p3">
+    <div class="p3-gap"></div>
+    <div class="photo-box">
+        <img src="/media/students/photos/AMIDO_JOHARIYATOU_HAJEYA.jpg" alt="Photo">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="issue-date">
+        <strong>Issued on:</strong> <em>20-07-2026</em><br>
+        <strong>Délivrée le:</strong> <em>20-07-2026</em>
+    </div>
+    <div class="p3-gap"></div>
+    <div class="seal-box">
+        <img src="/media/schools/seals/School_Seal.png" alt="Seal">
+    </div>
+    <div class="p3-gap"></div>
+    <div class="signature-line">
+        _____________________<br>
+        <strong>Principal's Signature</strong><br>
+        <em>Signature du Chef d'Établissement</em>
+    </div>
+    <div class="p3-gap"></div>
+</div>
+
+
+</div>
+</div>
+
+<div class="page">
+    <div class="cut-v1"></div><div class="cut-v2"></div><div class="cut-v3"></div><div class="cut-h"></div>
+    <div class="id-cell">
+<div class="margin-box p4">
+    <div class="renewals-title">RENEWALS<br><em>RENOUVELLEMENTS</em></div>
+    <div style="height:1mm;"></div>
+    <table class="renewals-table">
+        <tr><th>Class and Year<br><em>Classe et Année</em></th><th>Principal's Signature<br><em>Signature du Chef d'Établissement</em></th></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+    </table>
+</div>
+
+</div><div class="id-cell">
+<div class="margin-box p1">
+    <div class="p1-row p1-flag">
+        <div class="flag">
+            <div class="flag-g"></div>
+            <div class="flag-r"><div class="flag-star"></div></div>
+            <div class="flag-y"></div>
+        </div>
+        <div class="logo-area">
+            <img src="/media/schools/logos/School_Logo_2.png" alt="Logo">
+        </div>
+    </div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIC OF CAMEROON</span><br>Peace – Work – Fatherland</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIQUE DU CAMEROUN</span><br>Paix – Travail – Patrie</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-ministry tl-center fs-55 tl-black"><span class="tl-bold">MINISTRY OF SECONDARY EDUCATION</span><br><span class="tl-italic">MINISTERE DES ENSEIGNEMENTS SECONDAIRES</span></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-school tl-center fs-6 tl-purple"><span class="tl-bold">G.H.S. DUMBU</span><br>LYCÉE DE DUMBU</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-title tl-center fs-7 tl-purple"><div class="title-box"><span class="tl-bold">SCHOOL IDENTITY CARD</span><br>CARTE D'IDENTITÉ SCOLAIRE</div></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-year tl-center fs-6">School Year: <strong>2025/2026</strong></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-matric tl-center fs-6">Matricule: <strong class="tl-red">240605385</strong></div>
+    <div class="p1-fill"></div>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p4">
+    <div class="renewals-title">RENEWALS<br><em>RENOUVELLEMENTS</em></div>
+    <div style="height:1mm;"></div>
+    <table class="renewals-table">
+        <tr><th>Class and Year<br><em>Classe et Année</em></th><th>Principal's Signature<br><em>Signature du Chef d'Établissement</em></th></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+    </table>
+</div>
+
+</div><div class="id-cell">
+<div class="margin-box p1">
+    <div class="p1-row p1-flag">
+        <div class="flag">
+            <div class="flag-g"></div>
+            <div class="flag-r"><div class="flag-star"></div></div>
+            <div class="flag-y"></div>
+        </div>
+        <div class="logo-area">
+            <img src="/media/schools/logos/School_Logo_2.png" alt="Logo">
+        </div>
+    </div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIC OF CAMEROON</span><br>Peace – Work – Fatherland</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIQUE DU CAMEROUN</span><br>Paix – Travail – Patrie</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-ministry tl-center fs-55 tl-black"><span class="tl-bold">MINISTRY OF SECONDARY EDUCATION</span><br><span class="tl-italic">MINISTERE DES ENSEIGNEMENTS SECONDAIRES</span></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-school tl-center fs-6 tl-purple"><span class="tl-bold">G.H.S. DUMBU</span><br>LYCÉE DE DUMBU</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-title tl-center fs-7 tl-purple"><div class="title-box"><span class="tl-bold">SCHOOL IDENTITY CARD</span><br>CARTE D'IDENTITÉ SCOLAIRE</div></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-year tl-center fs-6">School Year: <strong>2025/2026</strong></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-matric tl-center fs-6">Matricule: <strong class="tl-red">250185768</strong></div>
+    <div class="p1-fill"></div>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p4">
+    <div class="renewals-title">RENEWALS<br><em>RENOUVELLEMENTS</em></div>
+    <div style="height:1mm;"></div>
+    <table class="renewals-table">
+        <tr><th>Class and Year<br><em>Classe et Année</em></th><th>Principal's Signature<br><em>Signature du Chef d'Établissement</em></th></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+    </table>
+</div>
+
+</div><div class="id-cell">
+<div class="margin-box p1">
+    <div class="p1-row p1-flag">
+        <div class="flag">
+            <div class="flag-g"></div>
+            <div class="flag-r"><div class="flag-star"></div></div>
+            <div class="flag-y"></div>
+        </div>
+        <div class="logo-area">
+            <img src="/media/schools/logos/School_Logo_2.png" alt="Logo">
+        </div>
+    </div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIC OF CAMEROON</span><br>Peace – Work – Fatherland</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIQUE DU CAMEROUN</span><br>Paix – Travail – Patrie</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-ministry tl-center fs-55 tl-black"><span class="tl-bold">MINISTRY OF SECONDARY EDUCATION</span><br><span class="tl-italic">MINISTERE DES ENSEIGNEMENTS SECONDAIRES</span></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-school tl-center fs-6 tl-purple"><span class="tl-bold">G.H.S. DUMBU</span><br>LYCÉE DE DUMBU</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-title tl-center fs-7 tl-purple"><div class="title-box"><span class="tl-bold">SCHOOL IDENTITY CARD</span><br>CARTE D'IDENTITÉ SCOLAIRE</div></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-year tl-center fs-6">School Year: <strong>2025/2026</strong></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-matric tl-center fs-6">Matricule: <strong class="tl-red">240590562</strong></div>
+    <div class="p1-fill"></div>
+</div>
+
+
+</div><div class="id-cell">
+<div class="margin-box p4">
+    <div class="renewals-title">RENEWALS<br><em>RENOUVELLEMENTS</em></div>
+    <div style="height:1mm;"></div>
+    <table class="renewals-table">
+        <tr><th>Class and Year<br><em>Classe et Année</em></th><th>Principal's Signature<br><em>Signature du Chef d'Établissement</em></th></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+    </table>
+</div>
+
+</div><div class="id-cell">
+<div class="margin-box p1">
+    <div class="p1-row p1-flag">
+        <div class="flag">
+            <div class="flag-g"></div>
+            <div class="flag-r"><div class="flag-star"></div></div>
+            <div class="flag-y"></div>
+        </div>
+        <div class="logo-area">
+            <img src="/media/schools/logos/School_Logo_2.png" alt="Logo">
+        </div>
+    </div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIC OF CAMEROON</span><br>Peace – Work – Fatherland</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIQUE DU CAMEROUN</span><br>Paix – Travail – Patrie</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-ministry tl-center fs-55 tl-black"><span class="tl-bold">MINISTRY OF SECONDARY EDUCATION</span><br><span class="tl-italic">MINISTERE DES ENSEIGNEMENTS SECONDAIRES</span></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-school tl-center fs-6 tl-purple"><span class="tl-bold">G.H.S. DUMBU</span><br>LYCÉE DE DUMBU</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-title tl-center fs-7 tl-purple"><div class="title-box"><span class="tl-bold">SCHOOL IDENTITY CARD</span><br>CARTE D'IDENTITÉ SCOLAIRE</div></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-year tl-center fs-6">School Year: <strong>2025/2026</strong></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-matric tl-center fs-6">Matricule: <strong class="tl-red">240575595</strong></div>
+    <div class="p1-fill"></div>
+</div>
+
+
+</div>
+</div>
+
+</body>
+</html>

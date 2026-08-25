@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% block title %}Administration &amp; Settings{% endblock %}
+{% block page_title %}Administration &amp; Settings{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-body" style="padding:0;">
+        <div style="padding:20px 24px; border-bottom:1px solid var(--border);">
+            <h2 class="mb-1" style="margin:0 0 4px;">School Configuration</h2>
+            <p class="text-muted mb-0" style="font-size:13.5px;">
+                Configure every part of {{ school.name_en|default:"your school" }} without Django Admin.
+                {% if current_term %}Current term: <strong>{{ current_term }}</strong>.{% endif %}
+            </p>
+        </div>
+
+        <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; padding:24px;">
+
+            {% for item in config_cards %}
+            <a href="{{ item.url }}" style="text-decoration:none; color:inherit;">
+                <div style="border:1px solid var(--border); border-radius:var(--radius); padding:18px; background:var(--card-bg); transition:box-shadow .15s ease, transform .15s ease;">
+                    <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
+                        <span style="font-size:24px;">{{ item.icon }}</span>
+                        <span class="badge badge-info">{{ item.count|default:0 }}</span>
+                    </div>
+                    <div style="font-weight:700; font-size:14.5px;">{{ item.title }}</div>
+                    <div class="text-muted" style="font-size:12.5px; margin-top:4px;">{{ item.desc }}</div>
+                </div>
+            </a>
+            {% endfor %}
+
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Quick Setup Checklist</span></div>
+    <div class="card-body">
+        <ol style="margin:0; padding-left:20px; line-height:2;">
+            <li><a href="{% url 'school_profile' %}">School profile</a> — name, matricule, contact, bilingual letterhead, logo &amp; seal.</li>
+            <li><a href="{% url 'terms_manage' %}">Academic terms</a> — create the year&rsquo;s terms and mark one current.</li>
+            <li><a href="{% url 'classes_manage' %}">Classes &amp; streams</a> — add Form 1&ndash;6 and streams (A, B, Commercial&hellip;).</li>
+            <li><a href="{% url 'subjects_manage' %}">Subjects</a> — add the subject catalogue, then assign <a href="{% url 'subjects_manage' %}">coefficients per class</a>.</li>
+            <li><a href="{% url 'competencies_manage' %}">Competencies</a> — record subject competencies per term &amp; form level.</li>
+            <li><a href="{% url 'teacher_list' %}">Teachers</a> — add staff, then link users &amp; assign subjects.</li>
+            <li><a href="{% url 'users_manage' %}">Users</a> — create accounts for staff and link them to teacher records.</li>
+            <li><a href="{% url 'pta_config' %}">PTA configuration</a> — rubric heads, sub-heads, per-class dues and fee types.</li>
+            <li><a href="{% url 'conduct_config' %}">Conduct thresholds</a> — set discipline levels for the class council.</li>
+            <li>Done &rarr; import students, enter marks, compute results and generate reports.</li>
+        </ol>
+    </div>
+</div>
+
+{% endblock %}

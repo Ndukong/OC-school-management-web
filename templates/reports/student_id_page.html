@@ -1,0 +1,84 @@
+{% if page_num == 1 %}
+<div class="margin-box p1">
+    <div class="p1-row p1-flag">
+        <div class="flag">
+            <div class="flag-g"></div>
+            <div class="flag-r"><div class="flag-star"></div></div>
+            <div class="flag-y"></div>
+        </div>
+        <div class="logo-area">
+            {% if school.logo %}<img src="{{ school.logo.url }}" alt="Logo">{% else %}<span class="logo-placeholder">LOGO</span>{% endif %}
+        </div>
+    </div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIC OF CAMEROON</span><br>Peace – Work – Fatherland</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-motto tl-center fs-55"><span class="tl-bold">REPUBLIQUE DU CAMEROUN</span><br>Paix – Travail – Patrie</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-ministry tl-center fs-55 tl-black"><span class="tl-bold">MINISTRY OF SECONDARY EDUCATION</span><br><span class="tl-italic">MINISTERE DES ENSEIGNEMENTS SECONDAIRES</span></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-school tl-center fs-6 tl-purple"><span class="tl-bold">{{ school.name_en|upper }}</span><br>{{ school.name_fr|default:school.name_en|upper }}</div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-title tl-center fs-7 tl-purple"><div class="title-box"><span class="tl-bold">SCHOOL IDENTITY CARD</span><br>CARTE D'IDENTITÉ SCOLAIRE</div></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-year tl-center fs-6">School Year: <strong>{{ academic_year }}</strong></div>
+    <div class="p1-gap"></div>
+    <div class="p1-row p1-matric tl-center fs-6">Matricule: <strong class="tl-red">{{ student.unique_id }}</strong></div>
+    <div class="p1-fill"></div>
+</div>
+
+{% elif page_num == 2 %}
+<div class="margin-box p2">
+    <table class="id-fields">
+        <tr><td class="id-label">Surname:<br><em>Nom</em></td><td class="id-value">{{ student.first_name|upper }}</td></tr>
+        <tr><td class="id-label">Other Names:<br><em>Prénom</em></td><td class="id-value">{{ student.other_names|upper }}</td></tr>
+        <tr><td class="id-label">Date of Birth:<br><em>Né(e) le:</em></td><td class="id-value">{{ student.date_of_birth|date:"d-m-Y" }}</td></tr>
+        <tr><td class="id-label">Place of birth:<br><em>Lieu de naissance</em></td><td class="id-value">{{ student.place_of_birth|upper }}</td></tr>
+        <tr><td class="id-label">Sex:<br><em>Sexe</em></td><td class="id-value">{{ student.get_sex_display }}</td></tr>
+        <tr><td class="id-label">Nationality:<br><em>Nationalité</em></td><td class="id-value">Cameroonian / Camerounaise</td></tr>
+        <tr><td class="id-label">Father's Name:<br><em>Nom du Père</em></td><td class="id-value">{{ student.father_name|upper }}</td></tr>
+        <tr><td class="id-label">Mother's Name:<br><em>Nom de la mère</em></td><td class="id-value">{{ student.mother_name|upper }}</td></tr>
+        <tr><td class="id-label">Region of Origin:<br><em>Région d'origine</em></td><td class="id-value">{{ student.region_of_origin|upper }}</td></tr>
+        <tr><td class="id-label">Division:<br><em>Département</em></td><td class="id-value">{{ student.division_of_origin|upper }}</td></tr>
+        <tr><td class="id-label">Sub-Division:<br><em>Arrondissement</em></td><td class="id-value">{{ student.sub_division_of_origin|upper }}</td></tr>
+        <tr><td class="id-label">Guardian/Contact:<br><em>Tuteur/Contact</em></td><td class="id-value">{{ student.guardian_contact }}</td></tr>
+    </table>
+</div>
+
+{% elif page_num == 3 %}
+<div class="margin-box p3">
+    <div class="p3-gap"></div>
+    <div class="photo-box">
+        {% if student.photo %}<img src="{{ student.photo.url }}" alt="Photo">{% else %}PHOTO{% endif %}
+    </div>
+    <div class="p3-gap"></div>
+    <div class="issue-date">
+        <strong>Issued on:</strong> <em>{{ today|date:"d-m-Y" }}</em><br>
+        <strong>Délivrée le:</strong> <em>{{ today|date:"d-m-Y" }}</em>
+    </div>
+    <div class="p3-gap"></div>
+    <div class="seal-box">
+        {% if school.seal %}<img src="{{ school.seal.url }}" alt="Seal">{% else %}SEAL{% endif %}
+    </div>
+    <div class="p3-gap"></div>
+    <div class="signature-line">
+        _____________________<br>
+        <strong>Principal's Signature</strong><br>
+        <em>Signature du Chef d'Établissement</em>
+    </div>
+    <div class="p3-gap"></div>
+</div>
+
+{% elif page_num == 4 %}
+<div class="margin-box p4">
+    <div class="renewals-title">RENEWALS<br><em>RENOUVELLEMENTS</em></div>
+    <div style="height:1mm;"></div>
+    <table class="renewals-table">
+        <tr><th>Class and Year<br><em>Classe et Année</em></th><th>Principal's Signature<br><em>Signature du Chef d'Établissement</em></th></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+        <tr><td></td><td></td></tr>
+    </table>
+</div>
+{% endif %}

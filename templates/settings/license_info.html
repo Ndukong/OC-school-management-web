@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}License Information{% endblock %}
+{% block page_title %}License Information{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Current License</span>
+        <div>
+            <a href="{% url 'generate_license_key' %}" class="btn btn-sm btn-primary">Generate Key</a>
+            <a href="{% url 'offline_license_check' %}" class="btn btn-sm">Offline Check</a>
+            <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+        </div>
+    </div>
+    <div class="card-body">
+        {% if license %}
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:16px;">
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">School</div>
+                <div style="font-weight:700; font-size:15px;">{{ license.school_name }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Status</div>
+                {% if license.is_valid %}
+                    <span class="badge badge-success">Active</span>
+                {% else %}
+                    <span class="badge badge-danger">{{ license.get_status_display }}</span>
+                {% endif %}
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Expires</div>
+                <div style="font-weight:600;">{{ license.expires_at|date:"M d, Y" }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Days Remaining</div>
+                <div style="font-weight:700; font-size:15px; color:{% if license.days_remaining > 30 %}var(--success){% elif license.days_remaining > 7 %}var(--warning){% else %}var(--danger){% endif %};">
+                    {{ license.days_remaining }}
+                </div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Max Students</div>
+                <div style="font-weight:600;">{{ license.max_students }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Max Devices</div>
+                <div style="font-weight:600;">{{ license.max_devices }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Activated</div>
+                <div style="font-weight:600;">{{ license.activated_at|date:"M d, Y H:i"|default:"N/A" }}</div>
+            </div>
+            <div>
+                <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Students Enrolled</div>
+                <div style="font-weight:600;">{{ student_count }} / {{ license.max_students }}</div>
+            </div>
+        </div>
+
+        <div style="margin-top:16px; padding:12px; background:var(--accent); border-radius:var(--radius);">
+            <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Product Key</div>
+            <div style="font-family:monospace; font-size:13px; word-break:break-all; margin-top:4px;">{{ license.product_key }}</div>
+        </div>
+
+        <div style="margin-top:12px; padding:12px; background:var(--accent); border-radius:var(--radius);">
+            <div class="text-muted" style="font-size:12px; text-transform:uppercase; letter-spacing:.05em;">Machine ID</div>
+            <div style="font-family:monospace; font-size:12px; word-break:break-all; margin-top:4px;">{{ machine_id }}</div>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No active license found. <a href="{% url 'activate' %}">Activate now</a>.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% if all_licenses %}
+<div class="card">
+    <div class="card-header"><span>License History</span></div>
+    <div class="card-body">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>School</th><th>Status</th><th>Expires</th><th>Activated</th></tr>
+                </thead>
+                <tbody>
+                    {% for lic in all_licenses %}
+                    <tr>
+                        <td>{{ lic.school_name }}</td>
+                        <td><span class="badge badge-{% if lic.is_valid %}success{% else %}danger{% endif %}">{{ lic.get_status_display }}</span></td>
+                        <td>{{ lic.expires_at|date:"M d, Y" }}</td>
+                        <td>{{ lic.activated_at|date:"M d, Y"|default:"N/A" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

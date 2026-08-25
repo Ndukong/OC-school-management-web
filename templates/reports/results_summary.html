@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@page { size: A4 portrait; margin: 2.5cm; }
+body { font-family: 'Segoe UI', Arial, sans-serif; font-size: 11pt; line-height: 1.4; color: #000; }
+.letterhead { text-align: center; margin-bottom: 8px; }
+.letterhead .row { display: flex; align-items: stretch; justify-content: center; }
+.letterhead .col { flex: 1; display: flex; flex-direction: column; }
+.letterhead .col-en { text-align: center; }
+.letterhead .col-fr { text-align: center; }
+.letterhead .col-logo { flex: 0 0 auto; padding: 0 8px; display: flex; align-items: center; }
+.letterhead .col-logo img { max-height: 60px; }
+.letterhead p { margin: 1px 0; font-size: 9pt; }
+.letterhead .mat-line { text-align: center; font-size: 9pt; margin-top: 4px; }
+.lh-line { margin:0; line-height:1.15; }
+.lh-star { margin:0; font-size:9pt; letter-spacing:1px; line-height:1.1; }
+.lh-matricule { text-align:center; font-size:9pt; margin:2px 0 0; }
+.report-title { text-align: center; font-weight: bold; font-size: 13pt; margin: 10px 0; page-break-after: avoid; }
+section {
+    page-break-inside: avoid;
+    padding-left: 24px;
+}
+section + section {
+    margin-top: 18px;
+    border-top: 1px solid #d0d0d0;
+    padding-top: 14px;
+}
+.content-wrap { padding-left: 24px; }
+.stats-list { margin: 6px 0 12px; padding: 0; list-style: none; font-size: 10pt; line-height: 1.7; }
+.stats-list li { padding: 1px 0; }
+.stats-list .label {
+    font-weight: normal;
+    display: inline-block;
+    width: 200px;
+}
+.stats-list .value { font-weight: bold; }
+.fail { color: red; font-weight: bold; }
+.heading-underline { text-decoration: underline; margin: 8px 0 4px; font-size: 11pt; }
+.student-list { margin: 4px 0 12px; padding-left: 24px; font-size: 10pt; }
+.student-list li { padding: 1px 0; }
+.student-list .st-name { font-weight: bold; }
+.student-list .st-avg { font-weight: bold; }
+.seal-area { text-align: center; margin-top: 20px; page-break-before: avoid; }
+.seal-area img { max-height: 4.6cm; }
+h3 { margin: 12px 0 4px; font-size: 12pt; }
+</style>
+</head>
+<body>
+
+<!-- Letterhead -->
+{% include "reports/_letterhead.html" with max_width="18cm" %}
+
+<div class="report-title">
+    {% if is_annual %}
+        RESULTS SUMMARY FOR {{ year_start }}/{{ year_end }} — ANNUAL
+    {% else %}
+        RESULTS SUMMARY FOR {{ term.year_start }}/{{ term.year_end }} — {{ term.label|upper }}
+    {% endif %}
+</div>
+
+<div class="content-wrap">
+{% for section in sections %}
+<section>
+    {{ section|safe }}
+</section>
+{% endfor %}
+</div>
+
+<div class="seal-area">
+    <strong>THE PRINCIPAL</strong><br>
+    {% if school.seal %}<img src="{{ school.seal.url }}" alt="Seal">{% endif %}
+</div>
+
+</body>
+</html>

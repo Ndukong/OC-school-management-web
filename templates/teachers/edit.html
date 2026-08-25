@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block title %}Edit Teacher{% endblock %}
+{% block page_title %}Edit Teacher: {{ teacher.first_name }} {{ teacher.last_name }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            {% if field.name == "signature" %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div style="display:flex; align-items:center; gap:16px; margin-top:6px;">
+                    {% if teacher.signature %}
+                    <img src="{{ teacher.signature.url }}" alt="Signature" style="height:50px; border-radius:6px; border:1px solid var(--border); background:#fff; padding:4px 12px; object-fit:contain;">
+                    {% else %}
+                    <div style="width:120px; height:50px; border-radius:6px; background:var(--accent); border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:11px; flex-shrink:0; text-align:center;">No signature<br>yet</div>
+                    {% endif %}
+                    <div style="flex:1;">
+                        {{ field }}
+                        <div class="form-hint">Handwritten signature image (.jpg, .png). Used on report cards and official documents.</div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+                {% for error in field.errors %}<div class="alert alert-danger" style="padding:4px 8px; margin-top:4px;">{{ error }}</div>{% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% if form.non_field_errors %}<div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>{% endif %}
+            <div style="display:flex; gap:10px; margin-top:16px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'teacher_detail' teacher.pk %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

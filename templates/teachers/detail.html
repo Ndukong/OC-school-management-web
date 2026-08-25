@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}{{ teacher.first_name }} {{ teacher.last_name }}{% endblock %}
+{% block page_title %}Teacher Profile{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span>{{ teacher.first_name }} {{ teacher.last_name }}</span>
+        {% if is_admin %}
+        <div style="display:flex; gap:8px;">
+            {% if not teacher.is_active %}
+            <span class="badge badge-danger">Inactive</span>
+            {% endif %}
+            <a href="{% url 'teacher_edit' teacher.pk %}" class="btn btn-sm btn-primary">Edit</a>
+            {% if teacher.is_active %}
+            <a href="{% url 'teacher_delete' teacher.pk %}" class="btn btn-sm" style="color:var(--danger);">Deactivate</a>
+            {% endif %}
+        </div>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if teacher.signature %}
+        <div style="margin-bottom:16px;">
+            <div style="font-size:12px; font-weight:600; color:var(--text-muted); margin-bottom:6px;">Signature</div>
+            <img src="{{ teacher.signature.url }}" alt="Signature" style="height:50px; border-radius:6px; border:1px solid var(--border); background:#fff; padding:4px 12px; object-fit:contain;">
+        </div>
+        {% endif %}
+        <table style="width:100%; border:none; font-size:13px;">
+            <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Teacher Code</td><td style="font-family:monospace;">{{ teacher.teacher_code|default:"-" }}</td></tr>
+            <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Email</td><td>{{ teacher.email|default:"-" }}</td></tr>
+            <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Phone</td><td>{{ teacher.phone|default:"-" }}</td></tr>
+            <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Status</td><td>{% if teacher.is_active %}<span class="badge badge-success">Active</span>{% else %}<span class="badge badge-danger">Inactive</span>{% endif %}</td></tr>
+        </table>
+    </div>
+</div>
+
+<div class="card" id="assignments">
+    <div class="card-header">
+        <span>Class & Subject Assignments ({{ assignments|length }})</span>
+        {% if is_admin %}
+        <a href="{% url 'teacher_assignments' %}" class="btn btn-sm">Manage</a>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if assignments %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead><tr><th>Class</th><th>Subject</th><th>Class Master</th></tr></thead>
+                <tbody>
+                {% for a in assignments %}
+                <tr>
+                    <td>{{ a.school_class }}</td>
+                    <td>{{ a.subject.name }} ({{ a.subject.code }})</td>
+                    <td>{% if a.is_class_master %}<span class="badge badge-info">Yes</span>{% else %}-{% endif %}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-muted">No active assignments.</div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

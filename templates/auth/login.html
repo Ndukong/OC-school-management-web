@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login - School Management System</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #1a2332 0%, #1f4e78 100%);
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 420px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    padding: 40px 36px;
+  }
+
+  .brand { text-align: center; margin-bottom: 32px; }
+
+  .brand-logo {
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 16px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    border: 3px solid #1f4e78;
+    background: #eef4f9;
+  }
+
+  .brand-logo-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    font-weight: 700;
+    color: #1f4e78;
+    background: linear-gradient(135deg, #eef4f9, #dbe9f5);
+  }
+
+  .school-name {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a2332;
+    letter-spacing: -0.3px;
+    line-height: 1.25;
+  }
+
+  .subtitle {
+    margin-top: 6px;
+    font-size: 14px;
+    color: #64748b;
+  }
+
+  .alert {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 18px;
+    border: 1px solid;
+  }
+
+  .alert-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+  .alert-success { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+  .alert-info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .alert-warning { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+
+  .field { margin-bottom: 18px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 7px;
+  }
+
+  input[type="text"],
+  input[type="password"] {
+    width: 100%;
+    padding: 12px 14px;
+    font-size: 15px;
+    color: #1e293b;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #1f4e78;
+    box-shadow: 0 0 0 3px rgba(31, 78, 120, 0.15);
+  }
+
+  .btn-login {
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #1f4e78;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+  }
+
+  .btn-login:hover { background: #17395a; }
+  .btn-login:active { background: #122e47; }
+  .btn-login:focus-visible { outline: 3px solid rgba(31, 78, 120, 0.4); outline-offset: 2px; }
+
+  .helper {
+    margin-top: 22px;
+    text-align: center;
+    font-size: 13px;
+    color: #94a3b8;
+  }
+
+  @media (max-width: 480px) {
+    .auth-card { padding: 32px 22px; }
+  }
+</style>
+</head>
+<body>
+  <main class="auth-card">
+    <header class="brand">
+      {% if school and school.logo %}
+        <img class="brand-logo" src="{{ school.logo.url }}" alt="{{ school.name_en }} logo">
+      {% else %}
+        <div class="brand-logo brand-logo-fallback" aria-hidden="true">
+          {% if school %}{{ school.name_en|first|upper }}{% else %}S{% endif %}
+        </div>
+      {% endif %}
+      <h1 class="school-name">
+        {% if school %}{{ school.name_en }}{% else %}School Management System{% endif %}
+      </h1>
+      <p class="subtitle">School Management System</p>
+    </header>
+
+    {% if messages %}
+      {% for message in messages %}
+        <div class="alert alert-{% if message.tags == 'error' %}error{% else %}{{ message.tags }}{% endif %}" role="alert">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <form method="post" action="{% url 'login' %}" novalidate>
+      {% csrf_token %}
+      <div class="field">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" autocomplete="username" autofocus required>
+      </div>
+      <div class="field">
+        <label for="password">Password</label>
+        <input type="password" id="password" name="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-login">Login</button>
+    </form>
+
+    <p class="helper">First time? Contact your administrator.</p>
+  </main>
+</body>
+</html>

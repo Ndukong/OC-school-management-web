@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+{% block title %}{{ student.full_name }}{% endblock %}
+{% block page_title %}Student Profile{% endblock %}
+{% block content %}
+<div style="display:flex; gap:20px; flex-wrap:wrap;">
+    <div style="flex:1; min-width:280px;">
+        <div class="card">
+            <div class="card-header">
+                <span>{{ student.full_name }}</span>
+                {% if is_admin %}
+                <a href="{% url 'student_edit' student.pk %}" class="btn btn-sm">Edit</a>
+                {% endif %}
+            </div>
+            <div class="card-body" style="display:flex; gap:20px; flex-wrap:wrap;">
+                {% if student.photo %}
+                <img src="{{ student.photo.url }}" alt="Photo" style="width:100px; height:100px; border-radius:8px; object-fit:cover; border:2px solid var(--border);">
+                {% else %}
+                <div style="width:100px; height:100px; border-radius:8px; background:var(--accent); border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:32px; flex-shrink:0;">&#128100;</div>
+                {% endif %}
+                <div style="flex:1; min-width:200px;">
+                    <table style="width:100%; border:none; font-size:13px;">
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Student ID</td><td style="font-family:monospace;">{{ student.unique_id }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Sex</td><td>{{ student.get_sex_display }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Date of Birth</td><td>{{ student.date_of_birth }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Place of Birth</td><td>{{ student.place_of_birth }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Guardian</td><td>{{ student.guardian_name }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Contact</td><td>{{ student.guardian_contact }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Father</td><td>{{ student.father_name|default:"-" }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Mother</td><td>{{ student.mother_name|default:"-" }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Region</td><td>{{ student.region_of_origin }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Division</td><td>{{ student.division_of_origin }}</td></tr>
+                        <tr><td style="font-weight:600; padding:4px 8px 4px 0;">Repeater</td><td>{% if student.repeater %}Yes{% else %}No{% endif %}</td></tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div style="flex:1.5; min-width:320px;">
+        <div class="card">
+            <div class="card-header">Enrollment History</div>
+            <div class="card-body">
+                {% if enrollments %}
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead><tr><th>Term</th><th>Class</th><th>Enrolled</th></tr></thead>
+                        <tbody>
+                        {% for e in enrollments %}
+                        <tr>
+                            <td>{{ e.academic_term }}</td>
+                            <td>{{ e.school_class }}</td>
+                            <td>{{ e.date_enrolled }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <div class="text-muted">No enrollments recorded.</div>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if subject_averages %}
+        <div class="card">
+            <div class="card-header">Current Term Averages ({{ current_term }})</div>
+            <div class="card-body">
+                <div class="table-wrap">
+                    <table class="table">
+                        <thead><tr><th>Subject</th><th>Average</th><th>Grade</th><th>Remark</th></tr></thead>
+                        <tbody>
+                        {% for sa in subject_averages %}
+                        <tr>
+                            <td>{{ sa.subject.name }}</td>
+                            <td>{{ sa.average }}</td>
+                            <td>{{ sa.grade }}</td>
+                            <td>{{ sa.remark }}</td>
+                        </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% if term_result %}
+                <div style="margin-top:12px; padding:10px; background:var(--accent); border-radius:var(--radius); font-size:13px;">
+                    <strong>Overall: {{ term_result.average }} ({{ term_result.grade }})</strong> &mdash; Rank {{ term_result.rank|default:"-" }}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,154 @@
+{% extends "base.html" %}
+{% block title %}School Profile{% endblock %}
+{% block page_title %}School Profile{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>School Profile &amp; Bilingual Letterhead</span>
+        <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>School name (EN) *</label>
+                    {{ form.name_en }}
+                    {% if form.name_en.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.name_en.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>School name (FR)</label>
+                    {{ form.name_fr }}
+                </div>
+                <div class="form-group">
+                    <label>Matricule *</label>
+                    {{ form.matricule }}
+                    {% if form.matricule.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.matricule.errors }}</div>{% endif %}
+                </div>
+                <div class="form-group">
+                    <label>Phone</label>
+                    {{ form.phone }}
+                </div>
+                <div class="form-group">
+                    <label>Region (EN) *</label>
+                    {{ form.region_en }}
+                </div>
+                <div class="form-group">
+                    <label>Region (FR)</label>
+                    {{ form.region_fr }}
+                </div>
+                <div class="form-group">
+                    <label>Division (EN) *</label>
+                    {{ form.division_en }}
+                </div>
+                <div class="form-group">
+                    <label>Division (FR)</label>
+                    {{ form.division_fr }}
+                </div>
+                <div class="form-group">
+                    <label>Motto (EN)</label>
+                    {{ form.motto_en }}
+                </div>
+                <div class="form-group">
+                    <label>Motto (FR)</label>
+                    {{ form.motto_fr }}
+                </div>
+                <div class="form-group">
+                    <label>Periods per day</label>
+                    {{ form.periods_per_day }}
+                    <div class="form-hint">Number of teaching periods per day (6–10). Used for period-by-period attendance.</div>
+                    {% if form.periods_per_day.errors %}<div class="alert alert-error" style="margin-top:6px;">{{ form.periods_per_day.errors }}</div>{% endif %}
+                </div>
+            </div>
+
+            <h3 style="margin:24px 0 12px; font-size:15px; color:var(--primary);">Bilingual Letterhead (printed on reports)</h3>
+            <p style="font-size:13px; color:var(--text-muted); margin-bottom:12px;">
+                Lines 1–2 (Country &amp; Motto) are standard and cannot be changed.
+                The Region, Division, and School Name are taken from the fields above.
+                Use the optional Line 3 fields below for any extra text.
+            </p>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Line 1 (EN) — fixed</label>
+                    <input type="text" value="REPUBLIC OF CAMEROON" disabled class="form-control" style="background:#f4f6f9;">
+                </div>
+                <div class="form-group">
+                    <label>Line 1 (FR) — fixed</label>
+                    <input type="text" value="RÉPUBLIQUE DU CAMEROUN" disabled class="form-control" style="background:#f4f6f9;">
+                </div>
+                <div class="form-group">
+                    <label>Line 2 (EN) — fixed</label>
+                    <input type="text" value="PEACE – WORK – FATHERLAND" disabled class="form-control" style="background:#f4f6f9;">
+                </div>
+                <div class="form-group">
+                    <label>Line 2 (FR) — fixed</label>
+                    <input type="text" value="PAIX – TRAVAIL – PATRIE" disabled class="form-control" style="background:#f4f6f9;">
+                </div>
+                <div class="form-group">
+                    <label>Line 3 (EN) — optional extra</label>
+                    {{ form.letterhead_line3_en }}
+                </div>
+                <div class="form-group">
+                    <label>Line 3 (FR) — optional extra</label>
+                    {{ form.letterhead_line3_fr }}
+                </div>
+            </div>
+
+            <h3 style="margin:24px 0 12px; font-size:15px; color:var(--primary);">Logo &amp; Seal</h3>
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>School Logo</label>
+                    {% if school.logo %}<div style="margin-bottom:8px;"><img src="{{ school.logo.url }}" alt="Logo" style="max-height:80px;"></div>{% endif %}
+                    {{ form.logo }}
+                    <div class="form-hint">PNG/JPG, square preferred.</div>
+                </div>
+                <div class="form-group">
+                    <label>School Seal</label>
+                    {% if school.seal %}<div style="margin-bottom:8px;"><img src="{{ school.seal.url }}" alt="Seal" style="max-height:80px;"></div>{% endif %}
+                    {{ form.seal }}
+                    <div class="form-hint">Round seal for report cards.</div>
+                </div>
+            </div>
+
+            <div style="margin-top:20px;">
+                <button type="submit" class="btn btn-primary">Save School Profile</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Letterhead Preview</span></div>
+    <div class="card-body" style="text-align:center;">
+        <div style="font-weight:800; letter-spacing:.06em;">
+            {{ school.letterhead_line1_en|default:"REPUBLIC OF CAMEROON" }}<br>
+            {{ school.letterhead_line1_fr|default:"RÉPUBLIQUE DU CAMEROUN" }}
+        </div>
+        <div style="margin-top:4px; color:var(--text-muted);">
+            {{ school.letterhead_line2_en|default:"PEACE – WORK – FATHERLAND" }} / {{ school.letterhead_line2_fr|default:"PAIX – TRAVAIL – PATRIE" }}
+        </div>
+        <div style="margin:6px 0; letter-spacing:2px;">**********</div>
+        <div style="font-size:13px;">
+            REGIONAL DELEGATION FOR {{ school.region_en }}<br>
+            DÉLÉGATION RÉGIONALE DU {{ school.region_fr }}
+        </div>
+        <div style="margin:6px 0; letter-spacing:2px;">**********</div>
+        <div style="font-size:13px;">
+            DIVISIONAL DELEGATION FOR {{ school.division_en }}<br>
+            DÉLÉGATION DÉPARTEMENTALE DU {{ school.division_fr }}
+        </div>
+        <div style="margin:6px 0; letter-spacing:2px;">**********</div>
+        {% if school.letterhead_line3_en or school.letterhead_line3_fr %}
+        <div style="font-size:13px; margin-bottom:4px;">
+            {{ school.letterhead_line3_en }}{% if school.letterhead_line3_en and school.letterhead_line3_fr %} / {% endif %}{{ school.letterhead_line3_fr }}
+        </div>
+        {% endif %}
+        <div style="margin-top:8px; font-weight:700;">{{ school.name_en }}{% if school.name_fr %} &mdash; {{ school.name_fr }}{% endif %}</div>
+        <div style="color:var(--text-muted); font-size:12px; margin-top:6px;">Matricule: {{ school.matricule }}{% if school.phone %} | Telephone: {{ school.phone }}{% endif %}</div>
+        <div style="border-top:3px solid var(--primary); margin-top:10px; width:100%;"></div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% load school_tags %}
+{% block title %}Class Council Remarks{% endblock %}
+{% block page_title %}Class Council Remarks{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span>Withheld-Class Remarks (Motifs)</span>
+        <div style="display:flex; gap:8px;">
+            <a href="{% url 'reports_hub' %}" class="btn btn-sm">&larr; Back to Reports</a>
+        </div>
+    </div>
+    <div class="card-body">
+
+        <form method="get" style="display:flex; flex-wrap:wrap; gap:8px; margin-bottom:16px;">
+            <div>
+                <label style="font-size:12px; display:block; margin-bottom:2px;">Period</label>
+                <select name="mode" onchange="this.form.submit()">
+                    <option value="term" {% if mode == "term" %}selected{% endif %}>Term</option>
+                    <option value="year" {% if mode == "year" %}selected{% endif %}>Academic Year</option>
+                </select>
+            </div>
+            {% if mode == "term" %}
+            <div>
+                <label style="font-size:12px; display:block; margin-bottom:2px;">Term</label>
+                <select name="term" onchange="this.form.submit()">
+                    <option value="">Select term...</option>
+                    {% for t in terms %}
+                    <option value="{{ t.id }}" {% if term_obj and term_obj.pk == t.pk %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% else %}
+            <div>
+                <label style="font-size:12px; display:block; margin-bottom:2px;">Year</label>
+                <select name="year" onchange="this.form.submit()">
+                    <option value="">Select year...</option>
+                    {% for y in terms %}
+                    <option value="{{ y.year_start }}/{{ y.year_end }}" {% if selected_year == y.year_start|stringformat:"d"|add:"/"|add:y.year_end %}selected{% endif %}>{{ y.year_start }}/{{ y.year_end }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            {% endif %}
+        </form>
+
+        {% if mode == "term" and not term_obj %}
+            <div class="alert alert-warning">Select a term to edit its remarks.</div>
+        {% elif mode == "year" and not selected_year %}
+            <div class="alert alert-warning">Select an academic year to edit its remarks.</div>
+        {% elif school %}
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="mode" value="{{ mode }}">
+            {% if term_obj %}<input type="hidden" name="term" value="{{ term_obj.pk }}">{% endif %}
+            {% if selected_year %}<input type="hidden" name="year" value="{{ selected_year }}">{% endif %}
+            <p class="text-muted" style="font-size:13px; margin-top:0;">
+                Classes with a remark will show the text in place of statistics in the class council report.
+                Leave a field empty to clear it.
+            </p>
+            <table class="table" style="max-width:720px;">
+                <thead><tr><th style="width:160px;">Class</th><th>Remark (motif)</th></tr></thead>
+                <tbody>
+                    {% for c in classes %}
+                    <tr>
+                        <td><strong>{{ c }}</strong></td>
+                        <td>
+                            <input type="text" name="motif_{{ c.pk }}" value="{{ remarks|get_item:c.pk }}"
+                                   placeholder="e.g. Awaiting GCE Results" style="width:100%;">
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            <button type="submit" class="btn btn-primary btn-sm">Save Remarks</button>
+        </form>
+        {% endif %}
+
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<style>
+@page {
+    size: A4 landscape;
+    margin: 12mm 10mm 12mm 10mm;
+}
+body {
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 8pt;
+    line-height: 1.2;
+    color: #000;
+}
+.letterhead {
+    text-align: center;
+    margin-bottom: 4px;
+}
+.letterhead .row { display: flex; align-items: center; justify-content: center; }
+.letterhead .col { flex: 1; }
+.letterhead .col-en { text-align: left; font-size: 7pt; }
+.letterhead .col-fr { text-align: right; font-size: 7pt; }
+.letterhead .col-logo { flex: 0 0 auto; padding: 0 8px; }
+.letterhead .col-logo img { max-height: 50px; }
+.letterhead p { margin: 0; line-height: 1.15; }
+.lh-line { margin:0; line-height:1.15; }
+.lh-star { margin:0; font-size:9pt; letter-spacing:1px; line-height:1.1; }
+.lh-matricule { text-align:center; font-size:9pt; margin:2px 0 0; }
+.report-title {
+    text-align: center;
+    font-weight: bold;
+    font-size: 11pt;
+    margin: 6px 0 4px;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.5pt;
+    table-layout: auto;
+}
+th, td {
+    border: 1px solid #000;
+    padding: 2px 3px;
+    text-align: center;
+    vertical-align: middle;
+}
+th {
+    font-weight: bold;
+    background-color: #f0f0f0;
+}
+.subject-header {
+    height: 34px;
+    font-size: 6.5pt;
+    text-align: center;
+    padding: 0 3px;
+    white-space: nowrap;
+}
+.name-col {
+    text-align: left;
+    min-width: 210px;
+    padding: 4px 6px;
+    font-size: 8pt;
+}
+tbody tr { height: 24px; }
+.fail { color: red; font-weight: bold; }
+.stats-line {
+    margin-top: 6px;
+    font-size: 8pt;
+}
+.signature-area {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 14px;
+    font-size: 8pt;
+}
+.signature-box { text-align: center; min-width: 120px; }
+.signature-box .sig-img { max-height: 35px; width: 2cm; }
+.signature-box .cm-sig-space {
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+</style>
+</head>
+<body>
+
+<!-- Letterhead -->
+{% include "reports/_letterhead.html" with max_width="21cm" %}
+
+<!-- Title -->
+{% if is_annual %}
+    <div class="report-title">ANNUAL MARK SHEET FOR {{ school_class.name }} — {{ terms.0.year_start }}/{{ terms.0.year_end }}</div>
+{% else %}
+    <div class="report-title">{{ term.year_start }}/{{ term.year_end }} MARK SHEET FOR {{ school_class.name }} — {{ term.label|upper }}</div>
+{% endif %}
+
+<!-- Table -->
+<table>
+    <thead>
+        <tr>
+            <th style="width:26px;">S/N</th>
+            <th style="width:210px;">Name of student</th>
+            <th style="width:26px;">Sex</th>
+            {% for cs in class_subjects %}
+                <th class="subject-header">{{ cs.subject.code }}<br>[{{ cs.coefficient }}]</th>
+            {% endfor %}
+            <th style="width:34px;">Coef.</th>
+            <th style="width:38px;">Score</th>
+            <th style="width:34px;">Av.</th>
+            <th style="width:32px;">Rank</th>
+            <th style="width:52px;">Remark</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for r in rows %}
+        <tr>
+            <td>{{ forloop.counter }}</td>
+            <td class="name-col">{{ r.student.full_name }}</td>
+            <td>{{ r.student.sex }}</td>
+            {% for ws in r.weighted_scores %}
+                <td class="{% if ws is not None and ws.fail %}fail{% endif %}">
+                    {% if ws is not None %}{{ ws.score|floatformat:2 }}{% endif %}
+                </td>
+            {% endfor %}
+            <td>{{ r.total_coef }}</td>
+            <td class="{% if r.average is not None and r.average < 10 %}fail{% endif %}">
+                {% if r.average is not None %}{{ r.total_score|floatformat:2 }}{% endif %}
+            </td>
+            <td class="{% if r.average is not None and r.average < 10 %}fail{% endif %}">
+                {% if r.average is not None %}{{ r.average|floatformat:2 }}{% endif %}
+            </td>
+            <td>{{ r.rank }}</td>
+            <td class="{% if r.average is not None and r.average < 10 %}fail{% endif %}">
+                {% if r.remark %}{{ r.remark }}{% endif %}
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+<!-- Stats -->
+<div class="stats-line">
+    Enrolment: M={{ enrolment_m }}, F={{ enrolment_f }}, T={{ enrolment_total }} &nbsp;|&nbsp;
+    Sat: {{ num_sat }} &nbsp;|&nbsp;
+    Passed: {{ num_passed }} &nbsp;|&nbsp;
+    Success Rate: <strong>{{ success_rate|floatformat:1 }}%</strong> &nbsp;|&nbsp;
+    Class Average: <strong>{{ class_average|floatformat:2 }}</strong>
+</div>
+
+<!-- Signature area -->
+<div class="signature-area">
+    <div class="signature-box">
+        Class Master<br>
+        <div class="cm-sig-space">
+            {% if class_master_signature %}<img src="{{ class_master_signature }}" alt="Class Master Sig" class="sig-img">{% endif %}
+        </div>
+        _________________________<br>
+        <em>{{ class_master|default:"" }}</em>
+    </div>
+    <div class="signature-box" style="margin-right:12px;">
+        THE PRINCIPAL<br>
+        {% if school.seal %}<img src="{{ school.seal.url }}" alt="Seal" style="max-height:4.8cm; width:auto;">{% endif %}
+    </div>
+</div>
+
+</body>
+</html>

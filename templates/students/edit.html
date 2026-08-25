@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Edit Student{% endblock %}
+{% block page_title %}Edit Student: {{ student.full_name }}{% endblock %}
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            {% for field in form %}
+            {% if field.name == "photo" %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                <div style="display:flex; align-items:center; gap:16px; margin-top:6px;">
+                    {% if student.photo %}
+                    <img src="{{ student.photo.url }}" alt="Current photo" style="width:90px; height:90px; border-radius:8px; object-fit:cover; border:2px solid var(--border);">
+                    {% else %}
+                    <div style="width:90px; height:90px; border-radius:8px; background:var(--accent); border:2px dashed var(--border); display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-size:28px; flex-shrink:0;">&#128247;</div>
+                    {% endif %}
+                    <div style="flex:1;">
+                        {{ field }}
+                        <div class="form-hint">Passport-size photo (.jpg, .png). Optional — can be added later.</div>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="form-group">
+                <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                {{ field }}
+                {% if field.help_text %}<div class="form-hint">{{ field.help_text }}</div>{% endif %}
+                {% for error in field.errors %}<div class="alert alert-danger" style="padding:4px 8px; margin-top:4px;">{{ error }}</div>{% endfor %}
+            </div>
+            {% endif %}
+            {% endfor %}
+            {% if form.non_field_errors %}
+            <div class="alert alert-danger">{% for e in form.non_field_errors %}{{ e }}{% endfor %}</div>
+            {% endif %}
+            <div style="display:flex; gap:10px; margin-top:16px;">
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+                <a href="{% url 'student_detail' student.pk %}" class="btn">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

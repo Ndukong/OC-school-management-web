@@ -1,0 +1,106 @@
+{% extends "base.html" %}
+{% block title %}SMS Configuration{% endblock %}
+{% block page_title %}SMS Configuration{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>SMS Provider Settings</span>
+        <div>
+            <a href="{% url 'sms_history' %}" class="btn btn-sm">History</a>
+            <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+        </div>
+    </div>
+    <div class="card-body">
+        <div style="display:flex; gap:12px; margin-bottom:16px; flex-wrap:wrap;">
+            <div class="badge badge-info">Queued: {{ queued_count }}</div>
+            <div class="badge badge-success">Sent today: {{ sent_today }} / {{ config.daily_limit }}</div>
+            <div class="badge badge-{% if config.is_active %}success{% else %}danger{% endif %}">
+                SMS: {% if config.is_active %}Active{% else %}Inactive{% endif %}
+            </div>
+        </div>
+
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="save_config">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Provider</label>
+                    <select name="provider">
+                        <option value="manual" {% if config.provider == "manual" %}selected{% endif %}>Manual / Bulk SMS</option>
+                        <option value="twilio" {% if config.provider == "twilio" %}selected{% endif %}>Twilio</option>
+                        <option value="africastalking" {% if config.provider == "africastalking" %}selected{% endif %}>Africa's Talking</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>API Key</label>
+                    <input type="password" name="api_key" value="{{ config.api_key }}" placeholder="API Key">
+                </div>
+                <div class="form-group">
+                    <label>API Secret / Auth Token</label>
+                    <input type="password" name="api_secret" value="{{ config.api_secret }}" placeholder="API Secret">
+                </div>
+                <div class="form-group">
+                    <label>Sender ID</label>
+                    <input type="text" name="sender_id" value="{{ config.sender_id }}" placeholder="e.g., SCHOOL">
+                </div>
+                <div class="form-group">
+                    <label>Daily Limit</label>
+                    <input type="number" name="daily_limit" value="{{ config.daily_limit }}" min="1">
+                </div>
+                <div class="form-group">
+                    <label style="display:flex; align-items:center; gap:8px;">
+                        <input type="checkbox" name="is_active" {% if config.is_active %}checked{% endif %}>
+                        Enable SMS
+                    </label>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Save Configuration</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Send Test SMS</span></div>
+    <div class="card-body">
+        <form method="post" style="display:flex; gap:8px; flex-wrap:wrap;">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="send_test">
+            <input type="text" name="test_number" placeholder="Phone number (e.g., 670000000)" required style="flex:1; min-width:200px;">
+            <button type="submit" class="btn btn-outline-primary">Send Test</button>
+        </form>
+    </div>
+</div>
+
+{% if recent_messages %}
+<div class="card">
+    <div class="card-header"><span>Recent Messages</span></div>
+    <div class="card-body">
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr><th>Recipient</th><th>Message</th><th>Status</th><th>Created</th></tr>
+                </thead>
+                <tbody>
+                    {% for sms in recent_messages %}
+                    <tr>
+                        <td>{{ sms.recipient_number }}{% if sms.recipient_name %} ({{ sms.recipient_name }}){% endif %}</td>
+                        <td style="max-width:300px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">{{ sms.message }}</td>
+                        <td>
+                            {% if sms.status == "sent" %}<span class="badge badge-success">Sent</span>
+                            {% elif sms.status == "queued" %}<span class="badge badge-warning">Queued</span>
+                            {% elif sms.status == "failed" %}<span class="badge badge-danger">Failed</span>
+                            {% elif sms.status == "cancelled" %}<span class="badge badge-info">Cancelled</span>
+                            {% else %}<span class="badge">{{ sms.get_status_display }}</span>{% endif %}
+                        </td>
+                        <td>{{ sms.created_at|date:"M d, H:i" }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+
+{% endblock %}

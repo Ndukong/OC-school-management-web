@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Activate Your School</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 32px 16px;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, "Helvetica Neue", Arial, sans-serif;
+    background: linear-gradient(135deg, #1a2332 0%, #1f4e78 100%);
+  }
+
+  .wizard-card {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+  }
+
+  .wizard-header {
+    background: #f8fafc;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 24px 28px 20px;
+  }
+
+  .wizard-title { text-align: center; margin-bottom: 22px; }
+
+  .wizard-title h1 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a2332;
+  }
+
+  .wizard-title p {
+    margin-top: 4px;
+    font-size: 13px;
+    color: #64748b;
+  }
+
+  .steps {
+    display: flex;
+    list-style: none;
+  }
+
+  .step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    position: relative;
+    cursor: default;
+    color: #94a3b8;
+  }
+
+  .step:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 14px;
+    left: calc(50% + 18px);
+    width: calc(100% - 36px);
+    height: 2px;
+    background: #e2e8f0;
+  }
+
+  .step.done:not(:last-child)::after { background: #1f4e78; }
+
+  .step-num {
+    position: relative;
+    z-index: 1;
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: #e2e8f0;
+    color: #64748b;
+    font-size: 13px;
+    font-weight: 600;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .step.active .step-num {
+    background: #1f4e78;
+    color: #ffffff;
+    box-shadow: 0 0 0 4px rgba(31, 78, 120, 0.18);
+  }
+
+  .step.done .step-num { background: #1f4e78; color: #ffffff; }
+  .step.done .step-num::after { content: "\2713"; font-size: 12px; }
+
+  .step-label { font-size: 12px; font-weight: 600; color: inherit; }
+  .step.active { color: #1f4e78; }
+  .step.done { color: #475569; }
+
+  .wizard-body { padding: 28px; }
+
+  .alert {
+    padding: 11px 14px;
+    border-radius: 8px;
+    font-size: 14px;
+    margin-bottom: 18px;
+    border: 1px solid;
+  }
+
+  .alert-error { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+  .alert-success { background: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+  .alert-info { background: #eff6ff; color: #1d4ed8; border-color: #bfdbfe; }
+  .alert-warning { background: #fffbeb; color: #b45309; border-color: #fde68a; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .panel-heading { margin-bottom: 20px; }
+  .panel-heading h2 { font-size: 18px; font-weight: 700; color: #1a2332; }
+  .panel-heading p { margin-top: 4px; font-size: 13px; color: #64748b; }
+
+  .field { margin-bottom: 16px; }
+
+  label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 6px;
+  }
+
+  input[type="text"],
+  input[type="password"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="file"] {
+    width: 100%;
+    padding: 11px 14px;
+    font-size: 15px;
+    color: #1e293b;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: #1f4e78;
+    box-shadow: 0 0 0 3px rgba(31, 78, 120, 0.15);
+  }
+
+  input[type="file"] { padding: 8px; font-size: 14px; color: #64748b; }
+
+  input.mono {
+    font-family: "Consolas", "SF Mono", Menlo, monospace;
+    font-size: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .hint { margin-top: 6px; font-size: 12px; color: #94a3b8; }
+
+  .row { display: flex; gap: 14px; }
+  .row .field { flex: 1; }
+
+  .btn-primary {
+    display: block;
+    width: 100%;
+    padding: 13px 16px;
+    font-size: 15px;
+    font-weight: 600;
+    color: #ffffff;
+    background: #1f4e78;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: background 0.15s;
+  }
+
+  .btn-primary:hover { background: #17395a; }
+  .btn-primary:focus-visible { outline: 3px solid rgba(31, 78, 120, 0.4); outline-offset: 2px; }
+
+  .activated-box {
+    background: #f0fdf4;
+    border: 1px solid #bbf7d0;
+    border-radius: 10px;
+    padding: 18px;
+    margin-bottom: 18px;
+  }
+
+  .activated-box .school { font-size: 16px; font-weight: 700; color: #166534; }
+  .activated-box .meta { margin-top: 6px; font-size: 13px; color: #15803d; }
+
+  @media (max-width: 520px) {
+    .wizard-body { padding: 20px 18px; }
+    .wizard-header { padding: 20px 18px 16px; }
+    .row { flex-direction: column; gap: 0; }
+  }
+</style>
+</head>
+<body>
+  <div class="wizard-card" id="wizard" data-active-step="{{ step }}">
+    <header class="wizard-header">
+      <div class="wizard-title">
+        <h1>{% if school %}{{ school.name_en }}{% else %}Activate Your School{% endif %}</h1>
+        <p>Complete the steps below to set up your school</p>
+      </div>
+      <ol class="steps">
+        <li class="step {% if step == 1 %}active{% endif %} {% if step > 1 %}done{% endif %}" data-step-tab="1">
+          <span class="step-num">1</span><span class="step-label">License</span>
+        </li>
+        <li class="step {% if step == 2 %}active{% endif %} {% if step > 2 %}done{% endif %}" data-step-tab="2">
+          <span class="step-num">2</span><span class="step-label">School</span>
+        </li>
+        <li class="step {% if step == 3 %}active{% endif %} {% if step > 3 %}done{% endif %}" data-step-tab="3">
+          <span class="step-num">3</span><span class="step-label">Admin</span>
+        </li>
+        <li class="step {% if step == 4 %}active{% endif %}" data-step-tab="4">
+          <span class="step-num">4</span><span class="step-label">Done</span>
+        </li>
+      </ol>
+    </header>
+
+    <div class="wizard-body">
+      {% if messages %}
+        {% for message in messages %}
+          <div class="alert alert-{% if message.tags == 'error' %}error{% else %}{{ message.tags }}{% endif %}" role="alert">
+            {{ message }}
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <section class="panel {% if step == 1 %}active{% endif %}" data-panel="1">
+        <div class="panel-heading">
+          <h2>Activate Your School</h2>
+          <p>Enter the product key issued to your school to unlock the system.</p>
+        </div>
+        {% if license %}
+          <div class="activated-box">
+            <div class="school">{{ license.school_name }}</div>
+            <div class="meta">
+              Expires: {{ license.expires_at }} &middot; {{ license.days_remaining }} days remaining
+            </div>
+          </div>
+        {% else %}
+          <form method="post" novalidate>
+            {% csrf_token %}
+            <input type="hidden" name="step" value="1">
+            <div class="field">
+              <label for="product_key">Product Key</label>
+              <input class="mono" type="text" id="product_key" name="product_key"
+                     placeholder="OC-xxxxxxxx-xxxxxxxxxxxx"
+                     autocomplete="off" spellcheck="false" required>
+              <p class="hint">Format: OC-xxxxxxxx-xxxxxxxxxxxx</p>
+            </div>
+            <button type="submit" class="btn-primary">Activate</button>
+          </form>
+        {% endif %}
+      </section>
+
+      <section class="panel {% if step == 2 %}active{% endif %}" data-panel="2">
+        <div class="panel-heading">
+          <h2>School Profile</h2>
+          <p>Tell us about your school. You can change these details later.</p>
+        </div>
+        <form method="post" enctype="multipart/form-data" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="step" value="2">
+          <div class="field">
+            <label for="name_en">School Name</label>
+            <input type="text" id="name_en" name="name_en"
+                   value="{% if school %}{{ school.name_en }}{% elif license %}{{ license.school_name }}{% endif %}" required>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="region_en">Region (EN)</label>
+              <input type="text" id="region_en" name="region_en" value="{% if school %}{{ school.region_en }}{% endif %}">
+            </div>
+            <div class="field">
+              <label for="division_en">Division (EN)</label>
+              <input type="text" id="division_en" name="division_en" value="{% if school %}{{ school.division_en }}{% endif %}">
+            </div>
+          </div>
+          <div class="field">
+            <label for="sub_division">Sub-Division</label>
+            <input type="text" id="sub_division" name="sub_division" value="{% if school %}{{ school.sub_division }}{% endif %}">
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="phone">Phone Number</label>
+              <input type="tel" id="phone" name="phone" value="{% if school %}{{ school.phone }}{% endif %}">
+            </div>
+            <div class="field">
+              <label for="motto_en">Motto</label>
+              <input type="text" id="motto_en" name="motto_en" value="{% if school %}{{ school.motto_en }}{% endif %}">
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="logo">Logo</label>
+              <input type="file" id="logo" name="logo" accept="image/*">
+            </div>
+            <div class="field">
+              <label for="seal">Seal</label>
+              <input type="file" id="seal" name="seal" accept="image/*">
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Save &amp; Continue</button>
+        </form>
+      </section>
+
+      <section class="panel {% if step == 3 %}active{% endif %}" data-panel="3">
+        <div class="panel-heading">
+          <h2>Admin Account</h2>
+          <p>Create the administrator account you will use to sign in.</p>
+        </div>
+        <form method="post" novalidate>
+          {% csrf_token %}
+          <input type="hidden" name="step" value="3">
+          <div class="field">
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username" autocomplete="username" required>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="first_name">First Name</label>
+              <input type="text" id="first_name" name="first_name" autocomplete="given-name">
+            </div>
+            <div class="field">
+              <label for="last_name">Last Name</label>
+              <input type="text" id="last_name" name="last_name" autocomplete="family-name">
+            </div>
+          </div>
+          <div class="field">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" autocomplete="email">
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="password">Password</label>
+              <input type="password" id="password" name="password" autocomplete="new-password" required>
+            </div>
+            <div class="field">
+              <label for="password_confirm">Confirm Password</label>
+              <input type="password" id="password_confirm" name="password_confirm" autocomplete="new-password" required>
+            </div>
+          </div>
+          <button type="submit" class="btn-primary">Create Account</button>
+        </form>
+      </section>
+
+      <section class="panel {% if step == 4 %}active{% endif %}" data-panel="4">
+        <div class="panel-heading">
+          <h2>All Set!</h2>
+          <p>Your school has been activated and your admin account is ready.</p>
+        </div>
+        <div class="activated-box">
+          <div class="school">Setup complete</div>
+          <div class="meta">
+            {% if license %}License active until {{ license.expires_at }}.{% endif %}
+            Sign in with your admin account to get started.
+          </div>
+        </div>
+        <a href="{% url 'dashboard' %}" class="btn-primary">Go to Dashboard</a>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    (function () {
+      var wizard = document.getElementById("wizard");
+      var currentStep = Number(wizard.getAttribute("data-active-step")) || 1;
+      var steps = Array.prototype.slice.call(document.querySelectorAll("[data-step-tab]"));
+      var panels = Array.prototype.slice.call(document.querySelectorAll("[data-panel]"));
+
+      function show(n) {
+        panels.forEach(function (p) {
+          p.classList.toggle("active", Number(p.getAttribute("data-panel")) === n);
+        });
+        steps.forEach(function (s) {
+          var sn = Number(s.getAttribute("data-step-tab"));
+          s.classList.toggle("active", sn === n);
+          s.classList.toggle("done", sn < n);
+          if (sn === n) {
+            s.setAttribute("aria-current", "step");
+          } else {
+            s.removeAttribute("aria-current");
+          }
+        });
+      }
+
+      steps.forEach(function (s) {
+        s.addEventListener("click", function () {
+          var n = Number(s.getAttribute("data-step-tab"));
+          if (n <= currentStep) {
+            show(n);
+          }
+        });
+      });
+
+      show(currentStep);
+    })();
+  </script>
+</body>
+</html>

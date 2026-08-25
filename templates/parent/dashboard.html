@@ -1,0 +1,63 @@
+{% extends "parent/base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+
+<div class="profile">
+    <div class="avatar">{{ student.first_name|first }}</div>
+    <div>
+        <div class="name">{{ student }}</div>
+        <div class="meta">ID: {{ student.unique_id }} &middot; {{ student.get_sex_display }}</div>
+        <div class="meta">{{ term.label|default:"No active term" }} {{ term.year_start }}/{{ term.year_end }}</div>
+    </div>
+</div>
+
+<div class="stat-grid">
+    <div class="stat {% if result and result.average >= 10 %}success{% elif result %}danger{% else %}primary{% endif %}">
+        <div class="value">{{ result.average|default:"—" }}</div>
+        <div class="label">Average</div>
+    </div>
+    <div class="stat primary">
+        <div class="value">{{ attendance.present }}</div>
+        <div class="label">Present Days</div>
+    </div>
+    <div class="stat {% if attendance.absent_unjustified %}warning{% else %}success{% endif %}">
+        <div class="value">{{ attendance.absent_unjustified }}</div>
+        <div class="label">Unjustified Absences</div>
+    </div>
+    <div class="stat {% if outstanding > 0 %}danger{% else %}success{% endif %}">
+        <div class="value">{{ outstanding|floatformat:0 }}</div>
+        <div class="label">Fees Due (FCFA)</div>
+    </div>
+</div>
+
+<div class="card">
+    <h2>Menu</h2>
+    <ul class="nav-list">
+        <li>
+            <a href="{% url 'parent:student_detail' %}">
+                <span>Student Details</span>
+                <span class="arrow">&#8250;</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'parent:marks' %}">
+                <span>Marks &amp; Results</span>
+                <span class="arrow">&#8250;</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'parent:attendance' %}">
+                <span>Attendance</span>
+                <span class="arrow">&#8250;</span>
+            </a>
+        </li>
+        <li>
+            <a href="{% url 'parent:fees' %}">
+                <span>Fee Status</span>
+                <span class="arrow">&#8250;</span>
+            </a>
+        </li>
+    </ul>
+</div>
+
+{% endblock %}

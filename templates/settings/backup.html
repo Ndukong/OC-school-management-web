@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Backup Management{% endblock %}
+{% block page_title %}Backup Management{% endblock %}
+{% block content %}
+
+<div class="card">
+    <div class="card-header">
+        <span>Create Backup</span>
+        <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
+    </div>
+    <div class="card-body">
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:16px;">
+                <div class="form-group">
+                    <label>Backup Type</label>
+                    <select name="backup_type">
+                        <option value="full">Full (Database + Media files)</option>
+                        <option value="database">Database Only</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Notes</label>
+                    <input type="text" name="notes" placeholder="Optional notes">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Create Backup Now</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Scheduled Backup</span></div>
+    <div class="card-body">
+        <p class="text-muted" style="font-size:13px;">
+            Generate a Windows Task Scheduler script for daily backups at 2 AM.
+            The .bat and .xml files will be saved to the <code>backups/</code> folder.
+        </p>
+        <form method="post">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="generate_schedule">
+            <button type="submit" class="btn btn-outline-primary">Generate Schedule Scripts</button>
+        </form>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><span>Backup History</span></div>
+    <div class="card-body">
+        {% if backups %}
+        <div class="table-wrap">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Filename</th>
+                        <th>Type</th>
+                        <th>Size</th>
+                        <th>Status</th>
+                        <th>Notes</th>
+                        <th>Created</th>
+                        <th>By</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for backup in backups %}
+                    <tr>
+                        <td style="font-weight:600; font-size:12px;">{{ backup.filename }}</td>
+                        <td><span class="badge badge-info">{{ backup.get_backup_type_display }}</span></td>
+                        <td>{{ backup.size_display }}</td>
+                        <td>
+                            {% if backup.status == "created" %}
+                                <span class="badge badge-success">Created</span>
+                            {% elif backup.status == "restored" %}
+                                <span class="badge badge-info">Restored</span>
+                            {% else %}
+                                <span class="badge badge-danger">{{ backup.get_status_display }}</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ backup.notes|default:"—" }}</td>
+                        <td>{{ backup.created_at|date:"M d, Y H:i" }}</td>
+                        <td>{{ backup.created_by|default:"System" }}</td>
+                        <td style="white-space:nowrap;">
+                            <a href="{% url 'download_backup' backup.pk %}" class="btn btn-sm btn-outline-primary">Download</a>
+                            {% if backup.status == "created" %}
+                            <form method="post" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="action" value="restore">
+                                <input type="hidden" name="backup_id" value="{{ backup.pk }}">
+                                <button type="submit" class="btn btn-sm btn-outline-primary"
+                                        onclick="return confirm('Restore this backup? The current database will be replaced.');">
+                                    Restore
+                                </button>
+                            </form>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+            <p class="text-muted mb-0">No backups yet. Create your first backup above.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
