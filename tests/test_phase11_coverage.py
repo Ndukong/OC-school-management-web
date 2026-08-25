@@ -78,12 +78,13 @@ def admin_user(school):
 
 
 @pytest.fixture
-def active_license():
+def active_license(school):
     from core.models import License
 
     lic, _ = License.objects.get_or_create(
         product_key="OC-cov-active",
         defaults={
+            "school": school,
             "school_name": "Coverage School",
             "expires_at": date.today() + timedelta(days=60),
             "status": "active",

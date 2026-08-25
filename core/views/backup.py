@@ -16,11 +16,15 @@ from core.utils.backup import (
     generate_scheduled_task_xml,
     restore_backup_archive,
 )
-from core.utils.permissions import get_school_for_user, role_required
+from core.utils.permissions import (
+    get_school_for_user,
+    role_required,
+    superuser_required,
+)
 
 
 @login_required
-@role_required("admin", "superuser")
+@superuser_required
 def backup_management(request):
     from core.models.backup import BackupHistory
 
@@ -65,7 +69,7 @@ def backup_management(request):
 
 
 @login_required
-@role_required("admin", "superuser")
+@superuser_required
 def download_backup(request, backup_id):
     from core.models.backup import BackupHistory
 
@@ -118,7 +122,7 @@ import hashlib
 
 
 @login_required
-@role_required("admin", "superuser")
+@superuser_required
 def generate_license_key(request):
     if request.method == "POST":
         school_name = request.POST.get("school_name", "").strip()

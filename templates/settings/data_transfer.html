@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block title %}Data Export &amp; Import{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Data Export &amp; Import</h1>
+    <p>Move your school's configuration and people in or out of the platform.</p>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span>Export School Data</span>
+    </div>
+    <div class="card-body">
+        <p>
+            Download a JSON snapshot of <strong>{{ school.name_en }}</strong> —
+            profile, terms, classes, subjects, competencies, teachers,
+            assignments, students, and enrollments. Photos and computed results
+            are not included.
+        </p>
+        <a href="{% url 'school_data_export' %}" class="btn btn-primary">Download Export (JSON)</a>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <span>Import School Data</span>
+    </div>
+    <div class="card-body">
+        <form method="post" enctype="multipart/form-data" action="{% url 'school_data_import' %}">
+            {% csrf_token %}
+            <p>
+                Upload a previously exported JSON file. Existing records are
+                kept; only missing records are created. Students whose IDs
+                already belong to another school are skipped.
+            </p>
+            <div class="mb-3">
+                <input type="file" name="file" accept="application/json,.json" required
+                       class="form-control">
+            </div>
+            <button type="submit" class="btn btn-primary">Import File</button>
+        </form>
+    </div>
+</div>
+
+<p><a href="{% url 'settings' %}">Back to Settings</a></p>
+{% endblock %}

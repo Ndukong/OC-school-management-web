@@ -69,6 +69,7 @@ def phase9_data():
 
     license_obj = License.objects.create(
         product_key="OC-test1234-validkey",
+        school=school,
         school_name="Phase9 School",
         max_students=500,
         max_devices=3,

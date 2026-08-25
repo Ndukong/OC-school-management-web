@@ -142,7 +142,9 @@ class TestFullInstallationFlow:
         )
         assert r.status_code == 302
         admin_user = User.objects.get(username="e2eadmin")
-        assert admin_user.is_superuser
+        # Tenant admins must never be Django superusers/staff (platform lockdown).
+        assert not admin_user.is_superuser
+        assert not admin_user.is_staff
 
         # Step 4: Seed defaults
         out = io.StringIO()

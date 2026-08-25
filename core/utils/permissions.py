@@ -53,6 +53,22 @@ def is_admin_or_superuser(user):
     )
 
 
+def superuser_required(view_func):
+    """Restrict a view to platform superusers only (the system owner)."""
+
+    @wraps(view_func)
+    def _wrapped(request, *args, **kwargs):
+        if not request.user.is_authenticated:
+            return login_required(view_func)(request, *args, **kwargs)
+        if not request.user.is_superuser:
+            return HttpResponseForbidden(
+                "This action is reserved for the platform owner."
+            )
+        return view_func(request, *args, **kwargs)
+
+    return _wrapped
+
+
 def can_manage_class(user, school_class) -> bool:
     """Admins and the class master of the given class can manage it."""
     if is_admin_or_superuser(user):

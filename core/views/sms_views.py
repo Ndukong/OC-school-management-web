@@ -98,7 +98,12 @@ def sms_history(request):
 @login_required
 @role_required("admin", "superuser")
 def sms_cancel(request, sms_id):
-    sms = get_object_or_404(SMSMessage, pk=sms_id, status="queued")
+    from core.utils.permissions import get_school_for_user
+
+    school = get_school_for_user(request.user)
+    sms = get_object_or_404(
+        SMSMessage, pk=sms_id, status="queued", config__school=school
+    )
     sms.status = "cancelled"
     sms.save(update_fields=["status"])
     messages.success(request, "SMS cancelled.")

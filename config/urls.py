@@ -28,6 +28,11 @@ from core.views.backup import (
     license_info,
     offline_license_check,
 )
+from core.views.data_transfer import (
+    school_data_export,
+    school_data_import,
+    school_data_transfer,
+)
 from core.views.discipline import (
     attendance_entry,
     conduct_config,
@@ -139,6 +144,10 @@ urlpatterns = [
     path("settings/license/", license_info, name="license_info"),
     path("settings/license/generate/", generate_license_key, name="generate_license_key"),
     path("settings/license/offline-check/", offline_license_check, name="offline_license_check"),
+    # Per-school data transfer
+    path("settings/data-transfer/", school_data_transfer, name="school_data_transfer"),
+    path("settings/data-transfer/export/", school_data_export, name="school_data_export"),
+    path("settings/data-transfer/import/", school_data_import, name="school_data_import"),
     # SMS
     path("settings/sms/", sms_configuration, name="sms_configuration"),
     path("settings/sms/history/", sms_history, name="sms_history"),

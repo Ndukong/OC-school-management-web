@@ -747,11 +747,19 @@
                         </a>
                     </li>
                     <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'school_data_transfer' %} active{% endif %}"
+                           href="{% url 'school_data_transfer' %}" title="Data Export &amp; Import">
+                            <span class="nav-icon">&#128228;</span><span class="nav-label">Data Export / Import</span>
+                        </a>
+                    </li>
+                    {% if user.is_superuser %}
+                    <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'backup_management' %} active{% endif %}"
                            href="{% url 'backup_management' %}" title="Backup &amp; Restore">
                             <span class="nav-icon">&#128190;</span><span class="nav-label">Backup &amp; Restore</span>
                         </a>
                     </li>
+                    {% endif %}
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'license_info' %} active{% endif %}"
                            href="{% url 'license_info' %}" title="License">

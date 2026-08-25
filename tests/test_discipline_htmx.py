@@ -169,6 +169,7 @@ class TestNewFeatures:
 
         License.objects.create(
             product_key="OC-abc-test",
+            school=data["school"],
             school_name="S",
             expires_at=date.today() + timedelta(days=30),
         )

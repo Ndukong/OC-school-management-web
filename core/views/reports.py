@@ -84,9 +84,9 @@ def batch_report_cards(request, class_id: int, term_id: int):
 
     logger = logging.getLogger(__name__)
 
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    school = school_class.school
-    term = get_object_or_404(AcademicTerm, pk=term_id)
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
 
     students = list(
         Student.objects.filter(
@@ -127,8 +127,8 @@ def batch_report_cards(request, class_id: int, term_id: int):
 def class_council_view(request, term_id: int):
     from core.utils.class_council import ClassCouncilReport
 
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = term.school
+    school = get_school_for_user(request.user)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = ClassCouncilReport(term, school)
 
     if request.GET.get("format") == "pdf":
@@ -150,6 +150,8 @@ def annual_class_council_view(request, year_start: int, year_end: int):
     from core.utils.class_council import AnnualClassCouncilReport
 
     school = get_school_for_user(request.user)
+    if not school:
+        return HttpResponse("No school linked to your account.", status=400)
     report = AnnualClassCouncilReport(year_start, year_end, school)
 
     if request.GET.get("format") == "pdf":
@@ -272,8 +274,8 @@ def class_council_motifs(request):
 def pta_financial_view(request, term_id: int):
     from core.utils.pta_finance import PTAFinanceReport
 
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = term.school
+    school = get_school_for_user(request.user)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = PTAFinanceReport(term, school)
 
     if request.GET.get("format") == "pdf":
@@ -293,9 +295,9 @@ def pta_financial_view(request, term_id: int):
 
 @role_required("admin")
 def download_term_report(request, student_id: int, term_id: int):
-    student = get_object_or_404(Student, pk=student_id)
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = student.school
+    school = get_school_for_user(request.user)
+    student = get_object_or_404(Student, pk=student_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = TermReportCard(student, term, school)
     pdf = report.render_pdf(request.build_absolute_uri("/"))
     response = HttpResponse(pdf, content_type="application/pdf")
@@ -305,8 +307,8 @@ def download_term_report(request, student_id: int, term_id: int):
 
 @role_required("admin")
 def download_annual_report(request, student_id: int, year_start: int, year_end: int):
-    student = get_object_or_404(Student, pk=student_id)
-    school = student.school
+    school = get_school_for_user(request.user)
+    student = get_object_or_404(Student, pk=student_id, school=school)
     report = AnnualReportCard(student, year_start, year_end, school)
     pdf = report.render_pdf(request.build_absolute_uri("/"))
     response = HttpResponse(pdf, content_type="application/pdf")
@@ -316,9 +318,9 @@ def download_annual_report(request, student_id: int, year_start: int, year_end: 
 
 @role_required("admin")
 def preview_term_report(request, student_id: int, term_id: int):
-    student = get_object_or_404(Student, pk=student_id)
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = student.school
+    school = get_school_for_user(request.user)
+    student = get_object_or_404(Student, pk=student_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = TermReportCard(student, term, school)
     html = report.render_html()
     return HttpResponse(html)
@@ -326,8 +328,8 @@ def preview_term_report(request, student_id: int, term_id: int):
 
 @role_required("admin")
 def preview_annual_report(request, student_id: int, year_start: int, year_end: int):
-    student = get_object_or_404(Student, pk=student_id)
-    school = student.school
+    school = get_school_for_user(request.user)
+    student = get_object_or_404(Student, pk=student_id, school=school)
     report = AnnualReportCard(student, year_start, year_end, school)
     html = report.render_html()
     return HttpResponse(html)
@@ -341,8 +343,8 @@ def batch_annual_report_cards(
 
     logger = logging.getLogger(__name__)
 
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    school = school_class.school
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
     terms = AcademicTerm.objects.filter(
         school=school, year_start=year_start, year_end=year_end
     ).order_by("term_number")
@@ -383,9 +385,9 @@ def batch_annual_report_cards(
 
 @role_required("admin")
 def download_mark_sheet(request, class_id: int, term_id: int):
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = school_class.school
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = MarkSheet(school_class, term, school)
     pdf = report.render_pdf(request.build_absolute_uri("/"))
     response = HttpResponse(pdf, content_type="application/pdf")
@@ -395,8 +397,8 @@ def download_mark_sheet(request, class_id: int, term_id: int):
 
 @role_required("admin")
 def download_annual_mark_sheet(request, class_id: int, year_start: int, year_end: int):
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    school = school_class.school
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
     report = AnnualMarkSheet(school_class, year_start, year_end, school)
     pdf = report.render_pdf(request.build_absolute_uri("/"))
     response = HttpResponse(pdf, content_type="application/pdf")
@@ -406,9 +408,9 @@ def download_annual_mark_sheet(request, class_id: int, year_start: int, year_end
 
 @role_required("admin")
 def preview_mark_sheet(request, class_id: int, term_id: int):
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = school_class.school
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = MarkSheet(school_class, term, school)
     html = report.render_html()
     return HttpResponse(html)
@@ -416,8 +418,8 @@ def preview_mark_sheet(request, class_id: int, term_id: int):
 
 @role_required("admin")
 def preview_annual_mark_sheet(request, class_id: int, year_start: int, year_end: int):
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    school = school_class.school
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
     report = AnnualMarkSheet(school_class, year_start, year_end, school)
     html = report.render_html()
     return HttpResponse(html)
@@ -444,10 +446,9 @@ def _selected_id_students(request, school):
 def preview_id_cards(request):
     from datetime import date
 
-    from core.models import School
     from core.utils.student_id import distribute_to_four, render_full_set_html
 
-    school = School.objects.first()
+    school = get_school_for_user(request.user)
     students = distribute_to_four(_selected_id_students(request, school))
     context = {"academic_year": "2025/2026", "today": date.today()}
     html = render_full_set_html(students, school, context)
@@ -458,10 +459,9 @@ def preview_id_cards(request):
 def download_id_cards(request):
     from datetime import date
 
-    from core.models import School
     from core.utils.student_id import distribute_to_four, render_full_set_html
 
-    school = School.objects.first()
+    school = get_school_for_user(request.user)
     students = distribute_to_four(_selected_id_students(request, school))
     context = {"academic_year": "2025/2026", "today": date.today()}
     html = render_full_set_html(students, school, context)
@@ -477,8 +477,8 @@ def download_results_summary(request, term_id: int):
     from core.models import AcademicTerm, SchoolClass
     from core.utils.results_summary import ResultsSummary
 
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = term.school
+    school = get_school_for_user(request.user)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     classes = SchoolClass.objects.filter(school=school).order_by("sort_order")
     sections = []
     for sc in classes:
@@ -505,8 +505,8 @@ def preview_results_summary(request, term_id: int):
     from core.models import AcademicTerm, SchoolClass
     from core.utils.results_summary import ResultsSummary
 
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = term.school
+    school = get_school_for_user(request.user)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     classes = SchoolClass.objects.filter(school=school).order_by("sort_order")
     sections = []
     for sc in classes:

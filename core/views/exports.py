@@ -76,8 +76,9 @@ def export_students_excel(request):
 @login_required
 @role_required("admin", "superuser")
 def export_marks_excel(request, class_id: int, term_id: int):
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    term = get_object_or_404(AcademicTerm, pk=term_id)
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
 
     enrollments = list(
         StudentEnrollment.objects.filter(
@@ -131,8 +132,8 @@ def export_marks_excel(request, class_id: int, term_id: int):
 @login_required
 @role_required("admin", "superuser")
 def export_finance_excel(request, term_id: int):
-    term = get_object_or_404(AcademicTerm, pk=term_id)
-    school = term.school
+    school = get_school_for_user(request.user)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
 
     income_rows = []
     for inc in IncomeRecord.objects.filter(
@@ -197,8 +198,9 @@ def export_finance_excel(request, term_id: int):
 @login_required
 @role_required("admin", "superuser")
 def export_attendance_excel(request, class_id: int, term_id: int):
-    school_class = get_object_or_404(SchoolClass, pk=class_id)
-    term = get_object_or_404(AcademicTerm, pk=term_id)
+    school = get_school_for_user(request.user)
+    school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
 
     registers = list(
         AttendanceRegister.objects.filter(
@@ -265,7 +267,8 @@ def export_attendance_excel(request, class_id: int, term_id: int):
 @login_required
 @role_required("admin", "superuser")
 def export_results_excel(request, term_id: int):
-    term = get_object_or_404(AcademicTerm, pk=term_id)
+    school = get_school_for_user(request.user)
+    term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
 
     results = list(
         TermResult.objects.filter(academic_term=term).select_related("student")

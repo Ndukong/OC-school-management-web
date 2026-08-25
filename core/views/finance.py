@@ -185,7 +185,9 @@ def student_fee_status(request, student_id: int):
     )
     term_id = request.GET.get("term_id")
     if term_id:
-        term = get_object_or_404(AcademicTerm, pk=term_id)
+        term = get_object_or_404(
+            AcademicTerm, pk=term_id, school=student.school
+        )
     else:
         term = terms.filter(is_current=True).first() or terms.first()
 

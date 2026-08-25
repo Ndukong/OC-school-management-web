@@ -7,7 +7,9 @@
     <div class="card-header">
         <span>Current License</span>
         <div>
+            {% if user.is_superuser %}
             <a href="{% url 'generate_license_key' %}" class="btn btn-sm btn-primary">Generate Key</a>
+            {% endif %}
             <a href="{% url 'offline_license_check' %}" class="btn btn-sm">Offline Check</a>
             <a href="{% url 'settings' %}" class="btn btn-sm">Back to Settings</a>
         </div>
