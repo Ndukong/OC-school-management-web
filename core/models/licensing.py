@@ -13,7 +13,7 @@ class License(models.Model):
         ("revoked", "Revoked"),
     ]
 
-    product_key = models.CharField(max_length=128, unique=True)
+    product_key = models.CharField(max_length=255, unique=True)
     school = models.ForeignKey(
         "core.School",
         on_delete=models.CASCADE,
