@@ -1,18 +1,17 @@
 [phases.setup]
-aptPkgs = [
-    "libpango-1.0-0",
-    "libpangocairo-1.0-0",
-    "libgdk-pixbuf2.0-0",
+nixPkgs = [
+    "glib",
+    "pango",
+    "cairo",
+    "gdk-pixbuf",
+    "fontconfig",
+    "freetype",
+    "fribidi",
+    "harfbuzz",
+    "libpng",
+    "zlib",
     "shared-mime-info",
-    "fonts-liberation",
 ]
 
 [phases.build]
-cmds = [
-    "ln -sf /usr/lib/x86_64-linux-gnu/libgobject-2.0.so.0 /usr/lib/x86_64-linux-gnu/libgobject-2.0-0",
-    "ln -sf /usr/lib/x86_64-linux-gnu/libpango-1.0.so.0 /usr/lib/x86_64-linux-gnu/libpango-1.0-0",
-    "ln -sf /usr/lib/x86_64-linux-gnu/libpangoft2-1.0.so.0 /usr/lib/x86_64-linux-gnu/libpangoft2-1.0-0",
-    "ln -sf /usr/lib/x86_64-linux-gnu/libpangocairo-1.0.so.0 /usr/lib/x86_64-linux-gnu/libpangocairo-1.0-0",
-    "ln -sf /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0.so.0 /usr/lib/x86_64-linux-gnu/libgdk_pixbuf-2.0-0",
-    "python manage.py collectstatic --noinput",
-]
+cmds = ["python manage.py collectstatic --noinput"]
