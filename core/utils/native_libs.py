@@ -1,72 +1,31 @@
 """Preload WeasyPrint's native libraries by absolute path.
 
-Railway/Nixpacks images ship a Nix-built Python whose RUNPATH loses to any
-LD_LIBRARY_PATH entry, so we cannot point the loader at Ubuntu's multiarch
-dir without crashing the interpreter. Preloading the dependency chain with
-absolute paths sidesteps search paths entirely: once a library is in the
-process image, later dlopen(soname) calls reuse it.
+Railway/Nixpacks images run a Nix-built interpreter whose loader never sees
+system library dirs (apt libs) nor the hashed /nix/store lib dirs (not on
+any search path), so WeasyPrint's dlopen("libgobject-2.0-0") always fails.
 
-No-op when the libraries are absent (local Windows dev uses the GTK bundle).
+Loading the top-level Nix packages' libraries by absolute path works because
+each Nix library embeds the store paths of its own dependencies as RUNPATH —
+the whole closure loads automatically and registers under its real sonames
+(e.g. libgobject-2.0.so.0), which WeasyPrint's fallback name list then hits.
+
+Silent no-op outside Nix images (local Windows dev uses the GTK bundle).
 """
 
+import glob
 from ctypes import CDLL
-from pathlib import Path
 
-_CANDIDATES = [
-    "libpcre2-8.so.0",
-    "libffi.so.8",
-    "libglib-2.0.so.0",
-    "libgobject-2.0.so.0",
-    "libgmodule-2.0.so.0",
-    "libstdc++.so.6",
-    "libgcc_s.so.1",
-    "libintl.so.8",
-    "libiconv.so.2",
-    "libz.so.1",
-    "libfribidi.so.0",
-    "libharfbuzz.so.0",
-    "libfontconfig.so.1",
-    "libfreetype.so.6",
-    "libpng16.so.16",
-    "libbrotlidec.so.1",
-    "libbrotlicommon.so.1",
-    "libexpat.so.1",
-    "libuuid.so.1",
-    "libpixman-1.so.0",
-    "libxcb.so.1",
-    "libxcb-render.so.0",
-    "libxcb-shm.so.0",
-    "libXau.so.6",
-    "libXdmcp.so.6",
-    "libX11.so.6",
-    "libXext.so.6",
-    "libXrender.so.1",
-    "libthai.so.0",
-    "libdatrie.so.1",
-    "libgraphite2.so.3",
-    "libbz2.so.1.0",
-    "liblzma.so.5",
-    "libjpeg.so.8",
-    "libtiff.so.6",
-    "libwebp.so.7",
-    "libwebpdemux.so.2",
-    "libwebpmux.so.3",
-    "libdeflate.so.0",
-    "libjbig.so.0",
-    "liblerc.so.4",
-    "libsharpyuv.so.0",
-    "libgdk_pixbuf-2.0.so.0",
-    "libcairo.so.2",
-    "libpango-1.0.so.0",
-    "libpangoft2-1.0.so.0",
-    "libpangocairo-1.0.so.0",
-]
-
-_SEARCH_DIRS = [
-    "/usr/lib/x86_64-linux-gnu",
-    "/usr/lib/aarch64-linux-gnu",
-    "/usr/lib",
-    "/lib/x86_64-linux-gnu",
+_NIX_GLOBS = [
+    "/nix/store/*-glib-*/lib/libgobject-2.0.so*",
+    "/nix/store/*-glib-*/lib/libgmodule-2.0.so*",
+    "/nix/store/*-glib-*/lib/libglib-2.0.so*",
+    "/nix/store/*-pango-*/lib/libpango*.so*",
+    "/nix/store/*-cairo-*/lib/libcairo*.so*",
+    "/nix/store/*-gdk-pixbuf-*/lib/libgdk_pixbuf*.so*",
+    "/nix/store/*-fontconfig-*/lib/libfontconfig*.so*",
+    "/nix/store/*-freetype-*/lib/libfreetype*.so*",
+    "/nix/store/*-harfbuzz-*/lib/libharfbuzz*.so*",
+    "/nix/store/*-fribidi-*/lib/libfribidi*.so*",
 ]
 
 _loaded = False
@@ -77,12 +36,9 @@ def preload_native_libs() -> None:
     if _loaded:
         return
     _loaded = True
-    for name in _CANDIDATES:
-        for directory in _SEARCH_DIRS:
-            candidate = Path(directory) / name
-            if candidate.exists():
-                try:
-                    CDLL(str(candidate))
-                except OSError:
-                    pass
-                break
+    for pattern in _NIX_GLOBS:
+        for path in sorted(glob.glob(pattern)):
+            try:
+                CDLL(path)
+            except OSError:
+                pass
