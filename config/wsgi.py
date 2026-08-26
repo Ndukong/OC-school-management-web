@@ -13,4 +13,8 @@ from django.core.wsgi import get_wsgi_application
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'config.settings')
 
+from core.utils.native_libs import preload_native_libs
+
+preload_native_libs()
+
 application = get_wsgi_application()

@@ -5,7 +5,7 @@
   },
   "deploy": {
     "preDeployCommand": "python manage.py migrate --noinput || (sleep 10 && python manage.py migrate --noinput) || (sleep 25 && python manage.py migrate --noinput) || (python manage.py migrate --noinput) && (python manage.py createsuperuser --noinput || true)",
-    "startCommand": "LD_LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:/usr/lib gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 2",
+    "startCommand": "gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 2",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
   }
