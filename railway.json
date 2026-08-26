@@ -4,7 +4,7 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "preDeployCommand": "python manage.py migrate --noinput && (python manage.py createsuperuser --noinput || true)",
+    "preDeployCommand": "python manage.py migrate --noinput || (sleep 10 && python manage.py migrate --noinput) || (sleep 25 && python manage.py migrate --noinput) || (python manage.py migrate --noinput) && (python manage.py createsuperuser --noinput || true)",
     "startCommand": "gunicorn config.wsgi --bind 0.0.0.0:$PORT --workers 2",
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 3
