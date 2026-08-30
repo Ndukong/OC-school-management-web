@@ -3,7 +3,6 @@ from decimal import Decimal
 from django.contrib import messages
 from django.db.models import Count, Sum
 from django.shortcuts import redirect, render
-from django.utils import timezone
 
 from core.models import (
     AcademicTerm,
@@ -15,6 +14,8 @@ from core.models import (
     SubjectAverage,
     TermResult,
 )
+from core.utils.tenancy import license_lapsed
+from core.utils.throttle import BruteForceThrottle, client_ip
 
 SESSION_KEY = "parent_student_id"
 
@@ -29,49 +30,64 @@ def _get_portal_student(request):
 
 PARENT_LOGIN_MAX_ATTEMPTS = 5
 PARENT_LOGIN_LOCKOUT_MINUTES = 5
+PARENT_IP_MAX_ATTEMPTS = 20
+PARENT_IP_LOCKOUT_MINUTES = 15
+
+_parent_throttle = BruteForceThrottle("parent_login")
 
 
-def _parent_lockout_remaining(request):
-    """Return remaining lockout minutes, or None when not locked out."""
-    lockout_until = request.session.get("parent_login_lockout_until")
-    if lockout_until:
-        remaining = (lockout_until - timezone.now().timestamp()) / 60
-        if remaining > 0:
-            return max(1, int(remaining))
-        request.session.pop("parent_login_lockout_until", None)
-        request.session.pop("parent_login_failures", None)
-    return None
-
-
-def _record_parent_failure(request):
-    attempts = request.session.get("parent_login_failures", 0) + 1
-    request.session["parent_login_failures"] = attempts
-    if attempts >= PARENT_LOGIN_MAX_ATTEMPTS:
-        request.session["parent_login_lockout_until"] = (
-            timezone.now().timestamp() + PARENT_LOGIN_LOCKOUT_MINUTES * 60
+def _parent_throttle_entries(request, unique_id=""):
+    """Scopes: the client IP plus the attempted register number."""
+    entries = [
+        (
+            "ip",
+            client_ip(request),
+            PARENT_IP_MAX_ATTEMPTS,
+            PARENT_IP_LOCKOUT_MINUTES,
         )
+    ]
+    if unique_id:
+        entries.append(
+            (
+                "uid",
+                unique_id.strip().lower(),
+                PARENT_LOGIN_MAX_ATTEMPTS,
+                PARENT_LOGIN_LOCKOUT_MINUTES,
+            )
+        )
+    return entries
 
 
-def _reset_parent_throttle(request):
-    request.session.pop("parent_login_failures", None)
-    request.session.pop("parent_login_lockout_until", None)
+def _parent_lockout_remaining(request, unique_id=""):
+    lockout, _remaining = _parent_throttle.check(
+        _parent_throttle_entries(request, unique_id)
+    )
+    return lockout
+
+
+def _record_parent_failure(request, unique_id=""):
+    _parent_throttle.record_failure(_parent_throttle_entries(request, unique_id))
+
+
+def _reset_parent_throttle(request, unique_id=""):
+    _parent_throttle.reset(_parent_throttle_entries(request, unique_id))
 
 
 def parent_login(request):
     if _get_portal_student(request):
         return redirect("parent:dashboard")
 
-    lockout_minutes = _parent_lockout_remaining(request)
-    if lockout_minutes is not None:
-        messages.error(
-            request,
-            f"Too many failed attempts. Try again in {lockout_minutes} minute(s).",
-        )
-        return render(request, "parent/login.html")
-
     if request.method == "POST":
         unique_id = request.POST.get("unique_id", "").strip()
         guardian_contact = request.POST.get("guardian_contact", "").strip()
+
+        lockout_minutes = _parent_lockout_remaining(request, unique_id)
+        if lockout_minutes is not None:
+            messages.error(
+                request,
+                f"Too many failed attempts. Try again in {lockout_minutes} minute(s).",
+            )
+            return render(request, "parent/login.html")
 
         matches = list(Student.objects.filter(unique_id=unique_id, is_active=True))
 
@@ -82,21 +98,35 @@ def parent_login(request):
             matches = [s for s in matches if s.guardian_contact == guardian_contact]
 
         if len(matches) != 1 or not matches[0].guardian_contact:
-            _record_parent_failure(request)
+            _record_parent_failure(request, unique_id)
             messages.error(request, "Invalid credentials. Please try again.")
             return redirect("parent:login")
 
         student = matches[0]
         if student.guardian_contact != guardian_contact:
-            _record_parent_failure(request)
+            _record_parent_failure(request, unique_id)
             messages.error(request, "Invalid credentials. Please try again.")
             return redirect("parent:login")
 
-        _reset_parent_throttle(request)
+        if license_lapsed(student.school):
+            messages.error(
+                request,
+                "The school's license has expired. Please contact the school office.",
+            )
+            return redirect("parent:login")
+
+        _reset_parent_throttle(request, unique_id)
+        request.session.cycle_key()
         request.session[SESSION_KEY] = student.pk
         request.session["parent_student_name"] = str(student)
         return redirect("parent:dashboard")
 
+    lockout_minutes = _parent_lockout_remaining(request)
+    if lockout_minutes is not None:
+        messages.error(
+            request,
+            f"Too many failed attempts. Try again in {lockout_minutes} minute(s).",
+        )
     return render(request, "parent/login.html")
 
 
@@ -113,6 +143,14 @@ def _require_portal(view_func):
         student = _get_portal_student(request)
         if student is None:
             return redirect("parent:login")
+        if license_lapsed(student.school):
+            request.session.pop(SESSION_KEY, None)
+            request.session.pop("parent_student_name", None)
+            messages.error(
+                request,
+                "The school's license has expired. Please contact the school office.",
+            )
+            return redirect("parent:login")
         return view_func(request, student, *args, **kwargs)
 
     return wrapper
@@ -120,15 +158,11 @@ def _require_portal(view_func):
 
 @_require_portal
 def parent_dashboard(request, student):
-    term = AcademicTerm.objects.filter(
-        school=student.school, is_current=True
-    ).first()
+    term = AcademicTerm.objects.filter(school=student.school, is_current=True).first()
 
     result = None
     if term:
-        result = TermResult.objects.filter(
-            student=student, academic_term=term
-        ).first()
+        result = TermResult.objects.filter(student=student, academic_term=term).first()
 
     attendance = _attendance_summary(student, term)
 
@@ -153,12 +187,16 @@ def parent_dashboard(request, student):
 
 @_require_portal
 def parent_student_detail(request, student):
-    enrollment = StudentEnrollment.objects.filter(
-        student=student
-    ).select_related("school_class", "academic_term").order_by(
-        "-academic_term__year_start", "-academic_term__year_end",
-        "-academic_term__term_number",
-    ).first()
+    enrollment = (
+        StudentEnrollment.objects.filter(student=student)
+        .select_related("school_class", "academic_term")
+        .order_by(
+            "-academic_term__year_start",
+            "-academic_term__year_end",
+            "-academic_term__term_number",
+        )
+        .first()
+    )
 
     return render(
         request,
@@ -169,9 +207,7 @@ def parent_student_detail(request, student):
 
 @_require_portal
 def parent_marks(request, student):
-    term = AcademicTerm.objects.filter(
-        school=student.school, is_current=True
-    ).first()
+    term = AcademicTerm.objects.filter(school=student.school, is_current=True).first()
 
     averages = SubjectAverage.objects.none()
     result = None
@@ -181,9 +217,7 @@ def parent_marks(request, student):
             .select_related("subject")
             .order_by("subject__sort_order")
         )
-        result = TermResult.objects.filter(
-            student=student, academic_term=term
-        ).first()
+        result = TermResult.objects.filter(student=student, academic_term=term).first()
 
     return render(
         request,
@@ -199,9 +233,7 @@ def parent_marks(request, student):
 
 @_require_portal
 def parent_attendance(request, student):
-    term = AcademicTerm.objects.filter(
-        school=student.school, is_current=True
-    ).first()
+    term = AcademicTerm.objects.filter(school=student.school, is_current=True).first()
 
     records = AttendanceRecord.objects.none()
     if term:
@@ -233,16 +265,12 @@ def parent_attendance(request, student):
 
 @_require_portal
 def parent_fees(request, student):
-    term = AcademicTerm.objects.filter(
-        school=student.school, is_current=True
-    ).first()
+    term = AcademicTerm.objects.filter(school=student.school, is_current=True).first()
 
     payments = IncomeRecord.objects.none()
     if term:
         payments = (
-            IncomeRecord.objects.filter(
-                student=student, academic_term=term
-            )
+            IncomeRecord.objects.filter(student=student, academic_term=term)
             .select_related("fee_type")
             .order_by("-date_paid")
         )
@@ -277,9 +305,7 @@ def _attendance_summary(student, term):
     if not term:
         return summary
 
-    enrollments = StudentEnrollment.objects.filter(
-        student=student, academic_term=term
-    )
+    enrollments = StudentEnrollment.objects.filter(student=student, academic_term=term)
     class_ids = list(enrollments.values_list("school_class_id", flat=True))
 
     if not class_ids:
@@ -304,7 +330,8 @@ def _attendance_summary(student, term):
             summary[key] = row["count"]
 
     summary["total_days"] = sum(
-        summary[k] for k in ("present", "absent_justified", "absent_unjustified", "late")
+        summary[k]
+        for k in ("present", "absent_justified", "absent_unjustified", "late")
     )
     return summary
 
@@ -326,7 +353,7 @@ def _expected_dues(student, term):
 def _collected_amount(student, term):
     if not term:
         return Decimal(0)
-    total = IncomeRecord.objects.filter(
-        student=student, academic_term=term
-    ).aggregate(total=Sum("amount"))["total"]
+    total = IncomeRecord.objects.filter(student=student, academic_term=term).aggregate(
+        total=Sum("amount")
+    )["total"]
     return total or Decimal(0)
