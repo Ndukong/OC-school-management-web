@@ -144,10 +144,41 @@ class TermReportCard(BaseReport):
         return {
             "class_average": avg.quantize(Decimal("0.01")),
             "number_passed": passed,
-            "success_rate": (
-                Decimal(passed) / Decimal(total) * Decimal(100)
-            ).quantize(Decimal("0.1")),
+            "success_rate": (Decimal(passed) / Decimal(total) * Decimal(100)).quantize(
+                Decimal("0.1")
+            ),
         }
+
+    def _get_subject_ranks(self, school_class: SchoolClass) -> dict[int, dict]:
+        """Per-subject ``{subject_id: {"rank": r, "total": n}}`` for this student.
+
+        The student's subject average is ranked against the classmates who
+        took the subject (i.e. have a computed subject average for the
+        term). Ties share the higher rank, matching compute_term_results.
+        """
+        rows = SubjectAverage.objects.filter(
+            academic_term=self.term,
+            student__enrollments__school_class=school_class,
+            student__enrollments__academic_term=self.term,
+        ).values_list("subject_id", "student_id", "average")
+
+        by_subject: dict[int, list] = {}
+        for subject_id, student_id, average in rows:
+            by_subject.setdefault(subject_id, []).append((average, student_id))
+
+        ranks: dict[int, dict] = {}
+        for subject_id, entries in by_subject.items():
+            total = len(entries)
+            ordered = sorted(entries, key=lambda entry: entry[0], reverse=True)
+            for average, student_id in ordered:
+                if student_id != self.student.pk:
+                    continue
+                ranks[subject_id] = {
+                    "rank": 1 + sum(1 for avg, _ in entries if avg > average),
+                    "total": total,
+                }
+                break
+        return ranks
 
     def get_context_data(self) -> dict:
         school_class = self._get_enrollment()
@@ -167,6 +198,7 @@ class TermReportCard(BaseReport):
             class_master, class_master_sig = self._get_class_master(school_class)
             enrolment = self._get_enrolment_count(school_class)
             class_profile = self._get_class_profile(school_class)
+            subject_ranks = self._get_subject_ranks(school_class)
 
             class_subjects = list(
                 school_class.subjects.select_related("subject").order_by("sort_order")
@@ -260,6 +292,7 @@ class TermReportCard(BaseReport):
                             if subject_avg is not None
                             else None
                         ),
+                        "subject_rank_info": subject_ranks.get(subject.pk),
                     }
                 )
 
@@ -338,18 +371,25 @@ class AnnualReportCard(BaseReport):
         }
 
         if school_class:
-            term_report = TermReportCard(self.student, terms[0], self.school) if terms else None
+            term_report = (
+                TermReportCard(self.student, terms[0], self.school) if terms else None
+            )
             if term_report:
-                class_master, class_master_sig = term_report._get_class_master(school_class)
+                class_master, class_master_sig = term_report._get_class_master(
+                    school_class
+                )
 
             annual_rows = []
+            annual_subject_averages: dict[int, list] = {}
             for student in Student.objects.filter(
                 enrollments__school_class=school_class,
                 enrollments__academic_term__in=terms,
                 is_active=True,
             ).distinct():
                 student_weighted = []
-                for cs in school_class.subjects.select_related("subject").order_by("sort_order"):
+                for cs in school_class.subjects.select_related("subject").order_by(
+                    "sort_order"
+                ):
                     term_avgs = list(
                         SubjectAverage.objects.filter(
                             student=student,
@@ -360,9 +400,25 @@ class AnnualReportCard(BaseReport):
                     subject_avg = compute_subject_average(term_avgs)
                     if subject_avg is not None:
                         student_weighted.append((subject_avg, cs.coefficient))
+                        annual_subject_averages.setdefault(cs.subject_id, []).append(
+                            (subject_avg, student.pk)
+                        )
                 if student_weighted:
                     _, _, student_avg = compute_term_total(student_weighted)
                     annual_rows.append((student, student_avg))
+
+            subject_ranks: dict[int, dict] = {}
+            for subject_id, entries in annual_subject_averages.items():
+                total = len(entries)
+                ordered = sorted(entries, key=lambda entry: entry[0], reverse=True)
+                for average, student_id in ordered:
+                    if student_id != self.student.pk:
+                        continue
+                    subject_ranks[subject_id] = {
+                        "rank": 1 + sum(1 for avg, _ in entries if avg > average),
+                        "total": total,
+                    }
+                    break
 
             annual_rows.sort(key=lambda row: row[1], reverse=True)
             enrolment = {
@@ -390,7 +446,9 @@ class AnnualReportCard(BaseReport):
                     rank = index
                     break
 
-            for cs in school_class.subjects.select_related("subject").order_by("sort_order"):
+            for cs in school_class.subjects.select_related("subject").order_by(
+                "sort_order"
+            ):
                 subject = cs.subject
                 per_term = {}
                 for term_obj in terms:
@@ -430,6 +488,7 @@ class AnnualReportCard(BaseReport):
                         "teacher_name": teacher_name,
                         "teacher_signature": teacher_sig,
                         "av_coef": subject_avg * cs.coefficient,
+                        "subject_rank_info": subject_ranks.get(subject.pk),
                     }
                 )
 

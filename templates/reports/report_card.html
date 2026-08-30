@@ -3,6 +3,10 @@
 <head>
 <meta charset="UTF-8">
 <style>
+/* Declared cell widths must include padding + borders, or every table
+   renders wider than its specified width and overflows the 18cm content. */
+* { box-sizing: border-box; }
+
 @page {
     size: A4 portrait;
     margin: 0;
@@ -22,22 +26,24 @@ body {
 .lh-star { margin:0; font-size:9pt; letter-spacing:1px; line-height:1.1; }
 .lh-matricule { text-align:center; font-size:9pt; margin:2px 0 0; }
 
-/* ── Student info section ── */
+/* ── Student info section ──
+   Geometry: photo 2.8cm + 2mm gap + info table 15cm = 18cm exactly.
+   table-layout:fixed everywhere so long text can never inflate the widths. */
 .si-wrap { width:18cm; margin:0 auto 6px; }
-.si-outer { width:18cm; border-collapse:collapse; }
+.si-outer { width:18cm; border-collapse:collapse; table-layout:fixed; }
 .si-outer td { padding:0; vertical-align:top; }
-.si-photo { width:2.84cm; height:2.84cm; border:1px solid #000; text-align:center; vertical-align:middle; padding:0; }
-.si-photo img { width:2.84cm; height:2.84cm; object-fit:contain; }
-.si-photo-placeholder { width:2.84cm; height:2.84cm; display:inline-flex; align-items:center; justify-content:center; font-size:7pt; color:#999; }
-.si-table { width:15cm; border-collapse:collapse; font-size:9pt; }
+.si-photo { width:2.8cm; height:2.8cm; border:1px solid #000; text-align:center; vertical-align:middle; padding:0; }
+.si-photo img { width:2.8cm; height:2.8cm; object-fit:contain; }
+.si-photo-placeholder { width:2.8cm; height:2.8cm; display:inline-flex; align-items:center; justify-content:center; font-size:7pt; color:#999; }
+.si-table { width:15cm; border-collapse:collapse; font-size:9pt; table-layout:fixed; }
 .si-table td { border:1px solid #000; padding:1px 4px; vertical-align:middle; height:0.45cm; }
 .si-table .val { font-weight:bold; text-transform:uppercase; }
 .si-table .no-border-cell { border:none; }
 .si-table .no-border-bottom { border-bottom:none; }
 .si-table .no-border-top { border-top:none; }
 
-/* ── Subject table ── */
-.subj-table { width:100%; border-collapse:collapse; font-size:8pt; margin-top:1mm; margin-bottom:6px; table-layout:fixed; }
+/* ── Subject table ── (fixed 18cm so competency text can never widen it) */
+.subj-table { width:18cm; border-collapse:collapse; font-size:8pt; margin-top:1mm; margin-bottom:6px; table-layout:fixed; }
 .subj-table th, .subj-table td { border:1px solid #000; padding:2px 3px; vertical-align:middle; }
 .subj-table th { font-weight:bold; text-align:center; background:#f0f0f0; }
 .subj-table .subj-name { font-weight:bold; text-align:left; }
@@ -66,7 +72,7 @@ body {
 .page {
     width: 21cm;
     min-height: 29.7cm;
-    padding: 13mm;
+    padding: 15mm;
     margin: 0 auto;
     background: #fff;
     box-sizing: border-box;
@@ -112,54 +118,61 @@ body {
 {% endif %}
 <div class="school-year">School Year: {{ term.year_start }}/{{ term.year_end }}</div>
 
-<!-- Student Info: photo (2.7cm) + 2mm gap + info table (15cm) = 18cm -->
+<!-- Student Info: photo (2.8cm) + 2mm gap + info table (15cm) = 18cm exactly -->
 <table class="si-outer">
 <tr>
-    <!-- Photo cell: 2.84cm x 2.84cm -->
-    <td style="width:2.84cm; height:2.84cm; border:1px solid #000; text-align:center; vertical-align:middle; padding:0;">
+    <!-- Photo cell: 2.8cm x 2.8cm -->
+    <td style="width:2.8cm; height:2.8cm; border:1px solid #000; text-align:center; vertical-align:middle; padding:0;">
         {% if student.photo %}
-            <img src="{{ student.photo.url }}" alt="Photo" style="width:2.84cm; height:2.84cm; object-fit:contain; display:block; margin:0 auto;">
+            <img src="{{ student.photo.url }}" alt="Photo" style="width:2.8cm; height:2.8cm; object-fit:contain; display:block; margin:0 auto;">
         {% else %}
-            <div style="width:2.84cm; height:2.84cm; display:inline-flex; align-items:center; justify-content:center; font-size:7pt; color:#999;">[photo]</div>
+            <div style="width:2.8cm; height:2.8cm; display:inline-flex; align-items:center; justify-content:center; font-size:7pt; color:#999;">[photo]</div>
         {% endif %}
     </td>
     <!-- 2mm gap -->
     <td style="width:2mm; border:none; padding:0;">&nbsp;</td>
-    <!-- Info table: 8.5cm + 2.5cm + 4cm = 15cm -->
+    <!-- Info table: 7.34cm + 3.66cm + 4cm = 15cm (first two columns 2:1) -->
     <td style="border:none; padding:0;">
         <table class="si-table">
+        <!-- Explicit column widths: fixed layout + colspans otherwise
+             distribute the merged span equally instead of 2:1. -->
+        <colgroup>
+            <col style="width:7.34cm">
+            <col style="width:3.66cm">
+            <col style="width:4cm">
+        </colgroup>
         <!-- Row 1: A+B merged | C -->
         <tr>
-            <td colspan="2" style="width:11cm;">Name of Student: <span class="val">{{ student.full_name }}</span></td>
-            <td style="width:4cm;">Class: <span class="val">{{ school_class.name }}</span></td>
+            <td colspan="2">Name of Student: <span class="val">{{ student.full_name }}</span></td>
+            <td>Class: <span class="val">{{ school_class.name }}</span></td>
         </tr>
         <!-- Row 2: A | B | C -->
         <tr>
-            <td style="width:8.5cm;">Date &amp; Place of Birth: <span class="val">{{ student.date_of_birth|date:"d/m/Y" }} at {{ student.place_of_birth }}</span></td>
-            <td style="width:2.5cm;">Sex: <span class="val">{{ student.get_sex_display }}</span></td>
-            <td style="width:4cm;">Class Enrolment: <span class="val">{{ enrolment.total }}</span></td>
+            <td>Date &amp; Place of Birth: <span class="val">{{ student.date_of_birth|date:"d/m/Y" }} at {{ student.place_of_birth }}</span></td>
+            <td>Sex: <span class="val">{{ student.get_sex_display }}</span></td>
+            <td>Class Enrolment: <span class="val">{{ enrolment.total }}</span></td>
         </tr>
         <!-- Row 3: A | B | C -->
         <tr>
-            <td style="width:8.5cm;">Unique Identification Number: <span class="val fail">{{ student.unique_id }}</span></td>
-            <td style="width:2.5cm;">Repeater? <span class="val">{% if student.repeater %}Yes{% else %}No{% endif %}</span></td>
-            <td style="width:4cm;">Number of Subjects: <span class="val">{{ total_subjects }}</span></td>
+            <td>Unique Identification Number: <span class="val fail">{{ student.unique_id }}</span></td>
+            <td>Repeater? <span class="val">{% if student.repeater %}Yes{% else %}No{% endif %}</span></td>
+            <td>Number of Subjects: <span class="val">{{ total_subjects }}</span></td>
         </tr>
         <!-- Row 4: A+B merged (faint border) | C -->
         <tr>
-            <td colspan="2" style="width:11cm; border-color:#ccc; border-left:1px solid #000;">Parent's/Guardian's Name and Contact:</td>
-            <td style="width:4cm;">Number Passed: <span class="val">{{ passed_subjects }}</span></td>
+            <td colspan="2" style="border-color:#ccc; border-left:1px solid #000;">Parent's/Guardian's Name and Contact:</td>
+            <td>Number Passed: <span class="val">{{ passed_subjects }}</span></td>
         </tr>
         <!-- Row 5: A+B merged (rowspan=2) | C -->
         <tr>
-            <td rowspan="2" colspan="2" style="width:11cm; border-left:1px solid #000; border-bottom:1px solid #000; border-top:none; border-right:none; text-align:left; vertical-align:middle; padding:1px 4px;">
+            <td rowspan="2" colspan="2" style="border-left:1px solid #000; border-bottom:1px solid #000; border-top:none; border-right:none; text-align:left; vertical-align:middle; padding:1px 4px;">
                 {{ student.guardian_name }}, {{ student.guardian_contact }}, {{ student.guardian_address }}
             </td>
-            <td style="width:4cm; border-bottom:none;">Class Master:</td>
+            <td style="border-bottom:none;">Class Master:</td>
         </tr>
         <!-- Row 6: C only (A+B covered by rowspan) -->
         <tr>
-            <td style="width:4cm; border-top:none; text-align:center;">{{ class_master }}</td>
+            <td style="border-top:none; text-align:center;">{{ class_master }}</td>
         </tr>
         </table>
     </td>
@@ -216,8 +229,10 @@ body {
             {% if sd.av_coef is not None %}{{ sd.av_coef|floatformat:2 }}{% endif %}
         </td>
         <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}">{{ sd.grade }}</td>
-        <td class="center{% if rank and average < 10 %} fail{% endif %}">
-            {% if forloop.first and rank %}{{ rank }}{% endif %}
+        <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}">
+            {% if forloop.first and sd.subject_rank_info %}
+                {{ sd.subject_rank_info.rank }}<span style="font-size:6.5pt;">/{{ sd.subject_rank_info.total }}</span>
+            {% endif %}
         </td>
         <td>
             <span class="{% if sd.average is not None and sd.average < 10 %}fail{% endif %}">{{ sd.remark }}</span>
@@ -286,8 +301,10 @@ body {
             <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}" rowspan="{{ sd.competencies|length }}">
                 {{ sd.grade }}
             </td>
-            <td class="center{% if rank and average < 10 %} fail{% endif %}" rowspan="{{ sd.competencies|length }}">
-                {% if forloop.parentloop.first and rank %}{{ rank }}{% endif %}
+            <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}" rowspan="{{ sd.competencies|length }}">
+                {% if forloop.parentloop.first and sd.subject_rank_info %}
+                    {{ sd.subject_rank_info.rank }}<span style="font-size:6.5pt;">/{{ sd.subject_rank_info.total }}</span>
+                {% endif %}
             </td>
             <td rowspan="{{ sd.competencies|length }}">
                 <span class="{% if sd.average is not None and sd.average < 10 %}fail{% endif %}">{{ sd.remark }}</span>
