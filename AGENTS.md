@@ -99,6 +99,7 @@ python manage.py render_report --report=annual --student=<id> --year-start=2025 
 # Demo/test data (deterministic, idempotent — safe to re-run)
 python manage.py seed_demo_students_marks
 python manage.py seed_demo_students_marks --form1 35 --seed 20260814
+python manage.py seed_demo_forms
 ```
 
 The `seed_demo_students_marks` command creates 35 Form 1 students (North West
@@ -107,3 +108,12 @@ student in all 3 terms of the current year, generates 1-3 randomized
 competency scores (3-19) per subject per student for the classes' selected
 subjects, then recomputes subject averages, term results and ranks. Re-running
 regenerates the same scores (fixed seed) and recomputes.
+
+The `seed_demo_forms` command builds the demo structure first if missing:
+Form 1-5 classes, three 2026/2027 terms (First Term current), the Form 1-5
+subject scheme with coefficients in display order (F1/F2 junior set; F3 adds
+ECO between HIS and BIO; F4/F5 senior set with HBI and COM), 11 teachers
+(sample signature files attached where available) with subject-pair
+assignments across classes and one class master per class, and 21-50 students
+per form (NW/SW Cameroon names, full registration details) enrolled in the
+current term. Run it before `seed_demo_students_marks` on a fresh database.
