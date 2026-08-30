@@ -1,7 +1,4 @@
-import base64
 import hashlib
-import hmac
-import json
 import platform
 import uuid
 
@@ -14,6 +11,7 @@ from django.utils import timezone
 from django.utils.http import url_has_allowed_host_and_scheme
 
 from core.utils.tenancy import get_tenant, get_tenant_license
+from core.utils.throttle import BruteForceThrottle, client_ip
 
 
 def login_view(request):
@@ -22,7 +20,11 @@ def login_view(request):
         return redirect("dashboard")
     school = None
 
-    lockout_time, attempts_remaining = _login_throttle(request)
+    username = (
+        request.POST.get("username", "").strip() if request.method == "POST" else ""
+    )
+
+    lockout_time, _attempts_remaining = _login_throttle(request, username)
 
     if lockout_time is not None:
         messages.error(
@@ -32,11 +34,10 @@ def login_view(request):
         return render(request, "auth/login.html", {"school": school})
 
     if request.method == "POST":
-        username = request.POST.get("username", "")
         password = request.POST.get("password", "")
         user = authenticate(request, username=username, password=password)
         if user:
-            _reset_login_throttle(request)
+            _reset_login_throttle(request, username)
             login(request, user)
             next_url = request.GET.get("next", "/")
             if not url_has_allowed_host_and_scheme(
@@ -44,9 +45,9 @@ def login_view(request):
             ):
                 next_url = "/"
             return redirect(next_url)
-        _record_login_failure(request)
-        attempts_remaining = _login_throttle(request)[1]
-        if attempts_remaining is not None and attempts_remaining <= 0:
+        _record_login_failure(request, username)
+        lockout_time, _attempts_remaining = _login_throttle(request, username)
+        if lockout_time is not None:
             messages.error(
                 request,
                 "Too many failed attempts. Please try again in a few minutes.",
@@ -58,47 +59,45 @@ def login_view(request):
 
 LOGIN_MAX_ATTEMPTS = 5
 LOGIN_LOCKOUT_MINUTES = 5
+LOGIN_IP_MAX_ATTEMPTS = 20
+LOGIN_IP_LOCKOUT_MINUTES = 15
+
+_staff_throttle = BruteForceThrottle("staff_login")
 
 
-def _throttle_key(request):
-    """Stable key for throttling — forces a session key so it never changes."""
-    if not request.session.session_key:
-        request.session.save()
-    return f"login_failures_{request.session.session_key}"
-
-
-def _login_throttle(request):
-    """Return (lockout_minutes_or_None, attempts_remaining)."""
-    key = _throttle_key(request)
-    lockout_until = request.session.get("login_lockout_until")
-    if lockout_until:
-        from django.utils import timezone
-
-        remaining = (lockout_until - timezone.now().timestamp()) / 60
-        if remaining > 0:
-            return max(1, int(remaining)), 0
-        del request.session["login_lockout_until"]
-
-    attempts = request.session.get(key, 0)
-    return None, max(0, LOGIN_MAX_ATTEMPTS - attempts)
-
-
-def _record_login_failure(request):
-    key = _throttle_key(request)
-    attempts = request.session.get(key, 0) + 1
-    request.session[key] = attempts
-    if attempts >= LOGIN_MAX_ATTEMPTS:
-        from django.utils import timezone
-
-        request.session["login_lockout_until"] = timezone.now().timestamp() + (
-            LOGIN_LOCKOUT_MINUTES * 60
+def _staff_throttle_entries(request, username):
+    """Throttle scopes: the client IP (shared-WiFi safe) and the username."""
+    entries = [
+        (
+            "ip",
+            client_ip(request),
+            LOGIN_IP_MAX_ATTEMPTS,
+            LOGIN_IP_LOCKOUT_MINUTES,
         )
+    ]
+    if username:
+        entries.append(
+            (
+                "user",
+                username.strip().lower(),
+                LOGIN_MAX_ATTEMPTS,
+                LOGIN_LOCKOUT_MINUTES,
+            )
+        )
+    return entries
 
 
-def _reset_login_throttle(request):
-    key = _throttle_key(request)
-    request.session.pop(key, None)
-    request.session.pop("login_lockout_until", None)
+def _login_throttle(request, username=""):
+    """Return (lockout_minutes_or_None, attempts_remaining)."""
+    return _staff_throttle.check(_staff_throttle_entries(request, username))
+
+
+def _record_login_failure(request, username=""):
+    _staff_throttle.record_failure(_staff_throttle_entries(request, username))
+
+
+def _reset_login_throttle(request, username=""):
+    _staff_throttle.reset(_staff_throttle_entries(request, username))
 
 
 def logout_view(request):
@@ -156,34 +155,34 @@ def activate_view(request):
 
     Each product key activates its own License, School, and admin account.
     The in-progress activation is tracked via ``activate_license_id`` in the
-    session so the wizard steps stay scoped to one school.
+    session so the wizard steps stay scoped to one school. The active step is
+    always derived server-side from the license state — the client-supplied
+    ``step`` field is never trusted.
     """
     from core.models import License
 
     pending_id = request.session.get("activate_license_id")
     license_obj = License.objects.filter(pk=pending_id).first() if pending_id else None
 
-    raw_step = (
-        request.POST.get("step", "1")
-        if request.method == "POST"
-        else request.GET.get("step", "1")
-    )
-    try:
-        step = int(raw_step)
-    except (TypeError, ValueError):
-        step = 1
+    step = _activation_step(license_obj)
 
     if request.method == "POST":
         if step == 1:
             return _activate_license(request)
-        elif step == 2:
+        if step == 2:
             return _setup_school(request, license_obj)
-        elif step == 3:
+        if step == 3:
             return _setup_admin(request, license_obj)
+        request.session.pop("activate_license_id", None)
+        messages.info(
+            request,
+            "This product key is already fully activated. Please log in.",
+        )
+        return redirect("activate")
 
     school = license_obj.school if license_obj else None
     ctx = {
-        "step": _activation_step(license_obj),
+        "step": step,
         "license": license_obj,
         "license_info": _license_dict(license_obj) if license_obj else None,
         "school": school,
@@ -198,9 +197,7 @@ def _activation_step(license_obj):
         return 1
     if not license_obj.school:
         return 2
-    if not UserProfile.objects.filter(
-        school=license_obj.school, role="admin"
-    ).exists():
+    if not UserProfile.objects.filter(school=license_obj.school, role="admin").exists():
         return 3
     return 4
 
@@ -218,7 +215,13 @@ def _activate_license(request):
 
     existing = License.objects.filter(product_key=key).first()
     if existing:
-        messages.info(request, "This license key has already been activated.")
+        if _activation_step(existing) == 4:
+            messages.info(
+                request,
+                "This product key has already been activated. Please log in.",
+            )
+            return redirect("activate")
+        messages.info(request, "Resuming setup for this product key.")
         request.session["activate_license_id"] = existing.pk
         return redirect("activate")
 
@@ -227,23 +230,8 @@ def _activate_license(request):
         messages.error(request, "Invalid product key format.")
         return redirect("activate")
 
-    signature = parts[1]
-    raw = parts[2]
-    padding = 4 - len(raw) % 4
-    raw_padded = raw + "=" * padding
-    try:
-        payload_bytes = base64.urlsafe_b64decode(raw_padded)
-        payload = json.loads(payload_bytes)
-    except (TypeError, ValueError):
-        messages.error(request, "Invalid product key.")
-        return redirect("activate")
-
-    expected = hmac.new(
-        settings.LICENSE_SECRET_KEY.encode(),
-        json.dumps(payload, sort_keys=True).encode(),
-        hashlib.sha256,
-    ).hexdigest()[:16]
-    if not hmac.compare_digest(signature, expected):
+    payload = License.verify_product_key(key, settings.LICENSE_SECRET_KEY)
+    if payload is None:
         messages.error(request, "Invalid product key - signature mismatch.")
         return redirect("activate")
 
@@ -321,6 +309,14 @@ def _setup_admin(request, license_obj):
         return redirect("activate")
 
     school = license_obj.school
+
+    if UserProfile.objects.filter(school=school, role="admin").exists():
+        request.session.pop("activate_license_id", None)
+        messages.error(
+            request,
+            "An admin account already exists for this school. Please log in instead.",
+        )
+        return redirect("activate")
 
     username = request.POST.get("username", "").strip()
     password = request.POST.get("password", "")

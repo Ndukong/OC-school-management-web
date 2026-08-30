@@ -161,14 +161,18 @@ def student_create(request):
 def student_detail(request, pk):
     school = get_school_for_user(request.user)
     student = get_object_or_404(Student, pk=pk)
-    if school and student.school_id != school.pk:
+    if school is None or student.school_id != school.pk:
         messages.error(request, "Student not found.")
         return redirect("student_list")
 
-    current_term = AcademicTerm.objects.filter(school=student.school, is_current=True).first()
-    enrollments = StudentEnrollment.objects.filter(student=student).select_related(
-        "school_class", "academic_term"
-    ).order_by("-academic_term__year_start", "-academic_term__term_number")
+    current_term = AcademicTerm.objects.filter(
+        school=student.school, is_current=True
+    ).first()
+    enrollments = (
+        StudentEnrollment.objects.filter(student=student)
+        .select_related("school_class", "academic_term")
+        .order_by("-academic_term__year_start", "-academic_term__term_number")
+    )
 
     subject_averages = []
     term_result = None
@@ -199,7 +203,7 @@ def student_detail(request, pk):
 def student_edit(request, pk):
     school = get_school_for_user(request.user)
     student = get_object_or_404(Student, pk=pk)
-    if school and student.school_id != school.pk:
+    if school is None or student.school_id != school.pk:
         messages.error(request, "Student not found.")
         return redirect("student_list")
 
@@ -231,9 +235,21 @@ def student_export_excel(request):
     ws.title = "Students"
 
     header_font = Font(bold=True, color="FFFFFF")
-    header_fill = PatternFill(start_color="1F4E78", end_color="1F4E78", fill_type="solid")
+    header_fill = PatternFill(
+        start_color="1F4E78", end_color="1F4E78", fill_type="solid"
+    )
 
-    headers = ["#", "Name", "Sex", "Student ID", "Class", "DOB", "Guardian", "Contact", "Status"]
+    headers = [
+        "#",
+        "Name",
+        "Sex",
+        "Student ID",
+        "Class",
+        "DOB",
+        "Guardian",
+        "Contact",
+        "Status",
+    ]
     for col, h in enumerate(headers, 1):
         cell = ws.cell(row=1, column=col, value=h)
         cell.font = header_font
@@ -250,12 +266,18 @@ def student_export_excel(request):
         .order_by("first_name")
     )
     for row, s in enumerate(students, 2):
-        enrollment = s.enrollments.filter(academic_term__is_current=True).select_related("school_class").first()
+        enrollment = (
+            s.enrollments.filter(academic_term__is_current=True)
+            .select_related("school_class")
+            .first()
+        )
         ws.cell(row=row, column=1, value=row - 1)
         ws.cell(row=row, column=2, value=s.full_name)
         ws.cell(row=row, column=3, value=s.get_sex_display())
         ws.cell(row=row, column=4, value=s.unique_id)
-        ws.cell(row=row, column=5, value=str(enrollment.school_class) if enrollment else "")
+        ws.cell(
+            row=row, column=5, value=str(enrollment.school_class) if enrollment else ""
+        )
         ws.cell(row=row, column=6, value=str(s.date_of_birth))
         ws.cell(row=row, column=7, value=s.guardian_name)
         ws.cell(row=row, column=8, value=s.guardian_contact)
@@ -264,7 +286,11 @@ def student_export_excel(request):
     for col in range(1, len(headers) + 1):
         ws.column_dimensions[chr(64 + col)].width = 16
 
-    response = HttpResponse(content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet")
-    response["Content-Disposition"] = f'attachment; filename="students_{school.matricule}.xlsx"'
+    response = HttpResponse(
+        content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+    )
+    response["Content-Disposition"] = (
+        f'attachment; filename="students_{school.matricule}.xlsx"'
+    )
     wb.save(response)
     return response

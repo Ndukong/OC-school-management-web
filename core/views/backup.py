@@ -1,4 +1,4 @@
-import json
+import hashlib
 import os
 import platform
 import uuid
@@ -9,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse
 from django.shortcuts import redirect, render
 
-from core.models import License, School
+from core.models import License
 from core.utils.backup import (
     create_backup_archive,
     generate_scheduled_task_script,
@@ -118,9 +118,6 @@ def license_info(request):
     )
 
 
-import hashlib
-
-
 @login_required
 @superuser_required
 def generate_license_key(request):
@@ -135,28 +132,12 @@ def generate_license_key(request):
             return redirect("generate_license_key")
 
         expires = date.today() + timedelta(days=validity_days)
-        payload = {
-            "school": school_name,
-            "max_students": max_students,
-            "max_devices": max_devices,
-            "expires": expires.isoformat(),
-        }
-
-        import base64
-
-        raw = (
-            base64.urlsafe_b64encode(json.dumps(payload, sort_keys=True).encode())
-            .rstrip(b"=")
-            .decode()
+        product_key = License.generate_product_key(
+            school_name=school_name,
+            max_students=max_students,
+            max_devices=max_devices,
+            expires=expires,
         )
-
-        sig = hashlib.new(
-            "sha256",
-            json.dumps(payload, sort_keys=True).encode(),
-            usedforsecurity=False,
-        ).hexdigest()[:16]
-
-        product_key = f"OC-{sig}-{raw}"
 
         return render(
             request,

@@ -176,7 +176,7 @@ def finance_dashboard(request):
 def student_fee_status(request, student_id: int):
     school = get_school_for_user(request.user)
     student = get_object_or_404(Student, pk=student_id)
-    if school and student.school_id != school.pk:
+    if school is None or student.school_id != school.pk:
         messages.error(request, "Student not found.")
         return redirect("finance_dashboard")
 

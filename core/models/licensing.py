@@ -1,8 +1,10 @@
+import base64
 import hashlib
 import hmac
 import json
 from datetime import date
 
+from django.conf import settings
 from django.db import models
 
 
@@ -46,28 +48,56 @@ class License(models.Model):
     def days_remaining(self) -> int:
         return (self.expires_at - date.today()).days
 
-    def validate_key(self, secret_key: str) -> bool:
-        """Validate the HMAC signature embedded in the product key."""
-        parts = self.product_key.split("-", 2)
-        if len(parts) != 3 or parts[0] != "OC":
-            return False
-        signature = parts[1]
-        raw = parts[2]
-        padding = 4 - len(raw) % 4
-        raw_padded = raw + "=" * padding
-        import base64
+    @classmethod
+    def generate_product_key(
+        cls,
+        school_name: str,
+        max_students: int,
+        max_devices: int,
+        expires: date,
+        secret_key: str | None = None,
+    ) -> str:
+        """Build a signed ``OC-<signature>-<payload>`` product key (HMAC-SHA256)."""
+        secret = secret_key or settings.LICENSE_SECRET_KEY
+        payload = {
+            "school": school_name,
+            "max_students": max_students,
+            "max_devices": max_devices,
+            "expires": expires.isoformat(),
+        }
+        payload_bytes = json.dumps(payload, sort_keys=True).encode()
+        signature = hmac.new(
+            secret.encode(),
+            payload_bytes,
+            hashlib.sha256,
+        ).hexdigest()[:16]
+        raw = base64.urlsafe_b64encode(payload_bytes).decode().rstrip("=")
+        return f"OC-{signature}-{raw}"
 
+    @classmethod
+    def verify_product_key(cls, product_key: str, secret_key: str) -> dict | None:
+        """Return the decoded payload when the key's HMAC signature is valid."""
+        parts = product_key.split("-", 2)
+        if len(parts) != 3 or parts[0] != "OC":
+            return None
+        signature, raw = parts[1], parts[2]
+        padding = 4 - len(raw) % 4
         try:
-            payload_bytes = base64.urlsafe_b64decode(raw_padded)
-        except (ValueError, TypeError):
-            return False
-        payload = json.loads(payload_bytes)
+            payload = json.loads(base64.urlsafe_b64decode(raw + "=" * padding))
+        except (TypeError, ValueError):
+            return None
         expected = hmac.new(
             secret_key.encode(),
             json.dumps(payload, sort_keys=True).encode(),
             hashlib.sha256,
         ).hexdigest()[:16]
-        return hmac.compare_digest(signature, expected)
+        if not hmac.compare_digest(signature, expected):
+            return None
+        return payload
+
+    def validate_key(self, secret_key: str) -> bool:
+        """Validate the HMAC signature embedded in the product key."""
+        return self.verify_product_key(self.product_key, secret_key) is not None
 
     @classmethod
     def get_active(cls):

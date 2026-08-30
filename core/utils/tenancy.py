@@ -24,6 +24,21 @@ def get_tenant_license(school):
     return License.get_active_for_school(school)
 
 
+def license_lapsed(school) -> bool:
+    """True when the school has license records but none currently valid.
+
+    Schools with no license records at all are a platform/dev anomaly and
+    keep the legacy dashboard-only behavior; the gate targets the real
+    business event: a tenant whose license expired or was revoked.
+    """
+    if not school:
+        return False
+    return (
+        License.objects.filter(school=school).exists()
+        and License.get_active_for_school(school) is None
+    )
+
+
 def tenant_at_student_limit(school) -> bool:
     """True when the school's licensed student quota is exhausted."""
     if not school:
@@ -48,4 +63,4 @@ def tenant_student_slots_remaining(school):
         return None
     active_count = Student.objects.filter(school=school, is_active=True).count()
     remaining = license_obj.max_students - active_count
-    return remaining if remaining > 0 else 0
+    return max(0, remaining)
