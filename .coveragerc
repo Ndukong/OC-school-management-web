@@ -6,6 +6,4 @@ exclude_lines =
     pragma: no cover
     raise NotImplementedError
 omit =
-    core/views/teachers.py
-    core/views/placeholders.py
     */migrations/*

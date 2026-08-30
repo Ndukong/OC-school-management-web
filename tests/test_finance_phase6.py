@@ -33,10 +33,12 @@ def finance_data():
     term = AcademicTerm.objects.create(
         school=school, term_number=1, year_start=2025, year_end=2026, is_current=True
     )
-    PTADueConfig.objects.create(school=school, school_class=sc, amount=Decimal(5000))
+    PTADueConfig.objects.create(school=school, school_class=sc, amount=Decimal(7000))
 
     pta_fee = FeeType.objects.create(school=school, name="PTA Due", category="PTA")
-    state_fee = FeeType.objects.create(school=school, name="School Fees", category="state")
+    state_fee = FeeType.objects.create(
+        school=school, name="School Fees", category="state"
+    )
 
     s1 = Student.objects.create(
         school=school,
@@ -63,7 +65,9 @@ def finance_data():
     StudentEnrollment.objects.create(student=s1, school_class=sc, academic_term=term)
     StudentEnrollment.objects.create(student=s2, school_class=sc, academic_term=term)
 
-    # Alice paid 3000 PTA, Bob paid 2000 PTA, plus 1000 state income
+    # Alice paid 3000 PTA, Bob paid 2500 PTA, plus 1000 state income.
+    # Amounts are deliberately distinct so dashboard totals cannot mask
+    # each other: expected 14000, collected 5500, outstanding 8500.
     IncomeRecord.objects.create(
         school=school,
         academic_term=term,
@@ -78,7 +82,7 @@ def finance_data():
         academic_term=term,
         fee_type=pta_fee,
         student=s2,
-        amount=Decimal(2000),
+        amount=Decimal(2500),
         date_paid=date(2025, 10, 2),
         receipt_number="R002",
     )
@@ -140,13 +144,13 @@ class TestFinanceDashboard:
     def test_expected_collected_outstanding_by_class(self, finance_data):
         c = finance_data["login"](finance_data["bursar"])
         r = c.get(reverse("finance_dashboard"))
-        html = r.content.decode()
-        # Expected = 5000 x 2 enrolled = 10000
-        assert "10000" in html.replace(",", "")
-        # Collected PTA = 3000 + 2000 = 5000
-        assert "5000" in html
-        # Outstanding = 5000
-        assert "5000" in html
+        html = r.content.decode().replace(",", "")
+        # Expected = 7000 x 2 enrolled = 14000
+        assert "14000" in html
+        # Collected PTA = 3000 + 2500 = 5500
+        assert "5500" in html
+        # Outstanding = 14000 - 5500 = 8500
+        assert "8500" in html
 
     def test_income_and_expenditure_forms_post(self, finance_data):
         c = finance_data["login"](finance_data["bursar"])
@@ -199,8 +203,8 @@ class TestStudentFeeStatus:
         c = finance_data["login"](finance_data["bursar"])
         r = c.get(reverse("student_fee_status", args=[finance_data["s1"].id]))
         html = r.content.decode()
-        # Expected 5000, paid 3000 -> outstanding 2000
-        assert "2000" in html
+        # Expected 7000, paid 3000 -> outstanding 4000 (distinct from both)
+        assert "4000" in html
 
     def test_teacher_cannot_view_fee_status(self, finance_data):
         c = finance_data["login"](finance_data["teacher"])
@@ -246,9 +250,11 @@ class TestStudentFeeStatus:
         for p in patterns:
             if hasattr(p, "url_patterns"):
                 for sub in p.url_patterns:
-                    if "finance" in str(sub.pattern) or "income" in str(
-                        sub.pattern
-                    ) or "expenditure" in str(sub.pattern):
+                    if (
+                        "finance" in str(sub.pattern)
+                        or "income" in str(sub.pattern)
+                        or "expenditure" in str(sub.pattern)
+                    ):
                         finance_paths.append(str(sub.pattern))
         for fp in finance_paths:
             assert "delete" not in fp.lower()

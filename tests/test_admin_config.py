@@ -812,7 +812,7 @@ class TestEndToEndNewSchool:
         )
         assert r.status_code == 302
         admin_user = User.objects.get(username="e2eadmin")
-        assert admin_user.is_superuser
+        assert not admin_user.is_superuser
 
         # ── Login as the new admin ───────────────────────────────────────
         c2 = Client()
@@ -835,44 +835,46 @@ class TestEndToEndNewSchool:
         assert school.matricule == "E2E-001"
         assert school.letterhead_line1_en == "REPUBLIC OF CAMEROON"
 
-        # ── Create academic term ─────────────────────────────────────────
+        # ── Create academic term (next academic year — wizard seeded 2025/2026) ──
         r = c2.post(
             reverse("terms_manage"),
             {
                 "action": "create",
                 "term_number": 1,
-                "year_start": 2025,
-                "year_end": 2026,
+                "year_start": 2026,
+                "year_end": 2027,
                 "is_current": True,
             },
         )
         assert r.status_code == 302
-        term = AcademicTerm.objects.get(school=school, term_number=1)
+        term = AcademicTerm.objects.get(school=school, year_start=2026, term_number=1)
         assert term.is_current
 
-        # ── Create classes ───────────────────────────────────────────────
-        for code, name, fl in [("F1", "Form 1", 1), ("F2", "Form 2", 2)]:
+        # ── Create classes (wizard seeded F1-F5/LS/US, so use fresh codes) ────
+        for code, name, fl in [("XA", "Form X", 1), ("XB", "Form Y", 2)]:
             r = c2.post(
                 reverse("classes_manage"),
                 {
                     "action": "create",
                     "name": name,
                     "code": code,
-                    "form_level": fl,
+                    "stream": "",
                     "cycle": "first",
+                    "form_level": fl,
                     "promotion_mark": 10,
+                    "dismissal_mark": 8,
                     "sort_order": fl,
                 },
             )
             assert r.status_code == 302
-        assert SchoolClass.objects.filter(school=school).count() == 2
-        f1 = SchoolClass.objects.get(school=school, code="F1")
+        assert SchoolClass.objects.filter(school=school).count() == 9
+        f1 = SchoolClass.objects.get(school=school, code="XA")
 
-        # ── Create subjects ──────────────────────────────────────────────
+        # ── Create subjects (wizard seeded 30, so use fresh codes) ────────
         for code, name in [
-            ("MAT", "Mathematics"),
-            ("ENL", "English"),
-            ("SCI", "Science"),
+            ("XP1", "X Programming One"),
+            ("XP2", "X Programming Two"),
+            ("XP3", "X Science"),
         ]:
             r = c2.post(
                 reverse("subjects_manage"),
@@ -884,8 +886,8 @@ class TestEndToEndNewSchool:
                 },
             )
             assert r.status_code == 302
-        assert Subject.objects.filter(school=school).count() == 3
-        mat = Subject.objects.get(school=school, code="MAT")
+        assert Subject.objects.filter(school=school).count() == 33
+        mat = Subject.objects.get(school=school, code="XP1")
 
         # ── Assign subject to class with coefficient ─────────────────────
         r = c2.post(
@@ -985,9 +987,9 @@ class TestEndToEndNewSchool:
         assert FeeType.objects.filter(school=school, name="PTA Term Dues").exists()
 
         # ── Verify all school-scoped ─────────────────────────────────────
-        assert AcademicTerm.objects.filter(school=school).count() == 1
-        assert SchoolClass.objects.filter(school=school).count() == 2
-        assert Subject.objects.filter(school=school).count() == 3
+        assert AcademicTerm.objects.filter(school=school).count() == 4
+        assert SchoolClass.objects.filter(school=school).count() == 9
+        assert Subject.objects.filter(school=school).count() == 33
         assert ClassSubject.objects.filter(school_class__school=school).count() == 1
         assert Competency.objects.filter(subject__school=school).count() == 1
         assert UserProfile.objects.filter(school=school).count() == 2

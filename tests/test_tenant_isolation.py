@@ -11,18 +11,17 @@ from django.contrib.auth.models import User
 from django.test import Client
 from django.urls import reverse
 
-from core.models import (
-    AcademicTerm,
-    License,
-    School,
-    SchoolClass,
-    SMSConfig,
-    SMSMessage,
-    Student,
-    UserProfile,
+from core.models import License, SMSConfig, SMSMessage, Student
+from tests.factories import (
+    PASSWORD,
+    login_client,
+    make_admin,
+    make_class,
+    make_school_with_license,
+    make_student,
+    make_term,
+    make_user,
 )
-
-PASSWORD = "isolation-pass"
 
 
 def _make_product_key(school_name: str, max_students: int = 500) -> str:
@@ -45,79 +44,25 @@ def _make_product_key(school_name: str, max_students: int = 500) -> str:
     return f"OC-{sig}-{raw}"
 
 
-def _make_school(name: str, matricule: str):
-    school = School.objects.create(
-        name_en=name,
-        matricule=matricule,
-        region_en="North West",
-        division_en="Mezam",
-    )
-    License.objects.create(
-        product_key=f"OC-isotest-{matricule}",
-        school=school,
-        school_name=name,
-        max_students=500,
-        expires_at=date.today() + timedelta(days=365),
-        status="active",
-    )
-    return school
-
-
-def _make_admin(username: str, school) -> User:
-    user = User.objects.create_user(username=username, password=PASSWORD)
-    UserProfile.objects.create(user=user, school=school, role="admin")
-    return user
-
-
 def _login(username: str) -> Client:
-    client = Client()
-    assert client.login(username=username, password=PASSWORD)
-    return client
+    return login_client(username, PASSWORD)
 
 
 @pytest.fixture
 def two_schools():
-    school_a = _make_school("Alpha High", "ISO-A")
-    school_b = _make_school("Beta High", "ISO-B")
+    school_a, _ = make_school_with_license("Alpha High", "ISO-A")
+    school_b, _ = make_school_with_license("Beta High", "ISO-B")
 
-    admin_a = _make_admin("iso_admin_a", school_a)
-    admin_b = _make_admin("iso_admin_b", school_b)
-
-    def make_class(school, code):
-        return SchoolClass.objects.create(
-            school=school, name=f"Form 1 {code}", code=code, form_level=1
-        )
-
-    def make_term(school):
-        return AcademicTerm.objects.create(
-            school=school,
-            term_number=1,
-            year_start=2025,
-            year_end=2026,
-            is_current=True,
-        )
-
-    def make_student(school, unique_id):
-        return Student.objects.create(
-            school=school,
-            first_name="Testy",
-            sex="M",
-            unique_id=unique_id,
-            date_of_birth=date(2010, 5, 5),
-            place_of_birth="Bamenda",
-            guardian_name="Guardian",
-            guardian_contact="600000000",
-            division_of_origin="Mezam",
-            region_of_origin="North West",
-        )
+    admin_a = make_user("iso_admin_a", school=school_a, role="admin")
+    admin_b = make_user("iso_admin_b", school=school_b, role="admin")
 
     return SimpleNamespace(
         school_a=school_a,
         school_b=school_b,
         admin_a=admin_a.username,
         admin_b=admin_b.username,
-        class_a=make_class(school_a, "FA1"),
-        class_b=make_class(school_b, "FB1"),
+        class_a=make_class(school_a, "Form 1 A", "FA1", 1),
+        class_b=make_class(school_b, "Form 1 B", "FB1", 1),
         term_a=make_term(school_a),
         term_b=make_term(school_b),
         student_a=make_student(school_a, "ISO-A-001"),
@@ -130,16 +75,12 @@ class TestCrossTenantIsolation:
     def test_same_tenant_access_still_works(self, two_schools):
         """Positive control: a school admin still sees their own objects."""
         client = _login(two_schools.admin_b)
-        resp = client.get(
-            reverse("student_detail", args=[two_schools.student_b.pk])
-        )
+        resp = client.get(reverse("student_detail", args=[two_schools.student_b.pk]))
         assert resp.status_code == 200
 
     def test_student_detail_cross_tenant_blocked(self, two_schools):
         client = _login(two_schools.admin_b)
-        resp = client.get(
-            reverse("student_detail", args=[two_schools.student_a.pk])
-        )
+        resp = client.get(reverse("student_detail", args=[two_schools.student_a.pk]))
         assert resp.status_code == 302
 
     def test_term_report_cross_tenant_404(self, two_schools):
@@ -329,9 +270,7 @@ class TestDataTransfer:
         payload = build_school_export(two_schools.school_a)
         assert payload["schema"] == "oc-school-export"
         assert any(s["unique_id"] == "ISO-A-001" for s in payload["students"])
-        assert not any(
-            s["unique_id"] == "ISO-B-001" for s in payload["students"]
-        )
+        assert not any(s["unique_id"] == "ISO-B-001" for s in payload["students"])
 
         # Importing into another school must keep catalog data but refuse
         # students whose globally-unique IDs belong elsewhere.
@@ -352,9 +291,7 @@ class TestDataTransfer:
         counts2 = restore_school_export(payload2, two_schools.school_b)
         assert counts2["students"] >= 1
         assert counts2["student_conflicts"] == 0
-        assert two_schools.school_b.students.filter(
-            unique_id="JSO-A-001"
-        ).exists()
+        assert two_schools.school_b.students.filter(unique_id="JSO-A-001").exists()
 
     def test_export_view_scoped_and_downloadable(self, two_schools):
         client = _login(two_schools.admin_b)
@@ -373,16 +310,11 @@ class TestDataTransfer:
 @pytest.mark.django_db
 class TestStudentQuotaEnforcement:
     def test_student_create_blocked_at_license_limit(self):
-        school = _make_school("Tiny School", "ISO-Q")
-        License.objects.update(school=school, max_students=1)
-        Student.objects.create(
-            school=school,
-            first_name="Full",
-            sex="M",
-            unique_id="Q-001",
-            date_of_birth=date(2010, 1, 1),
-        )
-        _make_admin("quota_admin", school)
+        school, license_obj = make_school_with_license("Tiny School", "ISO-Q")
+        license_obj.max_students = 1
+        license_obj.save()
+        make_student(school, "Q-001", first_name="Full")
+        make_admin("quota_admin", school)
         client = _login("quota_admin")
 
         before = Student.objects.filter(school=school).count()
