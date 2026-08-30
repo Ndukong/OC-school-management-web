@@ -91,7 +91,7 @@
                 <p class="text-muted" style="margin:0;">Set up PTA dues in Settings to track collection.</p>
             {% endif %}
             <div style="margin-top:16px;">
-                <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-primary">View student fee status</a>
+                <a href="{% url 'student_list' %}" class="btn btn-sm btn-outline-primary" title="Click to look up a student's fee payments and outstanding balance">View student fee status</a>
             </div>
         </div>
     </div>
@@ -159,7 +159,7 @@
                     {% if field.errors %}<div style="color:var(--danger); font-size:12px; margin-top:4px;">{{ field.errors|striptags }}</div>{% endif %}
                 </div>
                 {% endfor %}
-                <button type="submit" class="btn" style="width:100%; background:var(--success); border-color:var(--success); color:#fff;">Save Income</button>
+                <button type="submit" class="btn" style="width:100%; background:var(--success); border-color:var(--success); color:#fff;" title="Click to record this fee payment (income is immutable once saved)">Save Income</button>
             </form>
         </div>
     </div>
@@ -177,7 +177,7 @@
                     {% if field.errors %}<div style="color:var(--danger); font-size:12px; margin-top:4px;">{{ field.errors|striptags }}</div>{% endif %}
                 </div>
                 {% endfor %}
-                <button type="submit" class="btn btn-danger" style="width:100%;">Save Expenditure</button>
+                <button type="submit" class="btn btn-danger" style="width:100%;" title="Click to record this expenditure (immutable once saved)">Save Expenditure</button>
             </form>
         </div>
     </div>
@@ -188,9 +188,9 @@
 <div class="card" style="margin-top:16px;">
     <div class="card-header">Reports &amp; Exports</div>
     <div class="card-body" style="display:flex; flex-wrap:wrap; gap:10px;">
-        <a href="{% url 'pta_financial' term.id %}" class="btn btn-primary">PTA Financial Report (Preview)</a>
-        <a href="{% url 'pta_financial' term.id %}?format=pdf" class="btn btn-outline-primary">Download PDF</a>
-        <a href="{% url 'export_finance_excel' term.id %}" class="btn btn-outline-primary">Export Excel</a>
+        <a href="{% url 'pta_financial' term.id %}" class="btn btn-primary" title="Click to preview the PTA financial report for the current term in the browser">PTA Financial Report (Preview)</a>
+        <a href="{% url 'pta_financial' term.id %}?format=pdf" class="btn btn-outline-primary" title="Click to download the PTA financial report as a PDF file">Download PDF</a>
+        <a href="{% url 'export_finance_excel' term.id %}" class="btn btn-outline-primary" title="Click to export the finance summary for the current term to Excel">Export Excel</a>
     </div>
 </div>
 {% endif %}

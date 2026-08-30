@@ -12,7 +12,7 @@
                 <div style="font-weight:600; margin-bottom:4px;">{{ a.class }}</div>
                 <div class="text-muted" style="font-size:13px; margin-bottom:8px;">{{ a.subject }}</div>
                 {% if a.is_class_master %}<span class="badge badge-info" style="margin-bottom:8px;">Class Master</span>{% endif %}
-                <a href="{% url 'mark_entry' a.class.id a.subject.id %}" class="btn btn-primary btn-sm" style="width:100%;">Enter Marks</a>
+                <a href="{% url 'mark_entry' a.class.id a.subject.id %}" class="btn btn-primary btn-sm" style="width:100%;" title="Click to enter {{ a.subject }} marks for {{ a.class }}">Enter Marks</a>
             </div>
             {% endfor %}
         </div>

@@ -409,6 +409,31 @@
 
       show(currentStep);
     })();
+
+    /* Live preview for the logo/seal file inputs */
+    (function () {
+      document.addEventListener("change", function (e) {
+        var input = e.target;
+        if (!input || input.tagName !== "INPUT" || input.type !== "file") return;
+        var file = input.files && input.files[0];
+        var holder = input._previewImg;
+        if (!file || (file.type && file.type.indexOf("image/") !== 0)) {
+          if (holder) holder.remove();
+          input._previewImg = null;
+          return;
+        }
+        if (!holder || !holder.isConnected) {
+          holder = document.createElement("img");
+          holder.alt = "Preview";
+          holder.style.cssText =
+            "display:block;margin-top:8px;max-height:96px;max-width:200px;" +
+            "border-radius:8px;border:1px solid #cbd5e1;object-fit:cover;";
+          input.insertAdjacentElement("afterend", holder);
+          input._previewImg = holder;
+        }
+        holder.src = URL.createObjectURL(file);
+      });
+    })();
   </script>
 </body>
 </html>

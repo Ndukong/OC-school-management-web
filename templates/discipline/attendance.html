@@ -95,7 +95,7 @@
 <div class="card">
     <div class="card-header">
         <span>Register — {{ school_class }} / {{ selected_date }} ({{ periods|length }} periods)</span>
-        <button type="button" class="btn btn-primary btn-sm" onclick="markAllPresent()">Mark All Present</button>
+        <button type="button" class="btn btn-primary btn-sm" onclick="markAllPresent()" title="Click to mark every listed student present for all periods">Mark All Present</button>
     </div>
     <div class="summary-bar" id="summary-bar">
         <span>Present: {{ summary.present }}</span>
@@ -166,7 +166,7 @@
             </table>
         </div>
         <div class="card-footer" style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
-            <button type="submit" class="btn btn-primary">Save All</button>
+            <button type="submit" class="btn btn-primary" title="Click to save attendance for every student in the register">Save All</button>
             <span class="text-muted" style="font-size:12.5px;">Cell changes auto-save. Save All is a fallback when JavaScript is off.</span>
         </div>
     </form>

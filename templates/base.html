@@ -569,6 +569,35 @@
             .main-footer { justify-content: center; text-align: center; }
         }
 
+        /* Custom hover tooltip (instant, works on every button/link) */
+        .tip-box {
+            position: fixed;
+            z-index: 2000;
+            max-width: 280px;
+            padding: 7px 11px;
+            background: #1a2332;
+            color: #fff;
+            font-size: 12.5px;
+            line-height: 1.45;
+            border-radius: 8px;
+            box-shadow: var(--shadow-md);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity .1s ease;
+        }
+        .tip-box.show { opacity: 1; }
+
+        /* Live preview thumbnail for image file inputs */
+        .img-preview {
+            display: block;
+            margin-top: 8px;
+            max-height: 96px;
+            max-width: 200px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            object-fit: cover;
+        }
+
         :focus-visible {
             outline: 2px solid var(--primary-light);
             outline-offset: 2px;
@@ -582,8 +611,8 @@
 
     <!-- ============================= Top navbar ============================= -->
     <header class="topbar">
-        <label for="nav-toggle" class="icon-btn hamburger" title="Menu">&#9776;</label>
-        <label for="sidebar-collapse" class="icon-btn collapse-btn" title="Collapse sidebar">&#9776;</label>
+        <label for="nav-toggle" class="icon-btn hamburger" title="Open the navigation menu">&#9776;</label>
+        <label for="sidebar-collapse" class="icon-btn collapse-btn" title="Click to collapse or expand the sidebar">&#9776;</label>
 
         <div class="topbar-title">
             <h1>{% block page_title %}{% endblock %}</h1>
@@ -608,7 +637,7 @@
                     {% endif %}
                 </span>
             </div>
-            <a href="{% url 'logout' %}" class="logout-btn" title="Sign out">&#8617; Logout</a>
+            <a href="{% url 'logout' %}" class="logout-btn" title="Click to sign out of your account">&#8617; Logout</a>
         </div>
     </header>
 
@@ -626,61 +655,61 @@
                     <li class="nav-section">Administration</li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
-                           href="{% url 'dashboard' %}" title="Dashboard">
+                           href="{% url 'dashboard' %}" title="Go to your dashboard">
                             <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'student_list' %} active{% endif %}"
-                           href="{% url 'student_list' %}" title="Students">
+                           href="{% url 'student_list' %}" title="View, search and manage student records">
                             <span class="nav-icon">&#9636;</span><span class="nav-label">Students</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'teacher_list' %} active{% endif %}"
-                           href="{% url 'teacher_list' %}" title="Teachers">
+                           href="{% url 'teacher_list' %}" title="Manage teacher records and assignments">
                             <span class="nav-icon">&#9670;</span><span class="nav-label">Teachers</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'mark_entry_select' %} active{% endif %}"
-                           href="{% url 'mark_entry_select' %}" title="Mark Entry">
+                           href="{% url 'mark_entry_select' %}" title="Enter students' marks (competency scores)">
                             <span class="nav-icon">&#9998;</span><span class="nav-label">Mark Entry</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'compute_results' %} active{% endif %}"
-                           href="{% url 'compute_results' %}" title="Compute Results">
+                           href="{% url 'compute_results' %}" title="Recalculate averages, ranks and promotion decisions">
                             <span class="nav-icon">&#10010;</span><span class="nav-label">Compute Results</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'reports_hub' %} active{% endif %}"
-                           href="{% url 'reports_hub' %}" title="Reports">
+                           href="{% url 'reports_hub' %}" title="Generate report cards, mark sheets and summaries">
                             <span class="nav-icon">&#10047;</span><span class="nav-label">Reports</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'attendance_entry' %} active{% endif %}"
-                           href="{% url 'attendance_entry' %}" title="Attendance">
+                           href="{% url 'attendance_entry' %}" title="Mark the daily attendance register">
                             <span class="nav-icon">&#9745;</span><span class="nav-label">Attendance</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'discipline_summary' %} active{% endif %}"
-                           href="{% url 'discipline_summary' %}" title="Discipline">
+                           href="{% url 'discipline_summary' %}" title="View discipline summary and conduct records">
                             <span class="nav-icon">&#9888;</span><span class="nav-label">Discipline</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'finance_dashboard' %} active{% endif %}"
-                           href="{% url 'finance_dashboard' %}" title="Finance">
+                           href="{% url 'finance_dashboard' %}" title="Record fee payments and expenditures">
                             <span class="nav-icon">&#8355;</span><span class="nav-label">Finance</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'import_students' %} active{% endif %}"
-                           href="{% url 'import_students' %}" title="Import Students">
+                           href="{% url 'import_students' %}" title="Bulk-import students from an Excel file">
                             <span class="nav-icon">&#8678;</span><span class="nav-label">Import Students</span>
                         </a>
                     </li>
@@ -688,93 +717,93 @@
                     <li class="nav-section">Configuration</li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'settings' %} active{% endif %}"
-                           href="{% url 'settings' %}" title="Settings">
+                           href="{% url 'settings' %}" title="Open administration and settings">
                             <span class="nav-icon">&#9881;</span><span class="nav-label">Settings</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'school_profile' %} active{% endif %}"
-                           href="{% url 'school_profile' %}" title="School Profile">
+                           href="{% url 'school_profile' %}" title="Edit school name, letterhead, logo and seal">
                             <span class="nav-icon">&#127970;</span><span class="nav-label">School Profile</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'terms_manage' %} active{% endif %}"
-                           href="{% url 'terms_manage' %}" title="Academic Terms">
+                           href="{% url 'terms_manage' %}" title="Create terms and set the current one">
                             <span class="nav-icon">&#128197;</span><span class="nav-label">Academic Terms</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'classes_manage' %} active{% endif %}"
-                           href="{% url 'classes_manage' %}" title="Classes &amp; Streams">
+                           href="{% url 'classes_manage' %}" title="Add classes, streams and promotion marks">
                             <span class="nav-icon">&#127891;</span><span class="nav-label">Classes &amp; Streams</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'subjects_manage' %} active{% endif %}"
-                           href="{% url 'subjects_manage' %}" title="Subjects">
+                           href="{% url 'subjects_manage' %}" title="Manage the subject catalogue">
                             <span class="nav-icon">&#128221;</span><span class="nav-label">Subjects</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'class_subjects_all' %} active{% endif %}"
-                           href="{% url 'class_subjects_all' %}" title="Class Subjects &amp; Coefficients">
+                           href="{% url 'class_subjects_all' %}" title="Assign subjects to classes with coefficients">
                             <span class="nav-icon">&#10133;</span><span class="nav-label">Class Subjects &amp; Coefficients</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'competencies_manage' %} active{% endif %}"
-                           href="{% url 'competencies_manage' %}" title="Competencies">
+                           href="{% url 'competencies_manage' %}" title="Record competencies per subject, term and form level">
                             <span class="nav-icon">&#10004;</span><span class="nav-label">Competencies</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'users_manage' %} active{% endif %}"
-                           href="{% url 'users_manage' %}" title="Users &amp; Teacher Links">
+                           href="{% url 'users_manage' %}" title="Create staff accounts and link teachers">
                             <span class="nav-icon">&#128101;</span><span class="nav-label">Users &amp; Teacher Links</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'pta_config' %} active{% endif %}"
-                           href="{% url 'pta_config' %}" title="PTA Configuration">
+                           href="{% url 'pta_config' %}" title="Configure PTA rubrics, dues and fee types">
                             <span class="nav-icon">&#8355;</span><span class="nav-label">PTA Configuration</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'conduct_config' %} active{% endif %}"
-                           href="{% url 'conduct_config' %}" title="Conduct Thresholds">
+                           href="{% url 'conduct_config' %}" title="Set discipline levels for the class council">
                             <span class="nav-icon">&#9888;</span><span class="nav-label">Conduct Thresholds</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'school_data_transfer' %} active{% endif %}"
-                           href="{% url 'school_data_transfer' %}" title="Data Export &amp; Import">
+                           href="{% url 'school_data_transfer' %}" title="Export or restore school data">
                             <span class="nav-icon">&#128228;</span><span class="nav-label">Data Export / Import</span>
                         </a>
                     </li>
                     {% if user.is_superuser %}
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'activate' %} active{% endif %}"
-                           href="{% url 'activate' %}" title="Onboard a New School">
+                           href="{% url 'activate' %}" title="Activate a new school with a product key">
                             <span class="nav-icon">&#127979;</span><span class="nav-label">Onboard New School</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'backup_management' %} active{% endif %}"
-                           href="{% url 'backup_management' %}" title="Backup &amp; Restore">
+                           href="{% url 'backup_management' %}" title="Create or restore full system backups">
                             <span class="nav-icon">&#128190;</span><span class="nav-label">Backup &amp; Restore</span>
                         </a>
                     </li>
                     {% endif %}
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'license_info' %} active{% endif %}"
-                           href="{% url 'license_info' %}" title="License">
+                           href="{% url 'license_info' %}" title="View license status and details">
                             <span class="nav-icon">&#128196;</span><span class="nav-label">License</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'sms_configuration' %} active{% endif %}"
-                           href="{% url 'sms_configuration' %}" title="SMS">
+                           href="{% url 'sms_configuration' %}" title="Configure and send SMS notifications">
                             <span class="nav-icon">&#9993;</span><span class="nav-label">SMS</span>
                         </a>
                     </li>
@@ -783,19 +812,19 @@
                     <li class="nav-section">Finance</li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
-                           href="{% url 'dashboard' %}" title="Dashboard">
+                           href="{% url 'dashboard' %}" title="Go to your dashboard">
                             <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'finance_dashboard' %} active{% endif %}"
-                           href="{% url 'finance_dashboard' %}" title="Finance">
+                           href="{% url 'finance_dashboard' %}" title="Record fee payments and expenditures">
                             <span class="nav-icon">&#8355;</span><span class="nav-label">Finance</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'student_list' %} active{% endif %}"
-                           href="{% url 'student_list' %}" title="Students">
+                           href="{% url 'student_list' %}" title="View, search and manage student records">
                             <span class="nav-icon">&#9636;</span><span class="nav-label">Students</span>
                         </a>
                     </li>
@@ -804,37 +833,37 @@
                     <li class="nav-section">Class Management</li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
-                           href="{% url 'dashboard' %}" title="Dashboard">
+                           href="{% url 'dashboard' %}" title="Go to your dashboard">
                             <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
-                           href="{% url 'dashboard' %}#my-class" title="My Class">
+                           href="{% url 'dashboard' %}#my-class" title="View your class overview">
                             <span class="nav-icon">&#9635;</span><span class="nav-label">My Class</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'mark_entry_select' %} active{% endif %}"
-                           href="{% url 'mark_entry_select' %}" title="Mark Entry">
+                           href="{% url 'mark_entry_select' %}" title="Enter students' marks (competency scores)">
                             <span class="nav-icon">&#9998;</span><span class="nav-label">Mark Entry</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'attendance_entry' %} active{% endif %}"
-                           href="{% url 'attendance_entry' %}" title="Attendance">
+                           href="{% url 'attendance_entry' %}" title="Mark the daily attendance register">
                             <span class="nav-icon">&#9745;</span><span class="nav-label">Attendance</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'discipline_summary' %} active{% endif %}"
-                           href="{% url 'discipline_summary' %}" title="Discipline">
+                           href="{% url 'discipline_summary' %}" title="View discipline summary and conduct records">
                             <span class="nav-icon">&#9888;</span><span class="nav-label">Discipline</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'reports_hub' %} active{% endif %}"
-                           href="{% url 'reports_hub' %}" title="Reports">
+                           href="{% url 'reports_hub' %}" title="Generate report cards, mark sheets and summaries">
                             <span class="nav-icon">&#10047;</span><span class="nav-label">Reports</span>
                         </a>
                     </li>
@@ -843,13 +872,13 @@
                     <li class="nav-section">Teaching</li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'dashboard' %} active{% endif %}"
-                           href="{% url 'dashboard' %}" title="Dashboard">
+                           href="{% url 'dashboard' %}" title="Go to your dashboard">
                             <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
                         </a>
                     </li>
                     <li>
                         <a class="nav-link{% if request.resolver_match.url_name == 'mark_entry_select' %} active{% endif %}"
-                           href="{% url 'mark_entry_select' %}" title="Mark Entry">
+                           href="{% url 'mark_entry_select' %}" title="Enter students' marks (competency scores)">
                             <span class="nav-icon">&#9998;</span><span class="nav-label">Mark Entry</span>
                         </a>
                     </li>
@@ -857,7 +886,7 @@
                 {% else %}
                     <li class="nav-section">Menu</li>
                     <li>
-                        <a class="nav-link" href="{% url 'dashboard' %}" title="Dashboard">
+                        <a class="nav-link" href="{% url 'dashboard' %}" title="Go to your dashboard">
                             <span class="nav-icon">&#8962;</span><span class="nav-label">Dashboard</span>
                         </a>
                     </li>
@@ -907,6 +936,175 @@
     </footer>
 
     <script src="{% static 'vendor/alpinejs/alpine.min.js' %}" defer></script>
+    <script>
+        /* ------------------------------------------------------------------
+           1. Hint filler: every action button without an explicit hint gets
+              a "Click to <label>" one. Explicit hints always win.
+           2. Custom tooltip: instant, rendered near the cursor on every
+              element carrying a hint (title or data-tip). The native title
+              is parked into data-tip so the browser never shows its own
+              delayed tooltip next to ours.
+           3. Image previews: choosing a file on any image input shows a
+              thumbnail immediately, before saving.
+           ------------------------------------------------------------------ */
+        (function () {
+            /* --- 1. Hint filler ------------------------------------------ */
+            function enhance(root) {
+                var buttons = root.querySelectorAll(
+                    '.btn:not([data-tip]):not([title]),' +
+                    'button[type="submit"]:not([data-tip]):not([title])'
+                );
+                for (var i = 0; i < buttons.length; i++) {
+                    var el = buttons[i];
+                    if (el.disabled) continue;
+                    var label = (el.textContent || '')
+                        .replace(/\s+/g, ' ')
+                        .replace(/^[^A-Za-z]+/, '')
+                        .trim();
+                    if (!label) continue;
+                    el.setAttribute(
+                        'data-tip',
+                        'Click to ' +
+                            label.charAt(0).toLowerCase() +
+                            label.slice(1)
+                    );
+                }
+            }
+
+            /* --- 2. Custom tooltip --------------------------------------- */
+            var tip = null;
+            var current = null;
+
+            function ensureTip() {
+                if (tip) return;
+                tip = document.createElement('div');
+                tip.className = 'tip-box';
+                tip.setAttribute('role', 'tooltip');
+                document.body.appendChild(tip);
+            }
+
+            function parkTitle(el) {
+                var t = el.getAttribute('title');
+                if (t && !el.getAttribute('data-tip')) {
+                    el.setAttribute('data-tip', t.trim());
+                    el.setAttribute('aria-label', t.trim());
+                    el.removeAttribute('title');
+                }
+            }
+
+            function showTip(el) {
+                parkTitle(el);
+                var text = el.getAttribute('data-tip');
+                if (!text) return false;
+                ensureTip();
+                tip.textContent = text;
+                tip.classList.add('show');
+                return true;
+            }
+
+            function placeTip(x, y) {
+                var pad = 12;
+                var rect = tip.getBoundingClientRect();
+                var left = x + pad;
+                var top = y + pad;
+                if (left + rect.width > window.innerWidth - 8) {
+                    left = x - rect.width - pad;
+                }
+                if (top + rect.height > window.innerHeight - 8) {
+                    top = y - rect.height - pad;
+                }
+                tip.style.left = Math.max(8, left) + 'px';
+                tip.style.top = Math.max(8, top) + 'px';
+            }
+
+            function hideTip() {
+                if (tip) tip.classList.remove('show');
+                current = null;
+            }
+
+            function closestTipped(target) {
+                return target && target.closest
+                    ? target.closest('[title], [data-tip]')
+                    : null;
+            }
+
+            document.addEventListener('mouseover', function (e) {
+                var el = closestTipped(e.target);
+                if (el) {
+                    current = el;
+                    if (showTip(el)) placeTip(e.clientX, e.clientY);
+                } else if (current) {
+                    hideTip();
+                }
+            });
+
+            document.addEventListener('mousemove', function (e) {
+                if (!current) return;
+                var el = closestTipped(e.target);
+                if (el !== current) {
+                    hideTip();
+                    el = closestTipped(e.target);
+                    if (el) {
+                        current = el;
+                        if (showTip(el)) placeTip(e.clientX, e.clientY);
+                    }
+                    return;
+                }
+                placeTip(e.clientX, e.clientY);
+            });
+
+            document.addEventListener('mousedown', hideTip);
+
+            document.addEventListener('focusin', function (e) {
+                var el = closestTipped(e.target);
+                if (!el) return;
+                current = el;
+                if (showTip(el)) {
+                    var r = el.getBoundingClientRect();
+                    placeTip(r.left + r.width / 2, r.bottom);
+                }
+            });
+
+            document.addEventListener('focusout', hideTip);
+
+            /* --- 3. Live image previews ---------------------------------- */
+            document.addEventListener('change', function (e) {
+                var input = e.target;
+                if (
+                    !input ||
+                    input.tagName !== 'INPUT' ||
+                    input.type !== 'file' ||
+                    !/image/i.test(input.accept || '')
+                ) {
+                    return;
+                }
+                var file = input.files && input.files[0];
+                var holder = input._previewImg;
+                if (!file || (file.type && file.type.indexOf('image/') !== 0)) {
+                    if (holder) holder.remove();
+                    input._previewImg = null;
+                    return;
+                }
+                if (!holder || !holder.isConnected) {
+                    holder = document.createElement('img');
+                    holder.className = 'img-preview';
+                    holder.alt = 'Preview';
+                    input.insertAdjacentElement('afterend', holder);
+                    input._previewImg = holder;
+                }
+                holder.src = URL.createObjectURL(file);
+            });
+
+            /* --- boot ----------------------------------------------------- */
+            enhance(document);
+            document.addEventListener('DOMContentLoaded', function () {
+                enhance(document);
+            });
+            document.body.addEventListener('htmx:afterSwap', function (evt) {
+                enhance(evt.target);
+            });
+        })();
+    </script>
     {% block scripts %}{% endblock %}
 </body>
 </html>

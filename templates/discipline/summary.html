@@ -82,7 +82,7 @@
                     {% endfor %}
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Compute</button>
+            <button type="submit" class="btn btn-primary" title="Click to compute the discipline summary for the selected class and term">Compute</button>
         </form>
     </div>
 </div>
@@ -109,7 +109,7 @@
                             {% endif %}
                         </div>
                     {% endfor %}
-                    <button type="submit" class="btn btn-primary" style="width:100%;">Save Punishment</button>
+                    <button type="submit" class="btn btn-primary" style="width:100%;" title="Click to save the conduct decision and punishment for the selected student">Save Punishment</button>
                 </form>
             </div>
         </div>
@@ -117,7 +117,7 @@
         <div class="card">
             <div class="card-header">
                 <span>Conduct Thresholds</span>
-                <a href="{% url 'conduct_config' %}" class="btn btn-sm">Configure</a>
+                <a href="{% url 'conduct_config' %}" class="btn btn-sm" title="Click to set the conduct levels used by the class council">Configure</a>
             </div>
             <div class="card-body" style="padding-top:6px; padding-bottom:6px;">
                 {% if thresholds %}

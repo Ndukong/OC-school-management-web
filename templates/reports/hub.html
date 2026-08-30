@@ -49,9 +49,9 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a id="rc-preview" href="#" class="btn btn-sm" onclick="return openReport('rc')">Preview</a>
-                <a id="rc-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('rc','download')">Download</a>
-                <a id="rc-batch" href="#" class="btn btn-sm" onclick="return batchCards()">Batch (whole class)</a>
+                <a id="rc-preview" href="#" class="btn btn-sm" onclick="return openReport('rc')" title="Click to preview the report card in the browser before printing">Preview</a>
+                <a id="rc-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('rc','download')" title="Click to download the report card as a PDF file">Download</a>
+                <a id="rc-batch" href="#" class="btn btn-sm" onclick="return batchCards()" title="Click to generate report cards for every student in the selected class">Batch (whole class)</a>
             </div>
         </div>
     </div>
@@ -86,9 +86,9 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a id="ar-preview" href="#" class="btn btn-sm" onclick="return annualReport('preview')">Preview</a>
-                <a id="ar-download" href="#" class="btn btn-sm btn-primary" onclick="return annualReport('download')">Download</a>
-                <a id="ar-batch" href="#" class="btn btn-sm" onclick="return annualReportBatch()">Batch (whole class)</a>
+                <a id="ar-preview" href="#" class="btn btn-sm" onclick="return annualReport('preview')" title="Click to preview the annual report card in the browser">Preview</a>
+                <a id="ar-download" href="#" class="btn btn-sm btn-primary" onclick="return annualReport('download')" title="Click to download the annual report card as a PDF file">Download</a>
+                <a id="ar-batch" href="#" class="btn btn-sm" onclick="return annualReportBatch()" title="Click to generate annual report cards for the whole class">Batch (whole class)</a>
             </div>
         </div>
     </div>
@@ -123,11 +123,11 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a id="ms-preview" href="#" class="btn btn-sm" onclick="return openReport('ms')">Preview (Term)</a>
-                <a id="ms-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('ms','download')">Download (Term)</a>
-                <a id="ms-excel" href="#" class="btn btn-sm" onclick="return openReport('ms','excel')">Excel (Term)</a>
-                <a id="ams-preview" href="#" class="btn btn-sm" onclick="return openAnnualMarkSheet('preview')">Preview (Annual)</a>
-                <a id="ams-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualMarkSheet('download')">Download (Annual)</a>
+                <a id="ms-preview" href="#" class="btn btn-sm" onclick="return openReport('ms')" title="Click to preview the term mark sheet in the browser">Preview (Term)</a>
+                <a id="ms-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('ms','download')" title="Click to download the term mark sheet as a PDF file">Download (Term)</a>
+                <a id="ms-excel" href="#" class="btn btn-sm" onclick="return openReport('ms','excel')" title="Click to export the term mark sheet to Excel">Excel (Term)</a>
+                <a id="ams-preview" href="#" class="btn btn-sm" onclick="return openAnnualMarkSheet('preview')" title="Click to preview the annual mark sheet in the browser">Preview (Annual)</a>
+                <a id="ams-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualMarkSheet('download')" title="Click to download the annual mark sheet as a PDF file">Download (Annual)</a>
             </div>
         </div>
     </div>
@@ -147,8 +147,8 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a href="#" class="btn btn-sm" onclick="return openIdCards('preview')">Preview</a>
-                <a href="#" class="btn btn-sm btn-primary" onclick="return openIdCards('download')">Download HTML</a>
+                <a href="#" class="btn btn-sm" onclick="return openIdCards('preview')" title="Click to preview the selected ID cards (choose 1&ndash;4 students first)">Preview</a>
+                <a href="#" class="btn btn-sm btn-primary" onclick="return openIdCards('download')" title="Click to download the selected ID cards as a printable HTML booklet">Download HTML</a>
             </div>
             <p class="text-muted" style="font-size:12px; margin:10px 0 0;">Select 1&ndash;4 students. Fewer than 4 are replicated to fill the booklet.</p>
         </div>
@@ -177,11 +177,11 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a id="rs-preview" href="#" class="btn btn-sm" onclick="return openReport('rs')">Preview (Term)</a>
-                <a id="rs-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('rs','download')">Download (Term)</a>
-                <a id="rs-excel" href="#" class="btn btn-sm" onclick="return openReport('rs','excel')">Excel (Term)</a>
-                <a id="ars-preview" href="#" class="btn btn-sm" onclick="return openAnnualResultsSummary('preview')">Preview (Annual)</a>
-                <a id="ars-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualResultsSummary('download')">Download (Annual)</a>
+                <a id="rs-preview" href="#" class="btn btn-sm" onclick="return openReport('rs')" title="Click to preview the term results summary in the browser">Preview (Term)</a>
+                <a id="rs-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('rs','download')" title="Click to download the term results summary as a PDF file">Download (Term)</a>
+                <a id="rs-excel" href="#" class="btn btn-sm" onclick="return openReport('rs','excel')" title="Click to export the term results summary to Excel">Excel (Term)</a>
+                <a id="ars-preview" href="#" class="btn btn-sm" onclick="return openAnnualResultsSummary('preview')" title="Click to preview the annual results summary in the browser">Preview (Annual)</a>
+                <a id="ars-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualResultsSummary('download')" title="Click to download the annual results summary as a PDF file">Download (Annual)</a>
             </div>
         </div>
     </div>
@@ -209,10 +209,10 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a id="cc-preview" href="#" class="btn btn-sm" onclick="return openReport('cc')">Preview (Term)</a>
-                <a id="cc-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('cc','download')">Download PDF (Term)</a>
-                <a id="acc-preview" href="#" class="btn btn-sm" onclick="return openAnnualClassCouncil('preview')">Preview (Annual)</a>
-                <a id="acc-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualClassCouncil('download')">Download PDF (Annual)</a>
+                <a id="cc-preview" href="#" class="btn btn-sm" onclick="return openReport('cc')" title="Click to preview the term class council report in the browser">Preview (Term)</a>
+                <a id="cc-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('cc','download')" title="Click to download the term class council report as a PDF file">Download PDF (Term)</a>
+                <a id="acc-preview" href="#" class="btn btn-sm" onclick="return openAnnualClassCouncil('preview')" title="Click to preview the annual class council report in the browser">Preview (Annual)</a>
+                <a id="acc-download" href="#" class="btn btn-sm btn-primary" onclick="return openAnnualClassCouncil('download')" title="Click to download the annual class council report as a PDF file">Download PDF (Annual)</a>
             </div>
             <p class="text-muted" style="font-size:12px; margin:10px 0 0;">
                 <a href="{% url 'class_council_motifs' %}">Manage withheld-class remarks (motifs)</a>
@@ -236,9 +236,9 @@
                 </div>
             </div>
             <div class="btn-group-x">
-                <a id="pf-preview" href="#" class="btn btn-sm" onclick="return openReport('pf')">Preview</a>
-                <a id="pf-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('pf','download')">Download PDF</a>
-                <a id="pf-excel" href="#" class="btn btn-sm" onclick="return openReport('pf','excel')">Excel</a>
+                <a id="pf-preview" href="#" class="btn btn-sm" onclick="return openReport('pf')" title="Click to preview the PTA financial report in the browser">Preview</a>
+                <a id="pf-download" href="#" class="btn btn-sm btn-primary" onclick="return openReport('pf','download')" title="Click to download the PTA financial report as a PDF file">Download PDF</a>
+                <a id="pf-excel" href="#" class="btn btn-sm" onclick="return openReport('pf','excel')" title="Click to export the PTA financial report to Excel">Excel</a>
             </div>
         </div>
     </div>
@@ -265,7 +265,7 @@
                     </select>
                 </div>
             </div>
-            <a id="at-excel" href="#" class="btn btn-sm btn-primary" onclick="return openReport('at','excel')">Export Excel</a>
+            <a id="at-excel" href="#" class="btn btn-sm btn-primary" onclick="return openReport('at','excel')" title="Click to export the attendance register for the selected class and term to Excel">Export Excel</a>
         </div>
     </div>
 
@@ -275,7 +275,7 @@
             <span class="title">&#128100; Students Export</span>
         </div>
         <div class="report-card-body">
-            <a href="{% url 'student_export_excel' %}" class="btn btn-sm btn-primary">Export Excel</a>
+            <a href="{% url 'student_export_excel' %}" class="btn btn-sm btn-primary" title="Click to export the filtered student list to an Excel file">Export Excel</a>
         </div>
     </div>
 

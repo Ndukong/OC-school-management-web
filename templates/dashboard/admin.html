@@ -23,11 +23,11 @@
 <div class="card">
     <div class="card-header">Quick Actions</div>
     <div class="card-body" style="display:flex; flex-wrap:wrap; gap:10px;">
-        <a href="{% url 'mark_entry_select' %}" class="btn btn-primary">Mark Entry</a>
-        <a href="{% url 'compute_results' %}" class="btn">Compute Results</a>
-        <a href="{% url 'import_students' %}" class="btn">Import Students</a>
-        <a href="{% url 'finance_dashboard' %}" class="btn">Finance</a>
-        <a href="{% url 'attendance_entry' %}" class="btn">Attendance</a>
+        <a href="{% url 'mark_entry_select' %}" class="btn btn-primary" title="Click to enter or edit students' marks (competency scores)">Mark Entry</a>
+        <a href="{% url 'compute_results' %}" class="btn" title="Click to recalculate averages, ranks and promotion decisions for a term">Compute Results</a>
+        <a href="{% url 'import_students' %}" class="btn" title="Click to bulk-import students from an Excel (.xlsx) file">Import Students</a>
+        <a href="{% url 'finance_dashboard' %}" class="btn" title="Click to open the finance module (fee payments and expenditures)">Finance</a>
+        <a href="{% url 'attendance_entry' %}" class="btn" title="Click to mark the daily attendance register for a class">Attendance</a>
     </div>
 </div>
 {% endblock %}

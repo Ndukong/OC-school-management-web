@@ -79,8 +79,8 @@
                     </span>
                 </div>
                 <div class="class-actions">
-                    <a href="{% url 'mark_entry_select' %}" class="btn btn-sm btn-primary">Marks</a>
-                    <a href="{% url 'attendance_entry' %}?class_id={{ cls.id }}" class="btn btn-sm">Attendance</a>
+                    <a href="{% url 'mark_entry_select' %}" class="btn btn-sm btn-primary" title="Click to enter competency marks for {{ cls }}">Marks</a>
+                    <a href="{% url 'attendance_entry' %}?class_id={{ cls.id }}" class="btn btn-sm" title="Click to mark today's attendance for {{ cls }}">Attendance</a>
                 </div>
             </div>
             {% endwith %}
@@ -95,19 +95,19 @@
     <div class="card-header">Quick Actions</div>
     <div class="card-body">
         <div class="quick-actions">
-            <a href="{% url 'mark_entry_select' %}" class="quick-action">
+            <a href="{% url 'mark_entry_select' %}" class="quick-action" title="Click to enter students' marks per subject and class">
                 <span class="qa-title">Mark Entry</span>
                 <span class="qa-sub">Enter scores per subject</span>
             </a>
-            <a href="{% url 'attendance_entry' %}" class="quick-action">
+            <a href="{% url 'attendance_entry' %}" class="quick-action" title="Click to open the daily class register">
                 <span class="qa-title">Attendance</span>
                 <span class="qa-sub">Daily class register</span>
             </a>
-            <a href="{% url 'discipline_summary' %}" class="quick-action">
+            <a href="{% url 'discipline_summary' %}" class="quick-action" title="Click to view the discipline summary and punishments">
                 <span class="qa-title">Discipline</span>
                 <span class="qa-sub">Summary &amp; punishments</span>
             </a>
-            <a href="{% url 'reports_hub' %}" class="quick-action">
+            <a href="{% url 'reports_hub' %}" class="quick-action" title="Click to generate term and annual reports">
                 <span class="qa-title">Reports</span>
                 <span class="qa-sub">Term &amp; annual reports</span>
             </a>

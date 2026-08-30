@@ -296,5 +296,8 @@ urlpatterns = [
     ),
 ]
 
-if settings.DEBUG:
+# Uploaded media (photos, logos, seals, signatures) must be served even when
+# DEBUG is false: the offline LAN deployment and the pre-R2 Railway setup both
+# rely on local file storage, and without this every /media/ URL 404s.
+if not settings.USE_S3:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

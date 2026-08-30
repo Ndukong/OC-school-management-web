@@ -16,7 +16,7 @@
         <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(260px,1fr)); gap:16px; padding:24px;">
 
             {% for item in config_cards %}
-            <a href="{{ item.url }}" style="text-decoration:none; color:inherit;">
+            <a href="{{ item.url }}" style="text-decoration:none; color:inherit;" title="Click to configure {{ item.title|lower }} — {{ item.desc }}">
                 <div style="border:1px solid var(--border); border-radius:var(--radius); padding:18px; background:var(--card-bg); transition:box-shadow .15s ease, transform .15s ease;">
                     <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:8px;">
                         <span style="font-size:24px;">{{ item.icon }}</span>
@@ -36,15 +36,15 @@
     <div class="card-header"><span>Quick Setup Checklist</span></div>
     <div class="card-body">
         <ol style="margin:0; padding-left:20px; line-height:2;">
-            <li><a href="{% url 'school_profile' %}">School profile</a> — name, matricule, contact, bilingual letterhead, logo &amp; seal.</li>
-            <li><a href="{% url 'terms_manage' %}">Academic terms</a> — create the year&rsquo;s terms and mark one current.</li>
-            <li><a href="{% url 'classes_manage' %}">Classes &amp; streams</a> — add Form 1&ndash;6 and streams (A, B, Commercial&hellip;).</li>
-            <li><a href="{% url 'subjects_manage' %}">Subjects</a> — add the subject catalogue, then assign <a href="{% url 'subjects_manage' %}">coefficients per class</a>.</li>
-            <li><a href="{% url 'competencies_manage' %}">Competencies</a> — record subject competencies per term &amp; form level.</li>
-            <li><a href="{% url 'teacher_list' %}">Teachers</a> — add staff, then link users &amp; assign subjects.</li>
-            <li><a href="{% url 'users_manage' %}">Users</a> — create accounts for staff and link them to teacher records.</li>
-            <li><a href="{% url 'pta_config' %}">PTA configuration</a> — rubric heads, sub-heads, per-class dues and fee types.</li>
-            <li><a href="{% url 'conduct_config' %}">Conduct thresholds</a> — set discipline levels for the class council.</li>
+            <li><a href="{% url 'school_profile' %}" title="Click to edit the school profile">School profile</a> — name, matricule, contact, bilingual letterhead, logo &amp; seal.</li>
+            <li><a href="{% url 'terms_manage' %}" title="Click to create or edit academic terms">Academic terms</a> — create the year&rsquo;s terms and mark one current.</li>
+            <li><a href="{% url 'classes_manage' %}" title="Click to add classes and streams">Classes &amp; streams</a> — add Form 1&ndash;6 and streams (A, B, Commercial&hellip;).</li>
+            <li><a href="{% url 'subjects_manage' %}" title="Click to manage the subject catalogue">Subjects</a> — add the subject catalogue, then assign <a href="{% url 'subjects_manage' %}" title="Click to assign coefficients per class">coefficients per class</a>.</li>
+            <li><a href="{% url 'competencies_manage' %}" title="Click to record subject competencies">Competencies</a> — record subject competencies per term &amp; form level.</li>
+            <li><a href="{% url 'teacher_list' %}" title="Click to add or edit teachers">Teachers</a> — add staff, then link users &amp; assign subjects.</li>
+            <li><a href="{% url 'users_manage' %}" title="Click to create staff accounts">Users</a> — create accounts for staff and link them to teacher records.</li>
+            <li><a href="{% url 'pta_config' %}" title="Click to configure PTA dues and fee types">PTA configuration</a> — rubric heads, sub-heads, per-class dues and fee types.</li>
+            <li><a href="{% url 'conduct_config' %}" title="Click to set conduct thresholds">Conduct thresholds</a> — set discipline levels for the class council.</li>
             <li>Done &rarr; import students, enter marks, compute results and generate reports.</li>
         </ol>
     </div>
