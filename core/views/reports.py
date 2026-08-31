@@ -43,8 +43,6 @@ def reports_hub(request):
         messages.error(request, "No school linked to your account.")
         return render(request, "reports/hub.html", {"school": None})
 
-    from datetime import date
-
     from core.models import Subject, Teacher
 
     classes = SchoolClass.objects.filter(school=school).order_by("sort_order")
@@ -59,8 +57,15 @@ def reports_hub(request):
     )
     subjects = Subject.objects.filter(school=school).order_by("sort_order")
 
-    current_year = date.today().year
-    years = list(range(current_year - 1, current_year + 3))
+    # Only offer year ranges that actually have academic terms; a year with
+    # no terms produces empty annual cards and "no report cards" errors.
+    years = [
+        row["year_start"]
+        for row in AcademicTerm.objects.filter(school=school)
+        .values("year_start")
+        .distinct()
+        .order_by("-year_start")
+    ]
 
     return render(
         request,
@@ -107,7 +112,11 @@ def batch_report_cards(request, class_id: int, term_id: int):
             errors.append(f"{student.full_name}: {exc}")
 
     if not pdf_blobs:
-        detail = "; ".join(errors[:3]) if errors else "No students with results in this class/term."
+        detail = (
+            "; ".join(errors[:3])
+            if errors
+            else "No students with results in this class/term."
+        )
         return HttpResponse(
             f"No report cards could be generated. {detail}",
             status=500,
@@ -134,9 +143,7 @@ def class_council_view(request, term_id: int):
     if request.GET.get("format") == "pdf":
         pdf = report.render_pdf(request.build_absolute_uri("/"))
         response = HttpResponse(pdf, content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f'attachment; filename="{report.filename()}"'
-        )
+        response["Content-Disposition"] = f'attachment; filename="{report.filename()}"'
         return response
 
     html = report.render_html()
@@ -157,9 +164,7 @@ def annual_class_council_view(request, year_start: int, year_end: int):
     if request.GET.get("format") == "pdf":
         pdf = report.render_pdf(request.build_absolute_uri("/"))
         response = HttpResponse(pdf, content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f'attachment; filename="{report.filename()}"'
-        )
+        response["Content-Disposition"] = f'attachment; filename="{report.filename()}"'
         return response
 
     html = report.render_html()
@@ -281,16 +286,13 @@ def pta_financial_view(request, term_id: int):
     if request.GET.get("format") == "pdf":
         pdf = report.render_pdf(request.build_absolute_uri("/"))
         response = HttpResponse(pdf, content_type="application/pdf")
-        response["Content-Disposition"] = (
-            f'attachment; filename="{report.filename()}"'
-        )
+        response["Content-Disposition"] = f'attachment; filename="{report.filename()}"'
         return response
 
     html = report.render_html()
     response = HttpResponse(html)
     response["Content-Disposition"] = "inline"
     return response
-
 
 
 @role_required("admin")
@@ -309,6 +311,13 @@ def download_term_report(request, student_id: int, term_id: int):
 def download_annual_report(request, student_id: int, year_start: int, year_end: int):
     school = get_school_for_user(request.user)
     student = get_object_or_404(Student, pk=student_id, school=school)
+    if not AcademicTerm.objects.filter(
+        school=school, year_start=year_start, year_end=year_end
+    ).exists():
+        return HttpResponse(
+            f"No academic terms found for {year_start}/{year_end}.",
+            status=400,
+        )
     report = AnnualReportCard(student, year_start, year_end, school)
     pdf = report.render_pdf(request.build_absolute_uri("/"))
     response = HttpResponse(pdf, content_type="application/pdf")
@@ -330,15 +339,20 @@ def preview_term_report(request, student_id: int, term_id: int):
 def preview_annual_report(request, student_id: int, year_start: int, year_end: int):
     school = get_school_for_user(request.user)
     student = get_object_or_404(Student, pk=student_id, school=school)
+    if not AcademicTerm.objects.filter(
+        school=school, year_start=year_start, year_end=year_end
+    ).exists():
+        return HttpResponse(
+            f"No academic terms found for {year_start}/{year_end}.",
+            status=400,
+        )
     report = AnnualReportCard(student, year_start, year_end, school)
     html = report.render_html()
     return HttpResponse(html)
 
 
 @role_required("admin")
-def batch_annual_report_cards(
-    request, class_id: int, year_start: int, year_end: int
-):
+def batch_annual_report_cards(request, class_id: int, year_start: int, year_end: int):
     import logging
 
     logger = logging.getLogger(__name__)
@@ -348,6 +362,13 @@ def batch_annual_report_cards(
     terms = AcademicTerm.objects.filter(
         school=school, year_start=year_start, year_end=year_end
     ).order_by("term_number")
+    if not terms:
+        return HttpResponse(
+            f"No academic terms found for {year_start}/{year_end}. "
+            "Create the terms first (Settings > Academic Terms).",
+            status=400,
+            content_type="text/plain",
+        )
 
     students = list(
         Student.objects.filter(
@@ -368,7 +389,11 @@ def batch_annual_report_cards(
             errors.append(f"{student.full_name}: {exc}")
 
     if not pdf_blobs:
-        detail = "; ".join(errors[:3]) if errors else "No students with results in this class/year."
+        detail = (
+            "; ".join(errors[:3])
+            if errors
+            else "No students with results in this class/year."
+        )
         return HttpResponse(
             f"No report cards could be generated. {detail}",
             status=500,
