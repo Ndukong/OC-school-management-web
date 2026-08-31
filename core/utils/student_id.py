@@ -27,11 +27,16 @@ def distribute_to_four(students: list[Student]) -> list[Student]:
 def render_single_id_page(page_num: int, student: Student, school, context: dict = None) -> str:
     if context is None:
         context = {}
+    today = context.get("today", date.today())
+    # Cards expire on the next 10th of September after issue (school years
+    # begin around that date).
+    expiry_year = today.year if today < date(today.year, 9, 10) else today.year + 1
     ctx = {
         "school": school,
         "student": student,
         "page_num": page_num,
-        "today": context.get("today", date.today()),
+        "today": today,
+        "expires_on": date(expiry_year, 9, 10),
         "academic_year": context.get("academic_year", "2025/2026"),
     }
     return render_to_string("reports/student_id_page.html", ctx)
