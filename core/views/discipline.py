@@ -1,3 +1,4 @@
+import json
 from datetime import date as date_cls
 
 from django.contrib import messages
@@ -109,7 +110,9 @@ def attendance_entry(request):
         saved_count = 0
         for period in periods:
             posted = {
-                student.pk: request.POST.get(f"status_{student.pk}_{period}", "").strip()
+                student.pk: request.POST.get(
+                    f"status_{student.pk}_{period}", ""
+                ).strip()
                 for student in students
             }
             marks = {
@@ -263,9 +266,7 @@ def save_attendance_cell(request):
         school_class = SchoolClass.objects.get(
             pk=request.POST.get("class_id"), school=school
         )
-        student = Student.objects.get(
-            pk=request.POST.get("student_id"), school=school
-        )
+        student = Student.objects.get(pk=request.POST.get("student_id"), school=school)
         period = int(request.POST.get("period", ""))
         selected_date = _parse_date(request.POST.get("date"))
     except (SchoolClass.DoesNotExist, Student.DoesNotExist, TypeError, ValueError):
@@ -302,6 +303,114 @@ def save_attendance_cell(request):
 
 
 @login_required
+def save_attendance_batch(request):
+    """Bulk-set one status for many (student, period) pairs in one request.
+
+    Powers "Mark All Present" — a single round trip instead of one request
+    per cell, which raced on SQLite write locks and left random gaps.
+    """
+    if request.method != "POST":
+        return JsonResponse({"error": "Method not allowed"}, status=405)
+
+    school = get_school_for_user(request.user)
+    if not school:
+        return JsonResponse({"error": "No school linked"}, status=403)
+
+    try:
+        payload = json.loads(request.body or "{}")
+    except json.JSONDecodeError:
+        return JsonResponse({"error": "Invalid payload."}, status=400)
+
+    try:
+        school_class = SchoolClass.objects.get(
+            pk=payload.get("class_id"), school=school
+        )
+        selected_date = _parse_date(payload.get("date"))
+    except SchoolClass.DoesNotExist:
+        return JsonResponse({"error": "Invalid class."}, status=400)
+
+    if selected_date is None:
+        return JsonResponse({"error": "Invalid date."}, status=400)
+    if not can_manage_class(request.user, school_class):
+        return JsonResponse({"error": "Not authorized for this class."}, status=403)
+
+    status = str(payload.get("status", "")).strip().upper()
+    if status not in VALID_STATUSES:
+        return JsonResponse({"error": "Invalid status."}, status=400)
+
+    try:
+        pairs = [
+            (int(student_id), int(period))
+            for student_id, period in (payload.get("targets") or [])
+        ]
+    except (TypeError, ValueError):
+        return JsonResponse({"error": "Invalid targets."}, status=400)
+
+    pairs = [
+        (student_id, period)
+        for student_id, period in pairs
+        if 1 <= period <= school.periods_per_day
+    ]
+    student_ids = {student_id for student_id, _ in pairs}
+    valid_students = set(
+        Student.objects.filter(pk__in=student_ids, school=school).values_list(
+            "pk", flat=True
+        )
+    )
+    pairs = [
+        (student_id, period)
+        for student_id, period in pairs
+        if student_id in valid_students
+    ]
+
+    if pairs:
+        registers = {}
+        for period in {period for _, period in pairs}:
+            register, _ = AttendanceRegister.objects.get_or_create(
+                school_class=school_class, date=selected_date, period=period
+            )
+            registers[period] = register
+
+        existing = {
+            (record.register_id, record.student_id): record
+            for record in AttendanceRecord.objects.filter(
+                register__in=registers.values(),
+                student_id__in=student_ids,
+            )
+        }
+        to_create = []
+        to_update = []
+        for student_id, period in pairs:
+            register = registers[period]
+            record = existing.get((register.pk, student_id))
+            if record:
+                record.status = status
+                to_update.append(record)
+            else:
+                to_create.append(
+                    AttendanceRecord(
+                        register=register, student_id=student_id, status=status
+                    )
+                )
+        if to_create:
+            AttendanceRecord.objects.bulk_create(to_create)
+        if to_update:
+            AttendanceRecord.objects.bulk_update(to_update, ["status"])
+
+    day_registers = AttendanceRegister.objects.filter(
+        school_class=school_class, date=selected_date
+    )
+    day_statuses = AttendanceRecord.objects.filter(
+        register__in=day_registers
+    ).values_list("status", flat=True)
+    summary = _day_summary(day_statuses)
+
+    return JsonResponse(
+        {"saved": True, "status": status, "count": len(pairs), "summary": summary}
+    )
+
+
+@login_required
 def conduct_config(request):
     """Configure conduct thresholds for the school."""
     school = get_school_for_user(request.user)
@@ -318,11 +427,20 @@ def conduct_config(request):
             threshold, _ = ConductThreshold.objects.get_or_create(
                 school=school, conduct_type=conduct_type
             )
-            threshold.min_unjustified_abs = int(request.POST.get(f"min_ua_{conduct_type}", 0) or 0)
-            threshold.min_justified_abs = int(request.POST.get(f"min_ja_{conduct_type}", 0) or 0)
-            threshold.min_lateness = int(request.POST.get(f"min_lat_{conduct_type}", 0) or 0)
+            threshold.min_unjustified_abs = int(
+                request.POST.get(f"min_ua_{conduct_type}", 0) or 0
+            )
+            threshold.min_justified_abs = int(
+                request.POST.get(f"min_ja_{conduct_type}", 0) or 0
+            )
+            threshold.min_lateness = int(
+                request.POST.get(f"min_lat_{conduct_type}", 0) or 0
+            )
             from decimal import Decimal
-            threshold.min_punishment_hours = Decimal(request.POST.get(f"min_ph_{conduct_type}", 0) or 0)
+
+            threshold.min_punishment_hours = Decimal(
+                request.POST.get(f"min_ph_{conduct_type}", 0) or 0
+            )
             threshold.save()
         messages.success(request, "Conduct thresholds updated.")
         return redirect("conduct_config")
@@ -339,4 +457,6 @@ def conduct_config(request):
     ]
     for ct in conduct_types:
         ct["threshold"] = thresholds.get(ct["value"])
-    return render(request, "discipline/conduct_config.html", {"conduct_types": conduct_types})
+    return render(
+        request, "discipline/conduct_config.html", {"conduct_types": conduct_types}
+    )

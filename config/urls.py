@@ -37,6 +37,7 @@ from core.views.discipline import (
     attendance_entry,
     conduct_config,
     discipline_summary_view,
+    save_attendance_batch,
     save_attendance_cell,
 )
 from core.views.exports import (
@@ -134,29 +135,55 @@ urlpatterns = [
     path("settings/classes/", classes_manage, name="classes_manage"),
     path("settings/subjects/", subjects_manage, name="subjects_manage"),
     path("settings/subjects/classes/", class_subjects_index, name="class_subjects_all"),
-    path("settings/classes/<int:class_id>/subjects/", class_subjects_manage, name="class_subjects_manage"),
+    path(
+        "settings/classes/<int:class_id>/subjects/",
+        class_subjects_manage,
+        name="class_subjects_manage",
+    ),
     path("settings/competencies/", competencies_manage, name="competencies_manage"),
     path("settings/users/", users_manage, name="users_manage"),
     path("settings/pta-config/", pta_config, name="pta_config"),
     # Backup & License
     path("settings/backup/", backup_management, name="backup_management"),
-    path("settings/backup/<int:backup_id>/download/", download_backup, name="download_backup"),
+    path(
+        "settings/backup/<int:backup_id>/download/",
+        download_backup,
+        name="download_backup",
+    ),
     path("settings/license/", license_info, name="license_info"),
-    path("settings/license/generate/", generate_license_key, name="generate_license_key"),
-    path("settings/license/offline-check/", offline_license_check, name="offline_license_check"),
+    path(
+        "settings/license/generate/", generate_license_key, name="generate_license_key"
+    ),
+    path(
+        "settings/license/offline-check/",
+        offline_license_check,
+        name="offline_license_check",
+    ),
     # Per-school data transfer
     path("settings/data-transfer/", school_data_transfer, name="school_data_transfer"),
-    path("settings/data-transfer/export/", school_data_export, name="school_data_export"),
-    path("settings/data-transfer/import/", school_data_import, name="school_data_import"),
+    path(
+        "settings/data-transfer/export/", school_data_export, name="school_data_export"
+    ),
+    path(
+        "settings/data-transfer/import/", school_data_import, name="school_data_import"
+    ),
     # SMS
     path("settings/sms/", sms_configuration, name="sms_configuration"),
     path("settings/sms/history/", sms_history, name="sms_history"),
     path("settings/sms/<int:sms_id>/cancel/", sms_cancel, name="sms_cancel"),
     # Notifications
     path("notifications/", notifications_list, name="notifications_list"),
-    path("notifications/<int:notification_id>/read/", mark_notification_read, name="mark_notification_read"),
+    path(
+        "notifications/<int:notification_id>/read/",
+        mark_notification_read,
+        name="mark_notification_read",
+    ),
     path("notifications/read-all/", mark_all_read, name="mark_all_read"),
-    path("api/notifications/unread-count/", notifications_unread_count, name="notifications_unread_count"),
+    path(
+        "api/notifications/unread-count/",
+        notifications_unread_count,
+        name="notifications_unread_count",
+    ),
     # Mark Entry Engine
     path("marks/", mark_entry_select, name="mark_entry_select"),
     path("marks/save-cell/", save_score_cell, name="save_score_cell"),
@@ -269,17 +296,32 @@ urlpatterns = [
         export_marks_excel,
         name="export_marks_excel",
     ),
-    path("exports/finance/<int:term_id>/", export_finance_excel, name="export_finance_excel"),
+    path(
+        "exports/finance/<int:term_id>/",
+        export_finance_excel,
+        name="export_finance_excel",
+    ),
     path(
         "exports/attendance/<int:class_id>/<int:term_id>/",
         export_attendance_excel,
         name="export_attendance_excel",
     ),
-    path("exports/results/<int:term_id>/", export_results_excel, name="export_results_excel"),
+    path(
+        "exports/results/<int:term_id>/",
+        export_results_excel,
+        name="export_results_excel",
+    ),
     path("results/compute/", compute_results, name="compute_results"),
     path("finance/", finance_dashboard, name="finance_dashboard"),
     path("discipline/attendance/", attendance_entry, name="attendance_entry"),
-    path("discipline/attendance/save/", save_attendance_cell, name="save_attendance_cell"),
+    path(
+        "discipline/attendance/save/", save_attendance_cell, name="save_attendance_cell"
+    ),
+    path(
+        "discipline/attendance/save-batch/",
+        save_attendance_batch,
+        name="save_attendance_batch",
+    ),
     path("discipline/summary/", discipline_summary_view, name="discipline_summary"),
     path("discipline/conduct-config/", conduct_config, name="conduct_config"),
     # API

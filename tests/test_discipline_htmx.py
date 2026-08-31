@@ -52,7 +52,14 @@ def data():
     )
     user = User.objects.create_user(username="admin", password="pass")
     UserProfile.objects.create(user=user, school=school, role="admin")
-    return {"school": school, "klass": klass, "term": term, "student": student, "user": user, "subject": subject}
+    return {
+        "school": school,
+        "klass": klass,
+        "term": term,
+        "student": student,
+        "user": user,
+        "subject": subject,
+    }
 
 
 @pytest.mark.django_db
@@ -87,12 +94,15 @@ class TestNewFeatures:
         assert payload["status"] == "P"
         assert payload["summary"]["total"] == 1
         assert payload["summary"]["present"] == 1
-        assert AttendanceRecord.objects.get(
-            register__school_class=data["klass"],
-            register__date=date(2026, 3, 10),
-            register__period=1,
-            student=data["student"],
-        ).status == "P"
+        assert (
+            AttendanceRecord.objects.get(
+                register__school_class=data["klass"],
+                register__date=date(2026, 3, 10),
+                register__period=1,
+                student=data["student"],
+            ).status
+            == "P"
+        )
 
         r = c.post(
             reverse("save_attendance_cell"),
@@ -117,12 +127,15 @@ class TestNewFeatures:
             },
         )
         assert json.loads(r.content)["status"] == ""
-        assert AttendanceRecord.objects.filter(
-            register__school_class=data["klass"],
-            register__date=date(2026, 3, 10),
-            register__period=1,
-            student=data["student"],
-        ).count() == 0
+        assert (
+            AttendanceRecord.objects.filter(
+                register__school_class=data["klass"],
+                register__date=date(2026, 3, 10),
+                register__period=1,
+                student=data["student"],
+            ).count()
+            == 0
+        )
 
     def test_conduct_config_get_post(self, data):
         c = Client()
@@ -174,7 +187,10 @@ class TestNewFeatures:
             expires_at=date.today() + timedelta(days=30),
         )
         teacher = Teacher.objects.create(
-            school=data["school"], first_name="Jane", last_name="Doe", teacher_code="CM9"
+            school=data["school"],
+            first_name="Jane",
+            last_name="Doe",
+            teacher_code="CM9",
         )
         TeacherAssignment.objects.create(
             teacher=teacher,
@@ -192,3 +208,95 @@ class TestNewFeatures:
         assert "Pending Discipline" in body
         assert reverse("mark_entry_select") in body
         assert reverse("attendance_entry") in body
+
+
+@pytest.mark.django_db
+class TestAttendanceBatch:
+    def _post(self, c, data, status="P", targets=None, extra=None):
+        payload = {
+            "class_id": data["klass"].id,
+            "date": "2026-03-10",
+            "status": status,
+            "targets": targets or [[data["student"].id, p] for p in (1, 2, 3)],
+        }
+        if extra:
+            payload.update(extra)
+        return c.post(
+            reverse("save_attendance_batch"),
+            json.dumps(payload),
+            content_type="application/json",
+        )
+
+    def test_batch_creates_all_records_in_one_request(self, data):
+        c = Client()
+        c.login(username="admin", password="pass")
+
+        r = self._post(c, data)
+
+        assert r.status_code == 200
+        payload = json.loads(r.content)
+        assert payload["saved"] is True
+        assert payload["count"] == 3
+        assert payload["status"] == "P"
+        assert payload["summary"]["present"] == 3
+        records = AttendanceRecord.objects.filter(
+            register__school_class=data["klass"],
+            register__date=date(2026, 3, 10),
+            student=data["student"],
+        )
+        assert records.count() == 3
+        assert {rec.register.period for rec in records} == {1, 2, 3}
+        assert {rec.status for rec in records} == {"P"}
+
+    def test_batch_updates_existing_without_duplicates(self, data):
+        c = Client()
+        c.login(username="admin", password="pass")
+
+        r = self._post(c, data, status="A")
+
+        assert r.status_code == 200
+        records = AttendanceRecord.objects.filter(
+            register__school_class=data["klass"],
+            register__date=date(2026, 3, 10),
+            student=data["student"],
+        )
+        assert records.count() == 3
+        assert {rec.status for rec in records} == {"A"}
+
+    def test_batch_ignores_unknown_students_and_periods(self, data):
+        c = Client()
+        c.login(username="admin", password="pass")
+
+        r = self._post(
+            c,
+            data,
+            targets=[[9999, 1], [data["student"].id, 99], [data["student"].id, 2]],
+        )
+
+        payload = json.loads(r.content)
+        assert payload["saved"] is True
+        assert payload["count"] == 1
+        assert AttendanceRecord.objects.count() == 1
+        assert AttendanceRecord.objects.first().register.period == 2
+
+    def test_batch_rejects_invalid_status(self, data):
+        c = Client()
+        c.login(username="admin", password="pass")
+
+        r = self._post(c, data, status="XX")
+
+        assert r.status_code == 400
+        assert AttendanceRecord.objects.count() == 0
+
+    def test_batch_forbidden_without_manage_rights(self, data):
+        teacher_user = User.objects.create_user(username="plain", password="pass")
+        UserProfile.objects.create(
+            user=teacher_user, school=data["school"], role="teacher"
+        )
+        c = Client()
+        c.login(username="plain", password="pass")
+
+        r = self._post(c, data)
+
+        assert r.status_code == 403
+        assert AttendanceRecord.objects.count() == 0

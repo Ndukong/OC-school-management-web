@@ -139,11 +139,13 @@
                                 <button type="button"
                                     class="status-cell {% if current %}cell-{{ current|lower }} active{% endif %}"
                                     data-status="{{ current|default:'' }}"
-                                    hx-post="{% url 'save_attendance_cell' %}"
-                                    hx-vals='{"class_id": "{{ school_class.id }}", "date": "{{ selected_date|date:"Y-m-d" }}", "period": "{{ period }}", "student_id": "{{ student.id }}", "status": "js:this.dataset.status"}'
-                                    hx-trigger="click"
-                                    hx-swap="none"
-                                    hx-on::after-request="onAttendanceSaved(this, event)">{% if current %}{{ current }}{% else %}&middot;{% endif %}</button>
+                                    data-class-id="{{ school_class.id }}"
+                                    data-date="{{ selected_date|date:'Y-m-d' }}"
+                                    data-period="{{ period }}"
+                                    data-student="{{ student.id }}"
+                                    data-save-url="{% url 'save_attendance_cell' %}"
+                                    data-batch-url="{% url 'save_attendance_batch' %}"
+                                >{% if current %}{{ current }}{% else %}&middot;{% endif %}</button>
                                 <select name="status_{{ student.id }}_{{ period }}" class="fallback-select">
                                     <option value="">—</option>
                                     {% for value, label in status_choices %}
@@ -197,35 +199,88 @@
             '<span>Total: ' + (s.total || 0) + '</span>';
     }
 
-    window.onAttendanceSaved = function (btn, evt) {
-        var data;
-        try { data = JSON.parse(evt.detail.xhr.responseText); } catch (err) { return; }
-        if (data.saved) {
-            btn.classList.remove('saving');
-            btn.dataset.status = data.status;
-            btn.className = 'status-cell' + (data.status ? ' cell-' + data.status.toLowerCase() + ' active' : '');
-            btn.innerHTML = data.status ? data.status : '&middot;';
-            updateSummary(data.summary);
-        } else if (data.error) {
-            btn.classList.remove('saving');
-            btn.classList.add('error');
-            setTimeout(function () { btn.classList.remove('error'); }, 900);
-        }
-    };
+    function setStatus(btn, status) {
+        btn.dataset.status = status;
+        btn.className = 'status-cell' + (status ? ' cell-' + status.toLowerCase() + ' active' : '');
+        btn.innerHTML = status ? status : '&middot;';
+    }
 
-    window.markAllPresent = function () {
-        document.querySelectorAll('.status-cell').forEach(function (b) {
-            if (b.dataset.status !== 'P') {
-                b.classList.add('saving');
-                b.dataset.status = '';
-                b.click();
+    function flashError(btn) {
+        btn.classList.remove('saving');
+        btn.classList.add('error');
+        setTimeout(function () { btn.classList.remove('error'); }, 900);
+    }
+
+    /* Single cell: POST the current state; the server advances it through
+       Present -> Late -> Absent -> Permission -> unmarked and returns it. */
+    document.addEventListener('click', function (e) {
+        var btn = e.target.closest('.status-cell');
+        if (!btn || btn.dataset.busy) return;
+        e.preventDefault();
+        btn.dataset.busy = '1';
+        btn.classList.add('saving');
+        fetch(btn.dataset.saveUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'X-CSRFToken': csrf()
+            },
+            body: new URLSearchParams({
+                class_id: btn.dataset.classId,
+                date: btn.dataset.date,
+                period: btn.dataset.period,
+                student_id: btn.dataset.student,
+                status: btn.dataset.status || ''
+            }).toString()
+        }).then(function (r) { return r.json(); }).then(function (data) {
+            btn.classList.remove('saving');
+            if (data.saved) {
+                setStatus(btn, data.status);
+                updateSummary(data.summary);
+            } else {
+                flashError(btn);
             }
+        }).catch(function () {
+            flashError(btn);
+        }).finally(function () { delete btn.dataset.busy; });
+    });
+
+    /* Mark All Present: one batch request for every non-present cell,
+       applied instantly client-side (no per-cell round trips). */
+    window.markAllPresent = function () {
+        var cells = Array.prototype.slice.call(
+            document.querySelectorAll('.status-cell')
+        ).filter(function (b) { return b.dataset.status !== 'P'; });
+        if (!cells.length) return;
+        var first = cells[0];
+        var targets = cells.map(function (b) {
+            return [b.dataset.student, b.dataset.period];
+        });
+        cells.forEach(function (b) { setStatus(b, 'P'); });
+        fetch(first.dataset.batchUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': csrf()
+            },
+            body: JSON.stringify({
+                class_id: first.dataset.classId,
+                date: first.dataset.date,
+                status: 'P',
+                targets: targets
+            })
+        }).then(function (r) { return r.json(); }).then(function (data) {
+            if (data.saved) {
+                updateSummary(data.summary);
+            } else {
+                cells.forEach(function (b) {
+                    flashError(b);
+                });
+            }
+        }).catch(function () {
+            cells.forEach(function (b) { flashError(b); });
         });
     };
-
-    document.body.addEventListener('htmx:configRequest', function (e) {
-        e.detail.headers['X-CSRFToken'] = csrf();
-    });
 })();
 </script>
 {% endblock %}
