@@ -122,26 +122,36 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-STATICFILES_STORAGE = "whitenoise.storage.CompressedManifestStaticFilesStorage"
-
-# Media: default to local filesystem; switch to S3-compatible object storage
-# (Cloudflare R2 / Supabase) on the hosted deployment by setting USE_S3=true.
+# Media: local disk by default (offline / single-school deployments); S3-compatible
+# object storage (Cloudflare R2) on hosted deployments via USE_S3=true.
+# Declared explicitly through STORAGES - Django 5.1+ ignores the legacy
+# DEFAULT_FILE_STORAGE / STATICFILES_STORAGE settings.
 USE_S3 = os.environ.get("USE_S3", "false").lower() == "true"
+
+STORAGES = {
+    "default": {"BACKEND": "django.core.files.storage.FileSystemStorage"},
+    "staticfiles": {"BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage"},
+}
+
 if USE_S3:
-    DEFAULT_FILE_STORAGE = "storages.backends.s3boto3.S3Boto3Storage"
     AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID", "")
     AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY", "")
     AWS_STORAGE_BUCKET_NAME = os.environ.get("AWS_STORAGE_BUCKET_NAME", "")
     AWS_S3_ENDPOINT_URL = os.environ.get("AWS_S3_ENDPOINT_URL", "")
     AWS_S3_REGION_NAME = os.environ.get("AWS_S3_REGION_NAME", "auto")
-    AWS_DEFAULT_ACL = "public-read"
-    AWS_QUERYSTRING_AUTH = False
+    AWS_S3_ADDRESSING_STYLE = "path"
+    AWS_S3_SIGNATURE_VERSION = "s3v4"
+    AWS_QUERYSTRING_AUTH = False  # stable public URLs for photos/seals in report PDFs
+    AWS_S3_FILE_OVERWRITE = True
+    AWS_DEFAULT_ACL = None  # R2 manages access at the bucket level
+    AWS_S3_OBJECT_PARAMETERS = {"CacheControl": "max-age=86400"}
     AWS_S3_CUSTOM_DOMAIN = os.environ.get("AWS_S3_CUSTOM_DOMAIN", "")
     MEDIA_URL = os.environ.get(
         "MEDIA_URL",
         f"https://{AWS_S3_CUSTOM_DOMAIN or AWS_STORAGE_BUCKET_NAME}/",
     )
     MEDIA_ROOT = ""
+    STORAGES["default"]["BACKEND"] = "storages.backends.s3boto3.S3Boto3Storage"
 else:
     MEDIA_URL = "media/"
     MEDIA_ROOT = BASE_DIR / "media"

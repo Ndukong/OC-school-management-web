@@ -163,7 +163,44 @@ If it prints "WeasyPrint working", PDFs are ready.
 
 ## Backups
 
-### Manual Backup
+### Hosted Deployment (Railway) — REQUIRED before real use
+
+The Railway container disk is ephemeral: uploaded photos, logos and seals
+would vanish on every redeploy, and the database needs its own backups.
+
+**1. Media storage on Cloudflare R2 (free tier: 10 GB, no egress fees)**
+
+1. Create a Cloudflare account → R2 → create a bucket (e.g. `school-media`).
+2. In the bucket: Settings → enable public access via `r2.dev` (or bind a
+   custom domain, e.g. `cdn.yourschool.com`).
+3. Cloudflare → R2 → API Tokens → create a token with Object Read & Write
+   for this bucket. Note the Access Key ID, Secret and Account ID.
+4. In Railway → your web service → Variables, set:
+
+```
+USE_S3=true
+AWS_ACCESS_KEY_ID=<token access key>
+AWS_SECRET_ACCESS_KEY=<token secret>
+AWS_STORAGE_BUCKET_NAME=school-media
+AWS_S3_ENDPOINT_URL=https://<accountid>.r2.cloudflarestorage.com
+AWS_S3_CUSTOM_DOMAIN=<pub-xxxx.r2.dev or cdn.yourschool.com>
+```
+
+Railway restarts the service when variables change. All existing media
+references keep working - new uploads land in R2.
+
+**2. Database backups (two layers)**
+
+- Railway Postgres → your database → **Backups** tab → enable daily backups
+  (kept by Railway, restore is one click).
+- The app also archives data + media on every manual/scheduled backup and,
+  when `USE_S3=true`, uploads the archive straight to your R2 bucket under
+  `backups/` — an offsite copy you control.
+
+To create one immediately: `railway ssh -- python manage.py create_backup
+--notes "manual"` (or use **Settings → Backup & Restore**).
+
+### Manual Backup (offline deployment)
 
 ```bash
 Double-click backup.bat

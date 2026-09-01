@@ -69,7 +69,41 @@ def create_backup_archive(user=None, notes="", backup_type="full"):
         notes=notes,
         created_by=user,
     )
+
+    remote = upload_archive_offsite(filepath)
+    if remote:
+        history.notes = f"{history.notes} | offsite copy: {remote}".lstrip(" |")
+        history.save()
+
     return history
+
+
+def upload_archive_offsite(filepath: Path) -> str | None:
+    """Upload a backup archive to object storage when USE_S3 is enabled.
+
+    On hosted deployments the local disk is ephemeral, so the offsite copy
+    in the object store (Cloudflare R2) is the real backup. Returns the
+    stored name, or None when remote storage is not configured or the
+    upload fails (the failure is logged, never raised - the local archive
+    still exists for offline deployments).
+    """
+    if not getattr(settings, "USE_S3", False):
+        return None
+
+    import logging
+
+    logger = logging.getLogger(__name__)
+    remote_name = f"backups/{filepath.name}"
+    try:
+        from django.core.files.storage import default_storage
+
+        with filepath.open("rb") as fh:
+            saved = default_storage.save(remote_name, fh)
+        logger.info("Backup uploaded to object storage: %s", saved)
+        return saved
+    except Exception:
+        logger.exception("Offsite backup upload failed for %s", filepath.name)
+        return None
 
 
 def restore_backup_archive(backup_id):
