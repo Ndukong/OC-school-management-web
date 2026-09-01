@@ -13,8 +13,12 @@ class School(models.Model):
     region_fr = models.CharField(max_length=255, blank=True)
     division_en = models.CharField(max_length=255)
     division_fr = models.CharField(max_length=255, blank=True)
-    motto_en = models.CharField(max_length=255, default="Peace - Work - Fatherland", blank=True)
-    motto_fr = models.CharField(max_length=255, default="Paix - Travail - Patrie", blank=True)
+    motto_en = models.CharField(
+        max_length=255, default="Peace - Work - Fatherland", blank=True
+    )
+    motto_fr = models.CharField(
+        max_length=255, default="Paix - Travail - Patrie", blank=True
+    )
     letterhead_line1_en = models.CharField(
         max_length=255, default="REPUBLIC OF CAMEROON", blank=True
     )
@@ -49,9 +53,7 @@ class School(models.Model):
 class SchoolClass(models.Model):
     CYCLE_CHOICES = [("first", "First Cycle"), ("second", "Second Cycle")]
 
-    school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="classes"
-    )
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="classes")
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=20, help_text="e.g., F1, F2, LS, US")
     stream = models.CharField(
@@ -59,7 +61,8 @@ class SchoolClass(models.Model):
     )
     cycle = models.CharField(max_length=10, choices=CYCLE_CHOICES, default="first")
     form_level = models.PositiveSmallIntegerField(
-        default=1, help_text="Numeric form level (1=Form 1, 5=Form 5, 6=Lower Sixth, 7=Upper Sixth)"
+        default=1,
+        help_text="Numeric form level (1=Form 1, 5=Form 5, 6=Lower Sixth, 7=Upper Sixth)",
     )
     promotion_mark = models.FloatField(default=10.0)
     dismissal_mark = models.FloatField(
@@ -85,9 +88,7 @@ class AcademicTerm(models.Model):
         (3, "Third Term"),
     ]
 
-    school = models.ForeignKey(
-        School, on_delete=models.CASCADE, related_name="terms"
-    )
+    school = models.ForeignKey(School, on_delete=models.CASCADE, related_name="terms")
     term_number = models.PositiveSmallIntegerField(choices=TERM_CHOICES)
     year_start = models.PositiveIntegerField()
     year_end = models.PositiveIntegerField()
@@ -97,6 +98,20 @@ class AcademicTerm(models.Model):
         verbose_name = "Academic Term"
         verbose_name_plural = "Academic Terms"
         unique_together = [["school", "term_number", "year_start", "year_end"]]
+        constraints = [
+            models.UniqueConstraint(
+                fields=["school"],
+                condition=models.Q(is_current=True),
+                name="unique_current_term_per_school",
+            )
+        ]
+
+    def save(self, *args, **kwargs):
+        if self.is_current:
+            AcademicTerm.objects.filter(school=self.school, is_current=True).exclude(
+                pk=self.pk
+            ).update(is_current=False)
+        super().save(*args, **kwargs)
 
     def __str__(self) -> str:
         return f"{self.get_term_number_display()} - {self.year_start}/{self.year_end}"
@@ -111,9 +126,7 @@ class Subject(models.Model):
         School, on_delete=models.CASCADE, related_name="subjects"
     )
     name = models.CharField(max_length=200)
-    code = models.CharField(
-        max_length=10, help_text="e.g., ENL, FRE, MAT"
-    )
+    code = models.CharField(max_length=10, help_text="e.g., ENL, FRE, MAT")
     sort_order = models.PositiveIntegerField(default=0)
 
     class Meta:
@@ -200,5 +213,9 @@ class ClassCouncilRemark(models.Model):
         ordering = ["school_class__sort_order"]
 
     def __str__(self) -> str:
-        period = f"T{self.academic_term.term_number}" if self.academic_term else f"{self.year_start}/{self.year_end}"
+        period = (
+            f"T{self.academic_term.term_number}"
+            if self.academic_term
+            else f"{self.year_start}/{self.year_end}"
+        )
         return f"{self.school_class} ({period}): {self.motif[:40]}"
