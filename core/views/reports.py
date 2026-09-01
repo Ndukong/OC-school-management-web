@@ -1,5 +1,5 @@
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import get_object_or_404, redirect, render
 
 from core.models import (
@@ -8,7 +8,11 @@ from core.models import (
     Student,
 )
 from core.utils.mark_sheet import AnnualMarkSheet, MarkSheet
-from core.utils.permissions import get_school_for_user, role_required
+from core.utils.permissions import (
+    can_view_mark_sheet,
+    get_school_for_user,
+    role_required,
+)
 from core.utils.report_card import AnnualReportCard, TermReportCard
 
 
@@ -431,20 +435,30 @@ def download_annual_mark_sheet(request, class_id: int, year_start: int, year_end
     return response
 
 
-@role_required("admin")
+@login_required
 def preview_mark_sheet(request, class_id: int, term_id: int):
     school = get_school_for_user(request.user)
     school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    if not can_view_mark_sheet(request.user, school_class):
+        return HttpResponseForbidden(
+            "Only admins, the class master, and teachers of this class "
+            "can preview its mark sheet."
+        )
     term = get_object_or_404(AcademicTerm, pk=term_id, school=school)
     report = MarkSheet(school_class, term, school)
     html = report.render_html()
     return HttpResponse(html)
 
 
-@role_required("admin")
+@login_required
 def preview_annual_mark_sheet(request, class_id: int, year_start: int, year_end: int):
     school = get_school_for_user(request.user)
     school_class = get_object_or_404(SchoolClass, pk=class_id, school=school)
+    if not can_view_mark_sheet(request.user, school_class):
+        return HttpResponseForbidden(
+            "Only admins, the class master, and teachers of this class "
+            "can preview its mark sheet."
+        )
     report = AnnualMarkSheet(school_class, year_start, year_end, school)
     html = report.render_html()
     return HttpResponse(html)

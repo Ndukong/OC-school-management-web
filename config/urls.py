@@ -9,6 +9,7 @@ from core.api.views import (
     api_save_scores,
 )
 from core.views.admin_config import (
+    audit_log,
     class_subjects_index,
     class_subjects_manage,
     classes_manage,
@@ -143,6 +144,7 @@ urlpatterns = [
     path("settings/competencies/", competencies_manage, name="competencies_manage"),
     path("settings/users/", users_manage, name="users_manage"),
     path("settings/pta-config/", pta_config, name="pta_config"),
+    path("settings/audit/", audit_log, name="audit_log"),
     # Backup & License
     path("settings/backup/", backup_management, name="backup_management"),
     path(

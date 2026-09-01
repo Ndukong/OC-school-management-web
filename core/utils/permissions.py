@@ -84,6 +84,24 @@ def can_manage_class(user, school_class) -> bool:
     ).exists()
 
 
+def can_view_mark_sheet(user, school_class) -> bool:
+    """Admins, the class master, and any teacher assigned to the class.
+
+    Read-only transparency: assigned teachers can see the class mark sheet
+    to verify their own marks, but downloads stay admin-only.
+    """
+    if is_admin_or_superuser(user):
+        return True
+    teacher = get_teacher_for_user(user)
+    if teacher is None:
+        return False
+    return TeacherAssignment.objects.filter(
+        teacher=teacher,
+        school_class=school_class,
+        is_active=True,
+    ).exists()
+
+
 def role_required(*roles):
     """Allow superuser and admins always; require profile role in ``roles`` otherwise."""
 

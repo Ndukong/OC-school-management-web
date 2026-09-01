@@ -807,6 +807,12 @@
                             <span class="nav-icon">&#9993;</span><span class="nav-label">SMS</span>
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'audit_log' %} active{% endif %}"
+                           href="{% url 'audit_log' %}" title="See who logged in and what changed">
+                            <span class="nav-icon">&#128220;</span><span class="nav-label">Audit Trail</span>
+                        </a>
+                    </li>
 
                 {% elif is_bursar %}
                     <li class="nav-section">Finance</li>

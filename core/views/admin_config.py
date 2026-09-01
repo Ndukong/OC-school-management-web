@@ -1,8 +1,11 @@
+import json
+
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db import IntegrityError, models, transaction
 from django.shortcuts import get_object_or_404, redirect, render
+from django.urls import reverse
 
 from core.forms import (
     AcademicTermForm,
@@ -64,66 +67,73 @@ def settings_hub(request):
 
     config_cards = [
         {
-            "url": "school_profile",
+            "url": reverse("school_profile"),
             "icon": "&#127970;",
             "title": "School Profile",
             "desc": "Name, matricule, contact, bilingual letterhead, logo & seal.",
             "count": None,
         },
         {
-            "url": "terms_manage",
+            "url": reverse("terms_manage"),
             "icon": "&#128197;",
             "title": "Academic Terms",
             "desc": "Create terms and set the current one.",
             "count": counts.get("terms"),
         },
         {
-            "url": "classes_manage",
+            "url": reverse("classes_manage"),
             "icon": "&#127891;",
             "title": "Classes & Streams",
             "desc": "Forms, streams, cycles and promotion marks.",
             "count": counts.get("classes"),
         },
         {
-            "url": "subjects_manage",
+            "url": reverse("subjects_manage"),
             "icon": "&#128221;",
             "title": "Subjects",
             "desc": "Subject catalogue for the school.",
             "count": counts.get("subjects"),
         },
         {
-            "url": "class_subjects_all",
+            "url": reverse("class_subjects_all"),
             "icon": "&#10133;",
             "title": "Class Subjects & Coefficients",
             "desc": "Assign subjects to each class with coefficients.",
             "count": counts.get("class_subjects"),
         },
         {
-            "url": "competencies_manage",
+            "url": reverse("competencies_manage"),
             "icon": "&#10004;",
             "title": "Competencies",
             "desc": "Competencies by subject, term and form level.",
             "count": counts.get("competencies"),
         },
         {
-            "url": "users_manage",
+            "url": reverse("users_manage"),
             "icon": "&#128101;",
             "title": "Users & Teacher Links",
             "desc": "Accounts, roles and teacher links.",
             "count": counts.get("users"),
         },
         {
-            "url": "pta_config",
+            "url": reverse("pta_config"),
             "icon": "&#8355;",
             "title": "PTA Configuration",
             "desc": "Rubric heads, sub-heads, dues and fee types.",
             "count": counts.get("pta_heads") or counts.get("fee_types"),
         },
         {
-            "url": "conduct_config",
+            "url": reverse("conduct_config"),
             "icon": "&#9888;",
             "title": "Conduct Thresholds",
             "desc": "Discipline levels for the class council.",
+            "count": None,
+        },
+        {
+            "url": reverse("audit_log"),
+            "icon": "&#128220;",
+            "title": "Audit Trail",
+            "desc": "Logins and every tracked change, newest first.",
             "count": None,
         },
     ]
@@ -640,3 +650,41 @@ def pta_config(request):
             "feetype_form": FeeTypeForm(school=school),
         },
     )
+
+
+@login_required
+@role_required("admin", "superuser")
+def audit_log(request):
+    from auditlog.models import LogEntry
+
+    entries = LogEntry.objects.select_related("actor", "content_type").order_by(
+        "-timestamp"
+    )[:200]
+    rows = []
+    for entry in entries:
+        changes = entry.changes
+        if isinstance(changes, str):
+            try:
+                changes = json.loads(changes)
+            except json.JSONDecodeError:
+                changes = {}
+        if not isinstance(changes, dict):
+            changes = {}
+        if "auth_event" in changes:
+            event = changes["auth_event"]
+            detail = event.get("value", "") if isinstance(event, dict) else str(event)
+        elif changes:
+            detail = ", ".join(str(key) for key in changes)
+        else:
+            detail = ""
+        rows.append(
+            {
+                "timestamp": entry.timestamp,
+                "actor": entry.actor.username if entry.actor else "-",
+                "action": entry.get_action_display(),
+                "object": entry.object_repr,
+                "detail": detail,
+                "ip": entry.remote_addr,
+            }
+        )
+    return render(request, "settings/audit.html", {"rows": rows})
