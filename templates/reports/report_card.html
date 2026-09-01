@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load school_tags %}
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -230,9 +231,7 @@ body {
         </td>
         <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}">{{ sd.grade }}</td>
         <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}">
-            {% if forloop.first and sd.subject_rank_info %}
-                {{ sd.subject_rank_info.rank }}<span style="font-size:6.5pt;">/{{ sd.subject_rank_info.total }}</span>
-            {% endif %}
+            {% if sd.subject_rank_info %}<strong>{{ sd.subject_rank_info.rank|ordinal }}</strong>{% endif %}
         </td>
         <td>
             <span class="{% if sd.average is not None and sd.average < 10 %}fail{% endif %}">{{ sd.remark }}</span>
@@ -302,9 +301,7 @@ body {
                 {{ sd.grade }}
             </td>
             <td class="center{% if sd.average is not None and sd.average < 10 %} fail{% endif %}" rowspan="{{ sd.competencies|length }}">
-                {% if forloop.parentloop.first and sd.subject_rank_info %}
-                    {{ sd.subject_rank_info.rank }}<span style="font-size:6.5pt;">/{{ sd.subject_rank_info.total }}</span>
-                {% endif %}
+                {% if sd.subject_rank_info %}<strong>{{ sd.subject_rank_info.rank|ordinal }}</strong>{% endif %}
             </td>
             <td rowspan="{{ sd.competencies|length }}">
                 <span class="{% if sd.average is not None and sd.average < 10 %}fail{% endif %}">{{ sd.remark }}</span>
