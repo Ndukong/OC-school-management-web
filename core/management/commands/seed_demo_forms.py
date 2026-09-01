@@ -27,6 +27,7 @@ import random
 from datetime import date
 
 from django.conf import settings
+from django.contrib.auth import get_user_model
 from django.core.management.base import BaseCommand, CommandError
 from django.db import transaction
 
@@ -40,9 +41,11 @@ from core.models import (
     Subject,
     Teacher,
     TeacherAssignment,
+    UserProfile,
 )
 
 SEED = 20260815
+DEMO_PASSWORD = "demo1234"
 
 SUBJECT_NAMES = {
     "FRE": "French",
@@ -391,6 +394,12 @@ class Command(BaseCommand):
             default=SEED,
             help=f"Random seed (default {SEED}).",
         )
+        parser.add_argument(
+            "--password",
+            type=str,
+            default=DEMO_PASSWORD,
+            help=f"Password for demo staff logins (default {DEMO_PASSWORD}).",
+        )
 
     def handle(self, *args, **options):
         if options["school"]:
@@ -415,6 +424,7 @@ class Command(BaseCommand):
                 classes, subjects, teachers
             )
             n_students = self._ensure_students(school, classes, current_term, rng)
+            logins = self._ensure_accounts(school, teachers, options["password"])
 
         self.stdout.write(self.style.SUCCESS(f"School: {school.name_en}"))
         self.stdout.write(
@@ -449,6 +459,14 @@ class Command(BaseCommand):
             t = teachers[teacher_code]
             self.stdout.write(f"  Class master {code}: {t}")
         self.stdout.write(self.style.SUCCESS(f"Students created: {n_students}."))
+        self.stdout.write(
+            self.style.SUCCESS(
+                f"Logins: {logins} new "
+                f"({len(teachers) + 1} total, password: {options['password']})."
+            )
+        )
+        for username, role in self._login_table(teachers):
+            self.stdout.write(f"  {username:<22} {role}")
         for level in (1, 2, 3, 4, 5):
             count = Student.objects.filter(
                 enrollments__school_class=classes[f"F{level}"],
@@ -563,6 +581,97 @@ class Command(BaseCommand):
             teachers[code] = teacher
         return teachers
 
+    def _ensure_accounts(self, school, teachers, password: str) -> int:
+        """Create logins for every demo teacher plus a school bursar.
+
+        Class masters get the class_master role so their dashboard and nav
+        match their duties; everyone else is a plain teacher. Idempotent:
+        existing usernames are kept (passwords are not reset).
+        """
+        user_model = get_user_model()
+        master_codes = set(CLASS_MASTERS.values())
+        created = 0
+
+        for code, teacher in teachers.items():
+            username = f"{teacher.first_name.lower()}.{teacher.last_name.lower()}"
+            role = "class_master" if code in master_codes else "teacher"
+            created += self._ensure_login(
+                user_model,
+                username=username,
+                password=password,
+                first_name=teacher.first_name,
+                last_name=teacher.last_name,
+                email=teacher.email,
+                school=school,
+                role=role,
+                teacher=teacher,
+            )
+
+        created += self._ensure_login(
+            user_model,
+            username="bursar",
+            password=password,
+            first_name="School",
+            last_name="Bursar",
+            email="bursar@example.cm",
+            school=school,
+            role="bursar",
+            teacher=None,
+        )
+        return created
+
+    def _ensure_login(
+        self,
+        user_model,
+        username: str,
+        password: str,
+        first_name: str,
+        last_name: str,
+        email: str,
+        school,
+        role: str,
+        teacher,
+    ) -> int:
+        user, user_created = user_model.objects.get_or_create(
+            username=username,
+            defaults={
+                "first_name": first_name,
+                "last_name": last_name,
+                "email": email,
+            },
+        )
+        if user_created:
+            user.set_password(password)
+            user.save()
+
+        profile, _ = UserProfile.objects.get_or_create(
+            user=user,
+            defaults={"school": school, "role": role, "teacher": teacher},
+        )
+        updates = []
+        if profile.school_id != school.pk:
+            profile.school = school
+            updates.append("school")
+        if profile.role != role:
+            profile.role = role
+            updates.append("role")
+        if profile.teacher_id != (teacher.pk if teacher else None):
+            profile.teacher = teacher
+            updates.append("teacher")
+        if updates:
+            profile.save()
+        return 1 if user_created else 0
+
+    def _login_table(self, teachers) -> list[tuple[str, str]]:
+        master_codes = set(CLASS_MASTERS.values())
+        rows = []
+        for first, last, code, _sig in TEACHERS:
+            username = f"{first.lower()}.{last.lower()}"
+            role = "class_master" if code in master_codes else "teacher"
+            rows.append((username, role))
+        rows.append(("bursar", "bursar"))
+        return rows
+
     def _ensure_assignments(self, classes, subjects, teachers):
         created = 0
         for code, pairs in ASSIGNMENTS.items():
@@ -671,9 +780,7 @@ class Command(BaseCommand):
 
     def _phone(self, rng) -> str:
         # Cameroon mobile: 9 digits starting with 6 (65/67/68/69 ranges).
-        return (
-            f"6{rng.choice(('5', '7', '8', '9'))}{rng.randint(1_000_000, 9_999_999)}"
-        )
+        return f"6{rng.choice(('5', '7', '8', '9'))}{rng.randint(1_000_000, 9_999_999)}"
 
     def _adult_name(self, family: str, sex: str, rng) -> str:
         pool = GIVEN_FEMALE if sex == "F" else GIVEN_MALE

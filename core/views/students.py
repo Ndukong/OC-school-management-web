@@ -56,7 +56,7 @@ def _apply_student_filters(qs, q="", class_id="", sex=""):
 
 
 @login_required
-@role_required("admin", "superuser")
+@role_required("admin", "superuser", "bursar")
 def student_list(request):
     school = get_school_for_user(request.user)
     if not school:
