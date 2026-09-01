@@ -10,10 +10,8 @@ touching anything, so it is safe to keep in the release pipeline. Real
 deployments (a real school already configured) are never affected.
 """
 
-import json
-
 from django.core.management import call_command
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from core.models import License, School
 
