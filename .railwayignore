@@ -1,0 +1,9 @@
+.playwright-mcp/
+Notes.txt
+Notes.rar
+db.sqlite3
+.coverage
+staticfiles/
+backups/
+.ruff_cache/
+.pytest_cache/
