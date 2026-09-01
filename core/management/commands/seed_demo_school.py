@@ -51,19 +51,26 @@ class Command(BaseCommand):
             self.stdout.write(
                 self.style.WARNING(
                     f"School(s) already exist ({school.name_en}) — skipping demo "
-                    "seeding. Run with --force to seed anyway."
+                    "seeding. Run with --force to seed a separate demo school."
                 )
             )
             return
 
-        if school is None:
+        if school is None or options["force"]:
+            matricule = DEMO_MATRICULE
+            suffix = 1
+            while School.objects.filter(matricule=matricule).exists():
+                suffix += 1
+                matricule = f"{DEMO_MATRICULE}-{suffix}"
             school = School.objects.create(
                 name_en=options["school_name"],
-                matricule=DEMO_MATRICULE,
+                matricule=matricule,
                 region_en="North West",
                 division_en="Mezam",
             )
-            self.stdout.write(self.style.SUCCESS(f"Created school: {school.name_en}"))
+            self.stdout.write(
+                self.style.SUCCESS(f"Created school: {school.name_en} ({matricule})")
+            )
 
         if License.objects.filter(school=school).exists():
             self.stdout.write("License: already present, keeping it.")
