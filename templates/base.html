@@ -813,6 +813,12 @@
                             <span class="nav-icon">&#128220;</span><span class="nav-label">Audit Trail</span>
                         </a>
                     </li>
+                    <li>
+                        <a class="nav-link{% if request.resolver_match.url_name == 'timetable_hub' %} active{% endif %}"
+                           href="{% url 'timetable_hub' %}" title="View the weekly timetable">
+                            <span class="nav-icon">&#128467;</span><span class="nav-label">Timetable</span>
+                        </a>
+                    </li>
 
                 {% elif is_bursar %}
                     <li class="nav-section">Finance</li>

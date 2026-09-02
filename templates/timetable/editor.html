@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Edit Timetable{% endblock %}
+{% block page_title %}Edit — {{ timetable.name }}{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header">
+        <span>{{ timetable.name }} — click a cell to edit</span>
+        <div style="display:flex; gap:6px;">
+            <form method="post" action="{% url 'timetable_publish' timetable.pk %}" style="display:inline;">{% csrf_token %}
+                <button type="submit" class="btn btn-sm btn-success">Publish</button>
+            </form>
+            <a href="{% url 'timetable_master' timetable.pk %}" class="btn btn-sm">View</a>
+        </div>
+    </div>
+    <div class="table-wrap">
+        <table class="table" style="font-size:12px;">
+            <thead>
+                <tr>
+                    <th>Class</th>
+                    {% for col in grid.columns %}<th colspan="{{ col.slots|length }}" class="period-head">{{ col.day }}</th>{% endfor %}
+                </tr>
+                <tr>
+                    <th></th>
+                    {% for col in grid.columns %}{% for s in col.slots %}<th class="period-head" style="font-size:10px;">{% if s.slot_type == 'break' %}&middot;{% else %}{{ s.slot_number }}{% endif %}</th>{% endfor %}{% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+            {% for row in grid.rows %}
+                <tr>
+                    <td class="student-name">{{ row.school_class }}</td>
+                    {% for cell in row.cells %}
+                        {% if cell.type == 'break' %}
+                            <td style="background:#f0f0f0; min-width:8px;"></td>
+                        {% elif cell.type == 'lesson' %}
+                            <td colspan="{{ cell.colspan }}" style="background:{{ cell.color }}; text-align:center; font-weight:600;{% if cell.locked %} border:2px dashed #999;{% endif %}">{{ cell.entry.subject.code }}</td>
+                        {% else %}
+                            <td>&nbsp;</td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,17 @@
+{% if latest %}
+<div class="alert alert-{% if latest.status == 'published' %}success{% elif latest.status == 'failed' %}danger{% elif latest.status == 'generating' %}info{% else %}info{% endif %}" style="margin:12px 0;">
+    {% if latest.status == 'generating' %}
+        <strong>&#8987; Generating...</strong> Solving timetables for {{ latest.config }}.
+    {% elif latest.status == 'completed' %}
+        <strong>✓ Completed:</strong> {{ latest.name }} — score {{ latest.fitness_score|floatformat:0 }},
+        {{ latest.hard_violations }} hard violations,
+        {{ latest.soft_violation_count }} soft violations,
+        {{ latest.generation_time_seconds|floatformat:1 }}s.
+        <a href="{% url 'timetable_master' latest.pk %}" class="btn btn-sm btn-primary" style="margin-left:8px;">View</a>
+    {% elif latest.status == 'published' %}
+        <strong>&#10003; Published:</strong> {{ latest.name }}
+    {% else %}
+        <strong>Failed:</strong> {{ latest.solver_log|truncatechars:120 }}
+    {% endif %}
+</div>
+{% endif %}

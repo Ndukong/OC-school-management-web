@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Timetable{% endblock %}
+{% block page_title %}Timetable{% endblock %}
+
+{% block content %}
+{% if not config %}
+<div class="alert alert-info">
+    No timetable configuration exists yet. Click the button below to create one.
+    <br><a href="{% url 'timetable_config_create' %}" class="btn btn-primary mt-2">Create Configuration</a>
+</div>
+{% else %}
+<div class="card">
+    <div class="card-header">
+        <span>Timetable Configuration — {{ config.academic_year_start }}/{{ config.academic_year_end }}</span>
+        <div style="display:flex; gap:8px;">
+            <a href="{% url 'timetable_config_edit' config.pk %}" class="btn btn-sm">Configure</a>
+            {% if config.period_slots.count > 0 and config.subject_requirements.count > 0 %}
+            <form method="post" action="{% url 'timetable_generate' config.pk %}" style="display:inline;">{% csrf_token %}
+                <button type="submit" class="btn btn-primary btn-sm">Generate New</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+    <div class="card-body">
+        <p><strong>Days:</strong> {{ config.days|join:", " }} |
+           <strong>Periods/day:</strong> {{ config.teaching_slots_per_day }} |
+           <strong>Assembly:</strong> {{ config.assembly_day }} ({{ config.assembly_duration_periods }} period(s))</p>
+    </div>
+</div>
+
+<div id="generation-status" hx-get="{% url 'timetable_generation_status' config.pk %}" hx-trigger="every 3s" hx-swap="innerHTML">
+    {% include "timetable/_generation_status.html" with latest=latest %}
+</div>
+
+{% if timetables %}
+<div class="card">
+    <div class="card-header">Generated Timetables</div>
+    <div class="card-body" style="display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:12px;">
+        {% for tt in timetables %}
+        <div class="card" style="border:{% if tt.status == 'published' %}2px solid var(--success){% else %}1px solid var(--border){% endif %};">
+            <div class="card-body" style="padding:14px;">
+                <strong>{{ tt.name }}</strong>
+                <span class="badge badge-{% if tt.status == 'published' %}success{% elif tt.status == 'failed' %}danger{% else %}info{% endif %}">{{ tt.status }}</span>
+                <p style="font-size:12.5px; margin:8px 0;">
+                    Score: {{ tt.fitness_score|floatformat:0 }} |
+                    Violations: {{ tt.hard_violations }} hard, {{ tt.soft_violation_count }} soft |
+                    {{ tt.generation_time_seconds|floatformat:1 }}s
+                </p>
+                <div style="display:flex; gap:6px; flex-wrap:wrap;">
+                    <a href="{% url 'timetable_master' tt.pk %}" class="btn btn-sm">View</a>
+                    {% if tt.status == 'completed' or tt.status == 'failed' %}
+                    <a href="{% url 'timetable_edit' tt.pk %}" class="btn btn-sm">Edit</a>
+                    {% endif %}
+                    {% if tt.status == 'completed' %}
+                    <form method="post" action="{% url 'timetable_publish' tt.pk %}" style="display:inline;">{% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-primary">Publish</button>
+                    </form>
+                    {% endif %}
+                    {% if tt.status != 'published' %}
+                    <form method="post" action="{% url 'timetable_delete' tt.pk %}" style="display:inline;">{% csrf_token %}
+                        <button type="submit" class="btn btn-sm btn-danger">Delete</button>
+                    </form>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block scripts %}
+<script src="{% static 'vendor/htmx/htmx.min.js' %}"></script>
+{% endblock %}

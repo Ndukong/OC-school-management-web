@@ -8,3 +8,4 @@ from .notifications import *
 from .school import *
 from .student import *
 from .teacher import *
+from .timetable import *

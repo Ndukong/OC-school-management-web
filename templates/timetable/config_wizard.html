@@ -1,0 +1,126 @@
+{% extends "base.html" %}
+{% block title %}Timetable Configuration{% endblock %}
+{% block page_title %}Timetable Configuration{% endblock %}
+
+{% block content %}
+<form method="post">{% csrf_token %}
+<div class="accordion" id="wizardAccordion">
+
+    <!-- Step 1: Basic Setup -->
+    <div class="card">
+        <div class="card-header" id="heading1">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse1">Step 1: Basic Setup</button>
+        </div>
+        <div id="collapse1" class="collapse show" data-bs-parent="#wizardAccordion">
+            <div class="card-body">
+                <div class="form-group"><label>Academic Year Start</label><input type="number" name="academic_year_start" value="{{ config.academic_year_start|default:2026 }}" class="form-control" style="max-width:120px;"></div>
+                <div class="form-group"><label>Academic Year End</label><input type="number" name="academic_year_end" value="{{ config.academic_year_end|default:2027 }}" class="form-control" style="max-width:120px;"></div>
+                <div class="form-group"><label>Active Days</label><div>
+                {% for day in days_all %}
+                    <label style="margin-right:12px;"><input type="checkbox" name="days" value="{{ day }}" {% if day in days_checked %}checked{% endif %}> {{ day }}</label>
+                {% endfor %}
+                </div></div>
+                <div class="form-group"><label>Assembly Day</label>
+                    <select name="assembly_day" class="form-control" style="max-width:200px;">
+                    {% for day in days_all %}<option value="{{ day }}" {% if config.assembly_day == day %}selected{% endif %}>{{ day }}</option>{% endfor %}
+                    </select>
+                </div>
+                <div class="form-group"><label>Assembly Duration (periods)</label><input type="number" name="assembly_duration_periods" value="{{ config.assembly_duration_periods|default:1 }}" min="0" max="3" class="form-control" style="max-width:80px;"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 2: Period Slots -->
+    <div class="card">
+        <div class="card-header" id="heading2">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse2">Step 2: Period Slots</button>
+        </div>
+        <div id="collapse2" class="collapse" data-bs-parent="#wizardAccordion">
+            <div class="card-body">
+                <table class="table" id="slot-table">
+                    <thead><tr><th>#</th><th>Type</th><th>Label</th><th>Start</th><th>End</th></tr></thead>
+                    <tbody id="slot-rows">
+                    {% for slot in slots %}
+                        <tr>
+                            <td>{{ slot.slot_number }}<input type="hidden" name="slot_type_{{ slot.slot_number }}" value="{{ slot.slot_type }}"></td>
+                            <td><input type="hidden" name="slot_label_{{ slot.slot_number }}" value="{{ slot.label }}">{{ slot.label }}</td>
+                            <td><input type="hidden" name="slot_start_{{ slot.slot_number }}" value="{{ slot.start_time|time:'H:i' }}">{{ slot.start_time|time:'H:i' }}</td>
+                            <td><input type="hidden" name="slot_end_{{ slot.slot_number }}" value="{{ slot.end_time|time:'H:i' }}">{{ slot.end_time|time:'H:i' }}</td>
+                        </tr>
+                    {% empty %}
+                        <tr><td>1</td><td><input type="hidden" name="slot_type_1" value="teaching"><input type="hidden" name="slot_label_1" value="Period 1">Period 1</td><td><input type="hidden" name="slot_start_1" value="07:30">07:30</td><td><input type="hidden" name="slot_end_1" value="08:10">08:10</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <input type="hidden" name="slot_count" value="{{ slots|length|default:1 }}">
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Subject Requirements -->
+    <div class="card">
+        <div class="card-header" id="heading3">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse3">Step 3: Subject Period Requirements</button>
+        </div>
+        <div id="collapse3" class="collapse" data-bs-parent="#wizardAccordion">
+            <div class="card-body">
+                <p>Set how many periods per week each subject needs per class. Pre-filled from class-subject assignments.</p>
+                <table class="table">
+                    <thead><tr><th>Class</th><th>Subject</th><th>Periods/Week</th><th>Doubles/Week</th></tr></thead>
+                    <tbody>
+                    {% for req in requirements %}
+                        <tr><td>{{ req.school_class }}</td><td>{{ req.subject }}</td>
+                            <td><input type="number" name="req_{{ req.school_class_id }}_{{ req.subject_id }}_periods" value="{{ req.periods_per_week }}" min="1" max="12" class="form-control" style="width:80px;"></td>
+                            <td><input type="number" name="req_{{ req.school_class_id }}_{{ req.subject_id }}_doubles" value="{{ req.doubles_per_week }}" min="0" max="6" class="form-control" style="width:80px;"></td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 4: Teacher Availability & Preferences -->
+    <div class="card">
+        <div class="card-header" id="heading4">
+            <button class="btn btn-link" type="button" data-bs-toggle="collapse" data-bs-target="#collapse4">Step 4: Teacher Availability</button>
+        </div>
+        <div id="collapse4" class="collapse" data-bs-parent="#wizardAccordion">
+            <div class="card-body">
+                <table class="table">
+                    <thead><tr><th>Teacher</th><th>Preference Type</th><th>Weight</th><th></th></tr></thead>
+                    <tbody>
+                    {% for pref in preferences %}
+                        <tr><td>{{ pref.teacher }}</td><td>{{ pref.get_preference_type_display }}</td><td>{{ pref.weight }}</td>
+                            <td><button type="submit" name="action" value="delete_preference" class="btn btn-sm btn-danger">Remove</button>
+                                <input type="hidden" name="preference_id" value="{{ pref.pk }}"></td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <div style="margin-top:8px;">
+                    <label>Teacher</label>
+                    <select name="pref_teacher" class="form-control" style="max-width:250px;">
+                    {% for t in teachers %}<option value="{{ t.pk }}">{{ t }}</option>{% endfor %}
+                    </select>
+                    <label>Preference</label>
+                    <select name="pref_type" class="form-control" style="max-width:250px;">
+                        <option value="free_day">Free Day</option>
+                        <option value="max_consecutive">Max Consecutive</option>
+                        <option value="max_periods_per_day">Max Periods Per Day</option>
+                        <option value="prefer_morning">Prefer Morning</option>
+                        <option value="prefer_afternoon">Prefer Afternoon</option>
+                    </select>
+                    <label>Value</label><input type="text" name="pref_value" value="{}" class="form-control" style="max-width:200px;">
+                    <label>Weight (1-10)</label><input type="number" name="pref_weight" value="5" min="1" max="10" class="form-control" style="max-width:80px;">
+                    <button type="submit" name="action" value="add_preference" class="btn btn-sm mt-1">Add Preference</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+<div style="margin:16px 0;">
+    <button type="submit" name="action" value="save_basic" class="btn btn-primary">Save Configuration</button>
+</div>
+</form>
+{% endblock %}

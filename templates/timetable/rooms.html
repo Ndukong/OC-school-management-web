@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Rooms{% endblock %}
+{% block page_title %}Rooms{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><span>Rooms</span></div>
+    <div class="card-body">
+        <form method="post" style="display:flex; gap:8px; margin-bottom:12px;">{% csrf_token %}
+            <input type="hidden" name="action" value="create">
+            <input type="text" name="name" placeholder="Room name" required class="form-control" style="max-width:200px;">
+            <select name="room_type" class="form-control" style="max-width:150px;">
+                <option value="classroom">Classroom</option>
+                <option value="lab">Lab</option>
+                <option value="workshop">Workshop</option>
+                <option value="hall">Hall</option>
+                <option value="field">Field</option>
+                <option value="computer">Computer Room</option>
+            </select>
+            <input type="number" name="capacity" value="60" class="form-control" style="max-width:80px;">
+            <button type="submit" class="btn btn-primary btn-sm">Add</button>
+        </form>
+        <table class="table">
+            <thead><tr><th>Name</th><th>Type</th><th>Capacity</th><th></th></tr></thead>
+            <tbody>
+            {% for room in rooms %}
+                <tr>
+                    <td>{{ room.name }}</td><td>{{ room.room_type }}</td><td>{{ room.capacity }}</td>
+                    <td><form method="post" style="display:inline;">{% csrf_token %}<input type="hidden" name="action" value="delete"><input type="hidden" name="room_id" value="{{ room.pk }}"><button type="submit" class="btn btn-sm btn-danger">Delete</button></form></td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

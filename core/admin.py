@@ -32,6 +32,28 @@ from .models import (
     UserProfile,
 )
 
+from .models import (
+    PeriodSlot,
+    Room,
+    SubjectConstraint,
+    SubjectPeriodRequirement,
+    TeacherAvailability,
+    TeacherPreference,
+    Timetable,
+    TimetableConfig,
+    TimetableEntry,
+)
+
+admin.site.register(TimetableConfig)
+admin.site.register(PeriodSlot)
+admin.site.register(Room)
+admin.site.register(SubjectPeriodRequirement)
+admin.site.register(TeacherAvailability)
+admin.site.register(TeacherPreference)
+admin.site.register(SubjectConstraint)
+admin.site.register(Timetable)
+admin.site.register(TimetableEntry)
+
 
 @admin.action(description="Compute term results (current term) for selected classes")
 def compute_class_results(modeladmin, request, queryset):

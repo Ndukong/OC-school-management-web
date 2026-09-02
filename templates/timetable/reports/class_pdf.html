@@ -1,0 +1,12 @@
+<!DOCTYPE html><html><head><style>
+@page { size: A4 portrait; margin: 1.5cm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 11pt; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 1pt solid #000; padding: 6px; text-align: center; }
+th { background: #f0f0f0; }
+.header { text-align: center; margin-bottom: 12px; }
+</style></head><body>
+<div class="header"><h2>{{ school.name_en|upper }}</h2><p>{{ school_class }} — Weekly Timetable</p><p>Academic Year: {{ timetable.config.academic_year_start }}/{{ timetable.config.academic_year_end }}</p></div>
+<table><thead><tr><th>Day</th><th>Period</th><th>Subject</th><th>Teacher</th></tr></thead>
+<tbody>{% for row in grid.rows %}{% for cell in row.cells %}{% if cell.type == 'lesson' %}<tr><td>{{ cell.entry.day }}</td><td>{{ cell.entry.period_slot.label }}</td><td>{{ cell.entry.subject.code }}</td><td>{{ cell.entry.teacher.first_name }} {{ cell.entry.teacher.last_name }}</td></tr>{% endif %}{% endfor %}{% endfor %}</tbody></table>
+</body></html>

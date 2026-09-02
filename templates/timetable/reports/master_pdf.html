@@ -1,0 +1,16 @@
+<!DOCTYPE html><html><head><style>
+@page { size: A3 landscape; margin: 1cm; }
+body { font-family: "Segoe UI", Arial, sans-serif; font-size: 8pt; }
+table { width: 100%; border-collapse: collapse; }
+th, td { border: 0.5pt solid #000; padding: 2px; text-align: center; }
+th { background: #f0f0f0; }
+.header { text-align: center; margin-bottom: 8px; }
+.header h1 { font-size: 12pt; margin: 0; }
+.header p { font-size: 9pt; margin: 0; }
+</style></head><body>
+<div class="header"><h1>{{ school.name_en|upper }}</h1><p>Master Timetable — {{ timetable.name }}</p></div>
+<table><thead><tr><th>Class</th>{% for col in grid.columns %}<th colspan="{{ col.slots|length }}">{{ col.day }}</th>{% endfor %}</tr>
+<tr><th></th>{% for col in grid.columns %}{% for s in col.slots %}<th>{{ s.slot_number }}</th>{% endfor %}{% endfor %}</tr></thead>
+<tbody>{% for row in grid.rows %}<tr><td style="font-weight:bold; text-align:left;">{{ row.school_class }}</td>
+{% for cell in row.cells %}{% if cell.type == 'lesson' %}<td style="background:{{ cell.color }};">{{ cell.entry.subject.code }}</td>{% else %}<td></td>{% endif %}{% endfor %}</tr>{% endfor %}</tbody></table>
+</body></html>

@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}My Timetable{% endblock %}
+{% block page_title %}{{ teacher }} — Weekly Schedule{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><span>{{ teacher }} — {{ timetable.name }} | Total periods: {{ total_periods }}</span></div>
+    <div class="table-wrap">
+        <table class="table">
+            <thead><tr><th>Day</th><th>Period</th><th>Class</th><th>Subject</th><th>Room</th></tr></thead>
+            <tbody>
+                {% for row in grid_rows %}
+                    {% for cell in row.cells %}
+                        {% if cell.entry %}
+                            <tr>
+                                <td style="font-weight:600;">{{ cell.day }}</td>
+                                <td>{{ cell.entry.period_slot.label }}</td>
+                                <td>{{ cell.entry.school_class }}</td>
+                                <td>{{ cell.entry.subject.code }}</td>
+                                <td>{{ cell.entry.room.name|default:"—" }}</td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+                {% if not grid_rows %}
+                <tr><td colspan="5" class="text-muted" style="text-align:center;">No lessons scheduled.</td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

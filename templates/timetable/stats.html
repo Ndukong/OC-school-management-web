@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Timetable Stats{% endblock %}
+{% block page_title %}Timetable Statistics{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header"><span>Teacher Workload ({{ timetable.name }})</span></div>
+    <div class="card-body">
+        {% for w in workload %}
+        <div style="margin-bottom:8px;">
+            <span style="font-weight:600;">{{ w.name }}</span>
+            <div style="background:var(--accent); border-radius:4px; height:20px; width:100%;">
+                <div style="background:var(--primary); height:20px; border-radius:4px; width:{{ w.bar_pct }}%; color:#fff; text-align:right; padding-right:6px; font-size:11px; line-height:20px;">{{ w.periods }} periods, {{ w.classes }} classes</div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

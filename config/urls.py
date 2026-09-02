@@ -97,6 +97,30 @@ from core.views.teachers_crud import (
     teacher_edit,
     teacher_list,
 )
+from core.views.timetable import (
+    export_all_class_pdfs,
+    export_all_teacher_pdfs,
+    export_class_pdf,
+    export_master_excel,
+    export_master_pdf,
+    export_teacher_pdf,
+    generate_timetable,
+    generation_status,
+    rooms_manage,
+    timetable_class_view,
+    timetable_config_wizard,
+    timetable_delete,
+    timetable_edit,
+    timetable_hub,
+    timetable_lock_entry,
+    timetable_master_view,
+    timetable_publish,
+    timetable_regenerate,
+    timetable_room_view,
+    timetable_stats,
+    timetable_swap,
+    timetable_teacher_view,
+)
 
 urlpatterns = [
     path("", dashboard, name="dashboard"),
@@ -338,7 +362,34 @@ urlpatterns = [
         api_save_scores,
         name="api_save_scores",
     ),
+    # Timetable
+    path('timetable/', timetable_hub, name='timetable_hub'),
+    path('timetable/config/', timetable_config_wizard, name='timetable_config_create'),
+    path('timetable/config/<int:config_id>/', timetable_config_wizard, name='timetable_config_edit'),
+    path('timetable/rooms/', rooms_manage, name='timetable_rooms'),
+    path('timetable/config/<int:config_id>/generate/', generate_timetable, name='timetable_generate'),
+    path('timetable/config/<int:config_id>/status/', generation_status, name='timetable_generation_status'),
+    path('timetable/<int:timetable_id>/', timetable_master_view, name='timetable_master'),
+    path('timetable/<int:timetable_id>/class/<int:class_id>/', timetable_class_view, name='timetable_class'),
+    path('timetable/<int:timetable_id>/teacher/', timetable_teacher_view, name='timetable_my_schedule'),
+    path('timetable/<int:timetable_id>/teacher/<int:teacher_id>/', timetable_teacher_view, name='timetable_teacher'),
+    path('timetable/<int:timetable_id>/rooms/', timetable_room_view, name='timetable_room_view'),
+    path('timetable/<int:timetable_id>/stats/', timetable_stats, name='timetable_stats'),
+    path('timetable/<int:timetable_id>/edit/', timetable_edit, name='timetable_edit'),
+    path('timetable/<int:timetable_id>/swap/', timetable_swap, name='timetable_swap'),
+    path('timetable/entry/<int:entry_id>/lock/', timetable_lock_entry, name='timetable_lock_entry'),
+    path('timetable/<int:timetable_id>/publish/', timetable_publish, name='timetable_publish'),
+    path('timetable/<int:timetable_id>/regenerate/', timetable_regenerate, name='timetable_regenerate'),
+    path('timetable/<int:timetable_id>/delete/', timetable_delete, name='timetable_delete'),
+    path('timetable/<int:timetable_id>/export/master/pdf/', export_master_pdf, name='timetable_export_master_pdf'),
+    path('timetable/<int:timetable_id>/export/class/<int:class_id>/pdf/', export_class_pdf, name='timetable_export_class_pdf'),
+    path('timetable/<int:timetable_id>/export/teacher/pdf/', export_teacher_pdf, name='timetable_export_my_pdf'),
+    path('timetable/<int:timetable_id>/export/teacher/<int:teacher_id>/pdf/', export_teacher_pdf, name='timetable_export_teacher_pdf'),
+    path('timetable/<int:timetable_id>/export/all-classes/pdf/', export_all_class_pdfs, name='timetable_export_all_classes'),
+    path('timetable/<int:timetable_id>/export/all-teachers/pdf/', export_all_teacher_pdfs, name='timetable_export_all_teachers'),
+    path('timetable/<int:timetable_id>/export/excel/', export_master_excel, name='timetable_export_excel'),
 ]
+
 
 # Uploaded media (photos, logos, seals, signatures) must be served even when
 # DEBUG is false: the offline LAN deployment and the pre-R2 Railway setup both
