@@ -1,0 +1,10 @@
+# Caddy: automatic HTTPS. Replace the hostname with your real domain
+# (its DNS must point at this server's IP before starting).
+# For a bare IP with no domain, use:  http://<server-ip>
+your-school-domain.com {
+    encode gzip
+    request_body {
+        max_size 25MB
+    }
+    reverse_proxy web:8000
+}

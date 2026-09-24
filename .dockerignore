@@ -1,0 +1,14 @@
+.playwright-mcp/
+Notes.txt
+Notes.rar
+db.sqlite3
+.coverage
+.ruff_cache/
+.pytest_cache/
+backups/
+staticfiles/
+media/
+.git/
+.env
+*.md
+TIMETABLE_MODULE_PROMPT.md
