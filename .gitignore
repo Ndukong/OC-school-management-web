@@ -11,6 +11,8 @@ build/
 
 # Django
 db.sqlite3
+db.sqlite3-shm
+db.sqlite3-wal
 media/
 staticfiles/
 *.log
@@ -22,6 +24,13 @@ backups/
 .pytest_cache/
 .ruff_cache/
 .coverage
+.playwright-mcp/
+
+# Local notes / exported artifacts (may contain credentials like Notes.txt)
+Notes.txt
+Notes.rar
+TIMETABLE_MODULE_PROMPT.md
+page-*.yml
 
 # IDE
 .vscode/
