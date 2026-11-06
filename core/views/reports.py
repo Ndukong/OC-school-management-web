@@ -525,7 +525,7 @@ def download_id_cards(request):
         response = HttpResponse(pdf, content_type="application/pdf")
         response["Content-Disposition"] = 'attachment; filename="id_cards.pdf"'
         return response
-    html = render_full_set_html(students, school, context)
+    html = render_full_set_html(students, school, context, embed_images=True)
     response = HttpResponse(html, content_type="text/html")
     response["Content-Disposition"] = 'attachment; filename="id_cards.html"'
     return response

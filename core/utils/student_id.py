@@ -1,3 +1,5 @@
+import base64
+import mimetypes
 from datetime import date
 from pathlib import Path
 
@@ -46,7 +48,43 @@ def render_single_id_page(
     return render_to_string("reports/student_id_page.html", ctx)
 
 
-def render_full_set_html(students: list[Student], school, context: dict = None) -> str:
+def _to_data_uri(url):
+    if not url or url.startswith("data:"):
+        return url
+    if settings.MEDIA_URL and url.startswith(settings.MEDIA_URL):
+        rel = url[len(settings.MEDIA_URL) :]
+        path = Path(settings.MEDIA_ROOT) / rel
+    elif settings.STATIC_URL and url.startswith(settings.STATIC_URL):
+        rel = url[len(settings.STATIC_URL) :]
+        root = settings.STATIC_ROOT or (
+            settings.STATICFILES_DIRS[0] if settings.STATICFILES_DIRS else None
+        )
+        path = Path(root) / rel if root else None
+    else:
+        return url
+    if not path or not path.is_file():
+        return url
+    mime = mimetypes.guess_type(str(path))[0] or "application/octet-stream"
+    data = base64.b64encode(path.read_bytes()).decode("ascii")
+    return "data:" + mime + ";base64," + data
+
+
+def _embed_images(html_str):
+    import re as _re
+
+    def repl(m):
+        attr, quote, url, end_quote = m.groups()
+        if attr == "src":
+            url = _to_data_uri(url)
+        return attr + "=" + quote + url + end_quote
+
+    pattern = r"""(src|href)=(["'])([^"']+)(["'])"""
+    return _re.sub(pattern, repl, html_str)
+
+
+def render_full_set_html(
+    students: list[Student], school, context: dict = None, embed_images: bool = False
+) -> str:
     """Render 2 A4 sheets with booklet imposition for 4 students."""
     if context is None:
         context = {}
@@ -72,13 +110,16 @@ def render_full_set_html(students: list[Student], school, context: dict = None) 
         sheet2_pages.append(render_single_id_page(4, st2, school, context))
         sheet2_pages.append(render_single_id_page(1, st2, school, context))
 
-    return render_to_string(
+    html = render_to_string(
         "reports/student_id_full.html",
         {
             "sheet1_pages": sheet1_pages,
             "sheet2_pages": sheet2_pages,
         },
     )
+    if embed_images:
+        html = _embed_images(html)
+    return html
 
 
 def _resolve_local_urls(html_str: str) -> str:
@@ -104,7 +145,9 @@ def _resolve_local_urls(html_str: str) -> str:
     return re.sub(r'(src|href)=(["\'])([^"\']+)(["\'])', repl, html_str)
 
 
-def render_full_set_pdf(students, school, context=None, base_url: str | None = None) -> bytes:
+def render_full_set_pdf(
+    students, school, context=None, base_url: str | None = None
+) -> bytes:
     """Render the 4-student ID card set to a PDF (WeasyPrint)."""
     html_str = _resolve_local_urls(render_full_set_html(students, school, context))
     try:
