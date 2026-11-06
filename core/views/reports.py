@@ -485,11 +485,22 @@ def _selected_id_students(request, school):
 def preview_id_cards(request):
     from datetime import date
 
-    from core.utils.student_id import distribute_to_four, render_full_set_html
+    from core.utils.student_id import (
+        distribute_to_four,
+        render_full_set_html,
+        render_full_set_pdf,
+    )
 
     school = get_school_for_user(request.user)
     students = distribute_to_four(_selected_id_students(request, school))
     context = {"academic_year": "2025/2026", "today": date.today()}
+    if request.GET.get("format") == "pdf":
+        pdf = render_full_set_pdf(
+            students, school, context, request.build_absolute_uri("/")
+        )
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = 'inline; filename="id_cards.pdf"'
+        return response
     html = render_full_set_html(students, school, context)
     return HttpResponse(html)
 
@@ -498,11 +509,22 @@ def preview_id_cards(request):
 def download_id_cards(request):
     from datetime import date
 
-    from core.utils.student_id import distribute_to_four, render_full_set_html
+    from core.utils.student_id import (
+        distribute_to_four,
+        render_full_set_html,
+        render_full_set_pdf,
+    )
 
     school = get_school_for_user(request.user)
     students = distribute_to_four(_selected_id_students(request, school))
     context = {"academic_year": "2025/2026", "today": date.today()}
+    if request.GET.get("format") == "pdf":
+        pdf = render_full_set_pdf(
+            students, school, context, request.build_absolute_uri("/")
+        )
+        response = HttpResponse(pdf, content_type="application/pdf")
+        response["Content-Disposition"] = 'attachment; filename="id_cards.pdf"'
+        return response
     html = render_full_set_html(students, school, context)
     response = HttpResponse(html, content_type="text/html")
     response["Content-Disposition"] = 'attachment; filename="id_cards.html"'

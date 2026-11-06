@@ -1,5 +1,7 @@
 from datetime import date
+from pathlib import Path
 
+from django.conf import settings
 from django.template.loader import render_to_string
 
 from core.models import Student
@@ -24,7 +26,9 @@ def distribute_to_four(students: list[Student]) -> list[Student]:
     return distributed
 
 
-def render_single_id_page(page_num: int, student: Student, school, context: dict = None) -> str:
+def render_single_id_page(
+    page_num: int, student: Student, school, context: dict = None
+) -> str:
     if context is None:
         context = {}
     today = context.get("today", date.today())
@@ -68,7 +72,47 @@ def render_full_set_html(students: list[Student], school, context: dict = None) 
         sheet2_pages.append(render_single_id_page(4, st2, school, context))
         sheet2_pages.append(render_single_id_page(1, st2, school, context))
 
-    return render_to_string("reports/student_id_full.html", {
-        "sheet1_pages": sheet1_pages,
-        "sheet2_pages": sheet2_pages,
-    })
+    return render_to_string(
+        "reports/student_id_full.html",
+        {
+            "sheet1_pages": sheet1_pages,
+            "sheet2_pages": sheet2_pages,
+        },
+    )
+
+
+def _resolve_local_urls(html_str: str) -> str:
+    import re
+
+    def _local_file_url(url: str) -> str:
+        if settings.MEDIA_URL and url.startswith(settings.MEDIA_URL):
+            rel = url[len(settings.MEDIA_URL) :]
+            return (Path(settings.MEDIA_ROOT) / rel).as_uri()
+        if settings.STATIC_URL and url.startswith(settings.STATIC_URL):
+            rel = url[len(settings.STATIC_URL) :]
+            root = settings.STATIC_ROOT or (
+                settings.STATICFILES_DIRS[0] if settings.STATICFILES_DIRS else None
+            )
+            if root:
+                return (Path(root) / rel).as_uri()
+        return url
+
+    def repl(m):
+        attr, quote, url, end_quote = m.groups()
+        return f"{attr}={quote}{_local_file_url(url)}{end_quote}"
+
+    return re.sub(r'(src|href)=(["\'])([^"\']+)(["\'])', repl, html_str)
+
+
+def render_full_set_pdf(students, school, context=None, base_url: str | None = None) -> bytes:
+    """Render the 4-student ID card set to a PDF (WeasyPrint)."""
+    html_str = _resolve_local_urls(render_full_set_html(students, school, context))
+    try:
+        from weasyprint import HTML
+    except OSError as exc:
+        raise RuntimeError(
+            "PDF generation is unavailable on this computer: WeasyPrint could "
+            "not load its GTK libraries. Install the GTK runtime (see "
+            "DEPLOYMENT.md) or use Preview (HTML) instead."
+        ) from exc
+    return HTML(string=html_str, base_url=base_url).write_pdf()
