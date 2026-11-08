@@ -35,7 +35,12 @@ def _detect_columns(rows) -> tuple:
     header_idx = None
     for i, row in enumerate(rows):
         vals = [str(v).strip().lower() if v else "" for v in row]
-        if any("register" in v for v in vals):
+        if any(
+            ("register" in v)
+            or ("matricule" in v)
+            or ("matric" in v)
+            for v in vals
+        ):
             header_idx = i
             break
     if header_idx is None:
@@ -44,19 +49,19 @@ def _detect_columns(rows) -> tuple:
     headers = [str(v).strip().lower() if v else "" for v in rows[header_idx]]
     col_map = {}
     for i, h in enumerate(headers):
-        if "name" in h or "surname" in h:
+        if "name" in h or "surname" in h or "nom" in h or "prenom" in h:
             col_map["name"] = i
-        elif "register" in h or "matric" in h or "id" in h:
+        elif "register" in h or "matricule" in h or "matric" in h or h == "id":
             col_map["register"] = i
-        elif h in ("sex", "gender"):
+        elif h in ("sex", "gender", "sexe"):
             col_map["sex"] = i
-        elif "date" in h and "birth" in h:
+        elif "date" in h and ("birth" in h or "naissance" in h):
             col_map["dob"] = i
-        elif "place" in h and "birth" in h:
+        elif ("place" in h or "lieu" in h) and ("birth" in h or "naissance" in h):
             col_map["pob"] = i
         elif "class" in h and "sub" not in h:
             col_map["class"] = i
-        elif "subclass" in h or "sub" in h:
+        elif "subclass" in h or "sous" in h or "sub" in h:
             col_map["subclass"] = i
         elif "subdivision" in h or "sub-division" in h or "arrondissement" in h:
             col_map["subdivision"] = i

@@ -68,13 +68,16 @@ class Command(BaseCommand):
         rows = list(ws.iter_rows(values_only=True))
         header_idx = None
         for i, row in enumerate(rows):
-            vals = [str(v).strip() if v else "" for v in row]
-            if "register" in vals or "register" in " ".join(vals).lower():
+            vals = [str(v).strip().lower() if v else "" for v in row]
+            if any(
+                ("register" in v) or ("matricule" in v) or ("matric" in v)
+                for v in vals
+            ):
                 header_idx = i
                 break
 
         if header_idx is None:
-            raise CommandError("Could not find header row containing 'Register'")
+            raise CommandError("Could not find header row containing 'Register' or 'Matricule'")
 
         headers = [str(v).strip().lower() if v else "" for v in rows[header_idx]]
 
@@ -82,21 +85,21 @@ class Command(BaseCommand):
         col_map = {}
         for i, h in enumerate(headers):
             hl = h.lower()
-            if "name" in hl or "surname" in hl:
+            if "name" in hl or "surname" in hl or "nom" in hl or "prenom" in hl:
                 col_map["name"] = i
-            elif "register" in hl or "matric" in hl or "id" in hl:
+            elif "register" in hl or "matricule" in hl or "matric" in hl or hl == "id":
                 col_map["register"] = i
-            elif hl in ("sex", "gender"):
+            elif hl in ("sex", "gender", "sexe"):
                 col_map["sex"] = i
-            elif "date" in hl and "birth" in hl:
+            elif "date" in hl and ("birth" in hl or "naissance" in hl):
                 col_map["dob"] = i
-            elif "place" in hl and "birth" in hl:
+            elif ("place" in hl or "lieu" in hl) and ("birth" in hl or "naissance" in hl):
                 col_map["pob"] = i
-            elif "class" in hl or hl == "class":
+            elif "class" in hl and "sub" not in hl:
                 col_map["class"] = i
-            elif "subclass" in hl or "sub" in hl:
+            elif "subclass" in hl or "sous" in hl or "sub" in hl:
                 col_map["subclass"] = i
-            elif "nationality" in hl:
+            elif "nationality" in hl or "nationalit" in hl:
                 col_map["nationality"] = i
 
         required = ["name", "register", "sex", "dob"]

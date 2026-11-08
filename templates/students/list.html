@@ -29,6 +29,7 @@
         <span>All Students (<span id="students-count" class="stu-count">{{ total_count }}</span>)</span>
         <div style="display:flex; gap:8px;">
             <a href="{% url 'student_export_excel' %}?{% if class_filter %}class={{ class_filter }}&{% endif %}{% if sex_filter %}sex={{ sex_filter }}&{% endif %}{% if query %}q={{ query|urlencode }}{% endif %}" class="btn btn-sm" title="Click to export the current student list to an Excel file">&#8681; Excel</a>
+            <a href="{% url 'import_students' %}" class="btn btn-sm" title="Click to bulk-import students from an Excel (.xlsx) file">&#8678; Import</a>
             <a href="{% url 'student_create' %}" class="btn btn-sm btn-primary" title="Click to register a new student">+ Register</a>
         </div>
     </div>
