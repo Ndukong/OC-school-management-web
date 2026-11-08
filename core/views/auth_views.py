@@ -297,6 +297,10 @@ def _setup_school(request, license_obj):
         call_command("seed_default_config", "--school", str(school.pk), "--auto")
     except Exception:
         pass
+    try:
+        call_command("import_xlsx_defaults", "--school", str(school.pk), "--auto")
+    except Exception:
+        pass
 
     return redirect("activate")
 
